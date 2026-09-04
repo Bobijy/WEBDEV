@@ -1,0 +1,504 @@
+<?php
+/**
+ * Maison Ungod &mdash; Luxury Perfume House
+ * Pure PHP Landing Page
+ */
+
+// â”€â”€â”€ Site Configuration â”€â”€â”€
+$site = [
+    'name' => 'Maison Ungod',
+    'tagline' => 'Find Your Signature Scent',
+    'description' => 'Maison Ungod &mdash; Luxury fragrance house crafting exquisite perfumes with rare ingredients and masterful craftsmanship.',
+    'year' => date('Y'),
+];
+
+// â”€â”€â”€ Navigation Links â”€â”€â”€
+$navLinks = [
+    ['label' => 'Home', 'href' => '#hero', 'active' => true],
+    ['label' => 'Shop', 'href' => 'shop.php', 'active' => false],
+    ['label' => 'Best Seller', 'href' => '#collections', 'active' => false],
+    ['label' => 'Our Story', 'href' => '#story', 'active' => false],
+    ['label' => 'Contact', 'href' => '#', 'id' => 'contactToggle', 'active' => false],
+];
+
+// â”€â”€â”€ Product Categories â”€â”€â”€
+$categories = [
+    [
+        'title' => 'Pour Homme',
+        'subtitle' => 'Fragrance For Him',
+        'image' => 'assets/images/pour-homme.png',
+        'price' => '$145.00',
+        'link' => 'shop.php',
+    ],
+    [
+        'title' => 'Pour Femme',
+        'subtitle' => 'Fragrance For Her',
+        'image' => 'assets/images/pour-femme.png',
+        'price' => '$145.00',
+        'link' => 'shop.php',
+    ],
+];
+
+// â”€â”€â”€ Collections (from DB) â”€â”€â”€
+// Only Active products are shown to homepage visitors.
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/helpers.php';
+
+$collections = [];
+$rows = db_fetch_all($pdo, "SELECT id, image, name, price FROM products WHERE status = 'Active' ORDER BY id ASC");
+foreach ($rows as $row) {
+    $collections[] = [
+        'id'    => $row['id'],
+        'image' => $row['image'],
+        'label' => $row['name'],
+        'price' => 'â‚±' . number_format($row['price'], 2),
+    ];
+}
+
+// Ensure the slider has enough items to actually slide (overflow the container)
+// If there are 3 or fewer products, duplicate them to create an infinite scroll effect
+if (count($collections) > 0 && count($collections) <= 3) {
+    $collections = array_merge($collections, $collections, $collections);
+}
+
+// â”€â”€â”€ Features â”€â”€â”€
+$features = [
+    [
+        'title' => 'Rare Ingredients',
+        'text' => 'We source only the finest, most exclusive raw materials. Every botanical and resin is carefully selected to ensure unparalleled quality and a truly distinctive scent profile.',
+        'image' => 'assets/images/rare-ingredients.jpg',
+        'reverse' => false,
+    ],
+    [
+        'title' => 'Masterful Craftsmanship',
+        'text' => 'Perfumery excellence reimagined. Each Maison Ungod fragrance is meticulously blended and aged to perfection, allowing the unique character to develop over time.',
+        'image' => 'assets/images/craftsmanship.jpg',
+        'reverse' => true,
+    ],
+];
+
+// â”€â”€â”€ SVG Icons â”€â”€â”€
+$icons = [
+    'instagram' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
+    'facebook' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
+    'x' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16zM4 20l6.768 -6.768M13.232 10.768L20 4"/></svg>',
+    'search' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    'bag' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+];
+
+$socials = [
+    ['icon' => 'instagram', 'url' => '#'],
+    ['icon' => 'facebook', 'url' => '#'],
+    ['icon' => 'x', 'url' => '#'],
+];
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
+    <title><?= htmlspecialchars($site['name']) ?> &mdash; Luxury Fragrances</title>
+    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/animations.css?v=2">
+</head>
+
+<body>
+
+
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+
+    <!-- Custom Cursor (desktop only) -->
+
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     NAVBAR
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <!-- Top Row: Logo | Brand | Icons -->
+            <div class="nav-top">
+                <a href="/" class="nav-logo">
+                    <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
+                </a>
+                <span class="nav-brand">&mdash;<?= strtoupper($site['name']) ?>&mdash;</span>
+                <div class="nav-icons">
+                    <a href="#" class="nav-icon" id="searchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
+                    <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </a>
+                    <a href="#" class="nav-icon" id="cartToggle" aria-label="Cart"><?= $icons['bag'] ?></a>
+                </div>
+            </div>
+            <!-- Bottom Row: Centered Nav Links -->
+            <div class="nav-bottom" id="navLinks">
+                <?php foreach ($navLinks as $link): ?>
+                    <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="'.$link['id'].'"' : '' ?> <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     HERO
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section class="hero" id="hero">
+        <!-- Ambient Floating Particles -->
+        <div class="ambient-particles">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <!-- Mouse-Follow Glow -->
+        <div class="mouse-glow"></div>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1><?= $site['tagline'] ?></h1>
+                <a href="shop.php" class="btn-shop">Shop Now</a>
+            </div>
+            <div class="hero-image">
+                <img src="assets/images/hero-product.png" alt="<?= $site['name'] ?> Signature Fragrance" data-parallax="0.4">
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     CATEGORIES &mdash; Pour Homme / Pour Femme
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section class="categories" id="categories">
+        <div class="container categories-grid">
+            <?php foreach ($categories as $i => $cat): ?>
+                <div class="cat-card reveal reveal-d<?= $i + 1 ?>">
+                    <h3 class="cat-title"><?= $cat['title'] ?></h3>
+                    <p class="cat-subtitle"><?= $cat['subtitle'] ?></p>
+                    <img class="cat-img" src="<?= $cat['image'] ?>" alt="<?= $cat['title'] ?>">
+                    <p class="cat-price"><?= $cat['price'] ?></p>
+                    <a href="<?= $cat['link'] ?>" class="cat-link">Shop Link</Link></a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     THE COLLECTIONS
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section class="collections" id="collections">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>The Collections</h2>
+            </div>
+        </div>
+        <div class="coll-slider-wrap">
+            <!-- Left Arrow -->
+            <button class="coll-arrow coll-arrow--left" id="collPrev" aria-label="Previous">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <!-- Right Arrow -->
+            <button class="coll-arrow coll-arrow--right" id="collNext" aria-label="Next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </button>
+            <!-- Slider Track -->
+            <div class="coll-track" id="collTrack">
+                <?php foreach ($collections as $i => $col): ?>
+                    <div class="coll-card reveal reveal-d<?= ($i % 3) + 1 ?>">
+                        <h3 class="coll-card__title"><?= $col['label'] ?></h3>
+                        <div class="coll-card__img-wrap">
+                            <img src="<?= $col['image'] ?>" alt="<?= $col['label'] ?>">
+                        </div>
+                        <div class="coll-card__footer">
+                            <span class="coll-card__price"><?= $col['price'] ?></span>
+                            <button class="coll-card__bag add-to-cart-btn" data-id="<?= $col['id'] ?>" data-name="<?= $col['label'] ?>"
+                                data-price="<?= $col['price'] ?>" data-image="<?= $col['image'] ?>" aria-label="Add to bag">
+                                <?= $icons['bag'] ?>
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <!-- Slider Auto-play Progress -->
+            <div class="slider-progress"><div class="slider-progress__bar"></div></div>
+        </div>
+    </section>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     THE STORY OF THE MAISON
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section class="story" id="story">
+        <div class="container story-grid">
+            <div class="story-img-wrap reveal">
+                <img src="assets/images/story-perfume.png" alt="Maison Ungod Heritage" data-parallax="0.3">
+            </div>
+            <div class="story-content reveal reveal-d2">
+                <h2>The Story of<br>the Maison</h2>
+                <div class="story-bar"></div>
+                <p>
+                    At Maison Ungod, we believe a fragrance is more than a scent &mdash; it is an art of expression. The
+                    Maison represents an unwavering dedication to the timeless art of perfumery, merging age-old methods
+                    and modern sophistication.
+                </p>
+                <p>
+                    Crafted from rare ingredients and the most exquisite raw materials, each collection is designed to
+                    be a timeless, lingering legacy wherever you go.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     FEATURES
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <section class="features" id="features">
+        <div class="container">
+            <?php foreach ($features as $feat): ?>
+                <div class="feat-row <?= $feat['reverse'] ? 'feat-row--reverse' : '' ?> reveal">
+                    <div class="feat-text">
+                        <h3><?= $feat['title'] ?></h3>
+                        <p><?= $feat['text'] ?></p>
+                    </div>
+                    <div class="feat-img">
+                        <img src="<?= $feat['image'] ?>" alt="<?= $feat['title'] ?>">
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     FOOTER
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <footer class="site-footer" id="contact">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="assets/logo/logo.png" alt="<?= $site['name'] ?>">
+                    <div class="footer-social">
+                        <?php foreach ($socials as $s): ?>
+                            <a href="<?= $s['url'] ?>" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Menu</h4>
+                    <ul>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="index.php#collections">Collections</a></li>
+                        <li><a href="index.php#story">Our Story</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Legalities</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#">Phone: (0912) 0858</a></li>
+                        <li><a href="mailto:bobjoshuaungod26@gmail.com">Email: bobjoshuaungod26@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <?= $site['year'] ?> <?= $site['name'] ?>. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     SEARCH OVERLAY
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-modal">
+            <div class="search-modal__header">
+                <div class="search-input-wrap">
+                    <?= $icons['search'] ?>
+                    <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off">
+                </div>
+                <button class="search-modal__close" id="searchClose" aria-label="Close search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="search-results" id="searchResults">
+                <p class="search-hint">Type to search fragrances...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     CART MODAL (Slide-out or Centered)
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-panel" id="cartPanel">
+        <div class="cart-panel__header">
+            <h2>Your Bag <span class="cart-badge" id="cartBadge">0</span></h2>
+            <button class="cart-panel__close" id="cartClose" aria-label="Close cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="cart-panel__items" id="cartItems">
+            <!-- Items injected by JS -->
+            <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+        </div>
+        <div class="cart-panel__footer" id="cartFooter">
+            <div class="cart-total-row">
+                <span>Subtotal</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <p class="cart-tax-note">Shipping & taxes calculated at checkout</p>
+            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="text-align:center; display:block;">CHECK OUT</a>
+        </div>
+    </aside>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     ACCOUNT MODAL
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="account-overlay" id="accountOverlay"></div>
+    <div class="account-modal" id="accountModal">
+        <button class="account-modal__close" id="accountClose" aria-label="Close account">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+        
+        <div class="account-modal__inner">
+            <div class="auth-header">
+                <h2>Sign In</h2>
+            </div>
+            
+            <form class="account-form" id="loginForm">
+                <div class="account-msg" id="loginMsg"></div>
+                <div class="account-field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" placeholder="your@email.com" required>
+                </div>
+                <div class="account-field">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="account-submit" id="loginSubmit">Sign In</button>
+                <div class="auth-links">
+                    Don't have an account? <a href="#" id="showRegister">Register</a>
+                </div>
+            </form>
+
+            <form class="account-form" id="registerForm" style="display:none;">
+                <div class="account-msg" id="registerMsg"></div>
+                <div class="account-field">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" name="name" placeholder="John Doe" required>
+                </div>
+                <div class="account-field">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" placeholder="your@email.com" required>
+                </div>
+                <div class="account-field">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" name="password" placeholder="Min. 6 characters" required>
+                </div>
+                <button type="submit" class="account-submit" id="registerSubmit">Create Account</button>
+                <div class="auth-links">
+                    Already have an account? <a href="#" id="showLogin">Sign In</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="contact-overlay" id="contactOverlay"></div>
+    <div class="account-modal contact-modal" id="contactModal">
+        <button class="account-modal__close" id="contactClose" aria-label="Close contact">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="account-modal__inner">
+            <div class="auth-header">
+                <h2>Contact Us</h2>
+                <p>Send us a message and we will get back to you shortly.</p>
+            </div>
+            <form class="account-form" id="contactForm">
+                <div class="account-msg" id="contactMsg"></div>
+                <div class="account-field">
+                    <label for="contactName">Name</label>
+                    <input type="text" id="contactName" name="name" required>
+                </div>
+                <div class="account-field">
+                    <label for="contactEmail">Email</label>
+                    <input type="email" id="contactEmail" name="email" required>
+                </div>
+                <div class="account-field">
+                    <label for="contactMessage">Message</label>
+                    <textarea id="contactMessage" name="message" required style="width: 100%; background: #171717; border: 1px solid #2E2E2E; color: #F5F5F5; padding: 12px; border-radius: 4px; font-family: var(--font-body); resize: vertical; min-height: 100px;"></textarea>
+                </div>
+                <button type="submit" class="account-submit" id="contactSubmit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     SCRIPTS
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Scroll-to-Top Button -->
+    <button class="scroll-to-top" aria-label="Scroll to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+        </svg>
+    </button>
+
+    <!-- Page Transition Overlay -->
+    <!-- (injected by transitions.js) -->
+
+    <script src="js/main.js?v=4"></script>
+    <script src="js/cart.js?v=3"></script>
+    <script src="js/search.js?v=4"></script>
+    <script src="js/account.js?v=3"></script>
+    <script src="js/contact.js?v=3"></script>
+    <script src="js/transitions.js?v=4"></script>
+
+</body>
+
+</html>

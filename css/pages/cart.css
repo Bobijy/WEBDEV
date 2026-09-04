@@ -1,0 +1,126 @@
+/* ============================================================
+   cart.css — Cart Page Styles
+   Loaded only by cart.php
+   ============================================================ */
+
+.cart-page {
+    padding: 120px 20px 60px;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 80vh;
+}
+
+.cart-page h1 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.cart-table th {
+    color: #8A8A8A;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: left;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #2E2E2E;
+}
+
+.cart-table td {
+    padding: 20px 0;
+    border-bottom: 1px solid #2E2E2E;
+    vertical-align: middle;
+}
+
+.cart-item-product {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart-item-product img {
+    width: 80px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-name {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+}
+
+.cart-qty-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-qty-ctrl button {
+    background: #2E2E2E;
+    border: none;
+    color: #F5F5F5;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.cart-qty-ctrl button:hover { background: #71416B; }
+
+.cart-item-remove {
+    color: #8A8A8A;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.8rem;
+}
+
+.cart-item-remove:hover { color: #E57373; }
+
+.cart-summary {
+    background: #171717;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #2E2E2E;
+    text-align: right;
+}
+
+.cart-summary p { margin-bottom: 10px; font-size: 1.2rem; }
+
+.cart-checkout-btn {
+    background: #F5F5F5;
+    color: #121212;
+    padding: 15px 40px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cart-checkout-btn:hover { background: #71416B; color: #fff; }
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #8A8A8A;
+    text-decoration: none;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.back-link:hover { color: #F5F5F5; }

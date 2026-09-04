@@ -1,0 +1,251 @@
+/* ============================================================
+   order.css — Order Detail Page Styles
+   Loaded only by order.php
+   ============================================================ */
+
+:root {
+    --bg-main: #0b0b0b;
+    --bg-card: #1F1F1F;
+    --border: #2E2E2E;
+    --text-main: #F5F5F5;
+    --text-light: #C2C2C2;
+    --brand-color: #71416b;
+    --link-color: #F5F5F5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-main);
+    background: var(--bg-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Header */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.order-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-main);
+}
+
+.order-header-title:hover {
+    color: var(--text-light);
+}
+
+.order-header-title h1 {
+    font-family: 'Bodoni MT', 'Bodoni Moda', 'Didot', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--brand-color);
+    letter-spacing: 0.5px;
+}
+
+.order-date {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-left: 32px;
+    margin-top: 4px;
+}
+
+.btn-buy-again {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-main);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-buy-again:hover { border-color: var(--brand-color); color: var(--brand-color); }
+
+/* Banners */
+.alert-banner {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.alert-banner h3 {
+    font-family: 'Bodoni MT', 'Bodoni Moda', 'Didot', Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--brand-color);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-banner p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-left: 28px;
+}
+
+.alert-banner p + p {
+    margin-top: 4px;
+}
+
+/* Order Items Box */
+.order-box {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.item-thumb-wrapper {
+    position: relative;
+}
+
+.item-thumb {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4px;
+}
+
+.item-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.item-qty {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgba(113, 65, 107, 0.9);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.item-price {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Summary Lines */
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: var(--text-light);
+}
+
+.summary-line.total {
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    align-items: flex-end;
+}
+
+.total-price {
+    font-size: 1.25rem;
+}
+
+.currency {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+.tax-note {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0;
+}
+
+/* Information Box */
+.info-grid {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.info-row {
+    display: flex;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    width: 120px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.info-value {
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.info-value p { margin-bottom: 4px; }
+.info-value p:last-child { margin-bottom: 0; }
+
+/* Payment info small text */
+.info-value .payment-meta {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}

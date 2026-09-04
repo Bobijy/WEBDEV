@@ -1,0 +1,205 @@
+/* Admin Dashboard Core Styles */
+:root {
+    --bg-dark: #0A0A0A;
+    --bg-panel: #171717;
+    --border-color: #2E2E2E;
+    --accent: #71416B;
+    --accent-hover: #8A5A86;
+    --text-main: #F5F5F5;
+    --text-muted: #8A8A8A;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.admin-sidebar {
+    width: 250px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+.sidebar-brand {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 30px;
+}
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sidebar-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 15px 25px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+    color: var(--text-main);
+    background: rgba(113, 65, 107, 0.1);
+    border-left-color: var(--accent);
+}
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.admin-header {
+    height: 70px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    background: var(--bg-panel);
+}
+.admin-header h2 { font-family: var(--font-heading); font-weight: 400; }
+.admin-content { padding: 30px; }
+
+/* Dashboard Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.stat-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+.stat-card h4 { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.stat-card p { font-size: 2rem; font-family: var(--font-heading); color: var(--accent); }
+
+/* Tables */
+.admin-table-container {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.admin-table th { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(0,0,0,0.2); }
+.admin-table td { font-size: 0.9rem; }
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+
+/* Badges */
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; }
+.badge-active, .badge-approved, .badge-completed { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.badge-pending { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+.badge-cancelled, .badge-draft { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+/* Buttons */
+.btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+.btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+.btn-outline:hover { background: rgba(255,255,255,0.05); }
+
+/* Forms */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted); }
+.form-control {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 4px;
+    font-family: var(--font-body);
+}
+
+/* ═══════════════════════════════════════════════
+   ADMIN MODALS (Unified Design System)
+   ═══════════════════════════════════════════════ */
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
+}
+.admin-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%) scale(0.96);
+    background: #121212;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.admin-modal.open, .admin-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Enhancing inputs in admin modals to match modern style */
+.admin-modal .form-control {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+    border-radius: 8px;
+    padding: 12px;
+}
+.admin-modal .form-control:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+.admin-modal .btn {
+    padding: 12px 20px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    border-radius: 8px;
+}
