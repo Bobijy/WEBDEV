@@ -1,9 +1,33 @@
-<?php require_once __DIR__ . '/includes/header.php'; ?>
+<?php 
+require_once __DIR__ . '/includes/header.php'; 
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/helpers.php';
+
+// Fetch products from database natively instead of via AJAX
+$products = db_fetch_all($pdo, 'SELECT * FROM products ORDER BY id DESC');
+
+// Display flash messages
+$msg = $_SESSION['msg'] ?? '';
+$error = $_SESSION['error'] ?? '';
+unset($_SESSION['msg'], $_SESSION['error']);
+?>
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Product Catalog</h3>
-    <button class="btn" id="openAddProductModal">Add Product</button>
+    <a href="product_form.php" class="btn">Add Product</a>
 </div>
+
+<?php if ($msg): ?>
+    <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #c3e6cb;">
+        <?= htmlspecialchars($msg) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($error): ?>
+    <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #f5c6cb;">
+        <?= htmlspecialchars($error) ?>
+    </div>
+<?php endif; ?>
 
 <div class="admin-table-container">
     <table class="admin-table" id="productsTable">
@@ -19,64 +43,43 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+            <?php if (count($products) > 0): ?>
+                <?php foreach ($products as $p): ?>
+                    <tr>
+                        <td><img src="../<?= htmlspecialchars($p['image']) ?>" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"></td>
+                        <td><?= htmlspecialchars($p['name']) ?></td>
+                        <td><?= htmlspecialchars($p['category']) ?></td>
+                        <td>₱<?= number_format($p['price'], 2) ?></td>
+                        <td><?= htmlspecialchars((string)$p['stock']) ?></td>
+                        <td>
+                            <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: <?= $p['status'] === 'Active' ? '#e2f5ec' : '#f0f0f0' ?>; color: <?= $p['status'] === 'Active' ? '#1b8b54' : '#666' ?>;">
+                                <?= htmlspecialchars($p['status']) ?>
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap: 5px;">
+                                <a href="product_form.php?id=<?= $p['id'] ?>" class="btn" style="padding: 4px 8px; font-size: 12px;">Edit</a>
+                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="<?= $p['id'] ?>">
+                                    <button type="submit" class="btn" style="padding: 4px 8px; font-size: 12px; background-color: #dc3545;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="7" style="text-align:center;">No products found.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
-</div>
-
-<!-- Product Modal -->
-<div class="admin-modal-overlay" id="productModalOverlay"></div>
-<div class="admin-modal" id="productModal">
-    <h3 style="font-family: var(--font-heading); color: var(--accent); margin-bottom: 20px;" id="productModalTitle">Add Product</h3>
-    <form id="productForm">
-        <input type="hidden" id="prodId" name="id">
-        <div class="form-group">
-            <label>Name</label>
-            <input type="text" id="prodName" name="name" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label>Description</label>
-            <textarea id="prodDesc" name="description" class="form-control" rows="3"></textarea>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <div class="form-group">
-                <label>Price</label>
-                <input type="number" step="0.01" id="prodPrice" name="price" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Stock</label>
-                <input type="number" id="prodStock" name="stock" class="form-control" required min="0">
-            </div>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <div class="form-group">
-                <label>Category</label>
-                <select id="prodCategory" name="category" class="form-control">
-                    <option value="Pour Homme">Pour Homme</option>
-                    <option value="Pour Femme">Pour Femme</option>
-                    <option value="Unisex">Unisex</option>
-                    <option value="Uncategorized">Uncategorized</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="prodStatus" name="status" class="form-control">
-                    <option value="Active">Active</option>
-                    <option value="Draft">Draft</option>
-                </select>
-            </div>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button type="submit" class="btn" style="flex:1;">Save Product</button>
-            <button type="button" class="btn btn-outline" id="closeProductModal" style="flex:1;">Cancel</button>
-        </div>
-    </form>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pageTitle').textContent = 'Manage Products';
-        fetchProducts();
     });
 </script>
 

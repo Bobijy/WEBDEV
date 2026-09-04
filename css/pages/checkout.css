@@ -69,18 +69,18 @@ body {
 /* Headers & Layout Spacing */
 .header-logo {
     font-family: 'Bodoni MT', serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: var(--text-main);
     text-decoration: none;
     display: inline-block;
     margin-bottom: 30px;
 }
 
-h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: 20px; margin-top: 40px; }
+h2 { font-size: 1.1rem; font-weight: 500; margin-bottom: 20px; margin-top: 40px; }
 h2:first-of-type { margin-top: 0; }
 
 .contact-info { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-start; }
-.contact-info p { color: var(--text-light); font-size: 0.9rem; margin-top: 5px; }
+.contact-info p { color: var(--text-light); font-size: 0.8rem; margin-top: 5px; }
 .contact-badge {
     width: 48px;
     height: 48px;
@@ -91,7 +91,7 @@ h2:first-of-type { margin-top: 0; }
     justify-content: center;
     font-weight: 600;
     color: #737373;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 /* Forms */
@@ -112,7 +112,7 @@ h2:first-of-type { margin-top: 0; }
     border: 1px solid var(--border);
     border-radius: 5px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: var(--text-main);
     transition: border-color 0.2s, box-shadow 0.2s;
     appearance: none;
@@ -129,7 +129,7 @@ h2:first-of-type { margin-top: 0; }
     position: absolute;
     top: 14px;
     left: 13px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-light);
     transition: all 0.2s ease-out;
     pointer-events: none;
@@ -146,7 +146,7 @@ h2:first-of-type { margin-top: 0; }
 .floating-input input:not(:placeholder-shown) + label,
 .floating-input select + label {
     top: 6px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 /* Payment Selection Boxes */
@@ -211,7 +211,7 @@ h2:first-of-type { margin-top: 0; }
     align-items: center;
     gap: 10px;
     margin: 16px 0;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
 }
 
@@ -229,7 +229,7 @@ h2:first-of-type { margin-top: 0; }
     border: none;
     padding: 18px;
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
@@ -272,7 +272,7 @@ h2:first-of-type { margin-top: 0; }
     right: -8px;
     background: rgba(114, 114, 114, 0.9);
     color: white;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
     width: 20px;
     height: 20px;
@@ -283,9 +283,9 @@ h2:first-of-type { margin-top: 0; }
 }
 
 .item-info { flex: 1; }
-.item-info h4 { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; color: var(--text-main); }
-.item-info p { font-size: 0.8rem; color: var(--text-light); }
-.item-price { font-size: 0.9rem; font-weight: 500; }
+.item-info h4 { font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--text-main); }
+.item-info p { font-size: 0.75rem; color: var(--text-light); }
+.item-price { font-size: 0.85rem; font-weight: 500; }
 
 /* Discount Code */
 .discount-row {
@@ -304,6 +304,7 @@ h2:first-of-type { margin-top: 0; }
     border: 1px solid var(--border);
     border-radius: 5px;
     padding: 0 20px;
+    font-size: 0.85rem;
     font-weight: 500;
     color: #A3A3A3;
     cursor: not-allowed;
@@ -315,14 +316,14 @@ h2:first-of-type { margin-top: 0; }
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-light);
 }
 
 .totals-row .val { color: var(--text-main); font-weight: 500; }
 
 .totals-row.grand-total {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 500;
     color: var(--text-main);
     margin-top: 20px;
@@ -332,18 +333,18 @@ h2:first-of-type { margin-top: 0; }
 }
 
 .totals-row.grand-total .val {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .totals-row.grand-total .currency {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-light);
     margin-right: 6px;
     font-weight: normal;
 }
 
 .tax-note {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-light);
     margin-top: -8px;
     margin-bottom: 20px;

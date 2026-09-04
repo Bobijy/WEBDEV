@@ -1,1 +1,0 @@
-adding the necessary pages

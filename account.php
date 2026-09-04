@@ -10,9 +10,21 @@ require_once __DIR__ . '/includes/helpers.php';
 
 // Fetch user data
 $user = db_fetch($pdo,
-    'SELECT full_name, email, phone, address FROM users WHERE id = :id',
+    'SELECT full_name, email, phone, address, gender, dob FROM users WHERE id = :id',
     [':id' => (int) $_SESSION['user_id']]
 );
+
+// Parse DOB if available
+$dob_date = $dob_month = $dob_year = '';
+if (!empty($user['dob'])) {
+    $dob_parts = explode('-', $user['dob']);
+    if (count($dob_parts) === 3) {
+        $dob_year = $dob_parts[0];
+        $dob_month = ltrim($dob_parts[1], '0'); // remove leading zero for match
+        $dob_date = ltrim($dob_parts[2], '0');
+    }
+}
+
 
 // Fetch orders with their first product image
 $orders = db_fetch_all($pdo, '
@@ -25,6 +37,13 @@ $orders = db_fetch_all($pdo, '
     FROM   orders o
     WHERE  o.user_id = :uid
     ORDER BY o.created_at DESC
+', [':uid' => (int) $_SESSION['user_id']]);
+
+// Fetch user addresses
+$addresses = db_fetch_all($pdo, '
+    SELECT * FROM user_addresses 
+    WHERE user_id = :uid 
+    ORDER BY is_default DESC, id DESC
 ', [':uid' => (int) $_SESSION['user_id']]);
 
 $site = [
@@ -68,10 +87,10 @@ $socials = [
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="stylesheet" href="css/animations.css?v=2">
     
-    <link rel="stylesheet" href="css/pages/account.css?v=1">
+    <link rel="stylesheet" href="css/pages/account.css?v=8">
     
     <style>
         .account-page-wrapper {
@@ -120,17 +139,37 @@ $socials = [
     </nav>
 
     <div class="account-page-wrapper">
-<div class="account-layout" style="flex-direction: column; gap: 0;">
-    <a href="index.php" class="back-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        Back to Store
-    </a>
-    
-    <div style="display: flex; gap: 60px; width: 100%; flex-wrap: wrap;" class="account-inner-layout">
-        <!-- Sidebar Navigation -->
+<div class="account-layout">
+    <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <a class="nav-item" onclick="switchTab('orders')" id="nav-orders">Orders</a>
-        <a class="nav-item active" onclick="switchTab('profile')" id="nav-profile">Profile</a>
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">MU</div>
+            <div class="sidebar-username"><?= htmlspecialchars($user['full_name'] ?? 'bobjoshua005') ?></div>
+            <div class="sidebar-join-date">Joined May 2024</div>
+        </div>
+        <div class="sidebar-nav">
+            <a class="nav-item active" onclick="switchTab('profile')" id="nav-profile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                My Profile
+            </a>
+            <a class="nav-item" onclick="switchTab('orders')" id="nav-orders">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                Orders
+            </a>
+
+            <a class="nav-item" onclick="switchTab('addresses')" id="nav-addresses" style="cursor:pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Addresses
+            </a>
+            <a class="nav-item" onclick="openPasswordModal()" style="cursor:pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Change Password
+            </a>
+            <a class="nav-item" id="logoutBtnNav" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </a>
+        </div>
     </div>
     
     <!-- Main Content Area -->
@@ -138,61 +177,140 @@ $socials = [
         
         <!-- PROFILE TAB -->
         <div class="tab-content active" id="tab-profile">
-            <div class="section-header">
-                <h2><?= htmlspecialchars($user['full_name'] ?? 'Maison Ungod User') ?></h2>
-                <button class="btn-small" id="editProfileBtn">Edit</button>
+            <div class="main-header">
+                <h2>My Profile</h2>
+                <p>Manage and protect your account</p>
             </div>
             
-            <div class="info-box">
-                <div class="info-content" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="info-label">Email</span>
-                    <span style="font-size: 0.95rem; letter-spacing: 0.2px;"><?= htmlspecialchars($user['email']) ?></span>
-                </div>
-            </div>
+            <div class="divider"></div>
             
-            <div class="section-header">
-                <h2>Addresses</h2>
-                <button class="btn-small" id="editAddressBtn">Add</button>
-            </div>
-            
-            <div class="info-box clickable">
-                <div class="info-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <form id="inlineProfileForm" class="profile-form">
+                <div class="edit-msg" id="editMsg"></div>
+                
+                <div class="form-row">
+                    <div class="form-label">Username</div>
+                    <div class="form-value">
+                        <span class="form-text"><?= htmlspecialchars(explode('@', $user['email'])[0]) ?></span>
+                    </div>
                 </div>
-                <div class="info-content">
-                    <h4><?= htmlspecialchars($user['full_name'] ?? 'User') ?> <span style="font-weight: normal; color: var(--text-light); font-size: 0.9rem; margin-left: 8px;">Default</span></h4>
-                    <p><?= htmlspecialchars($user['address'] ?? 'No address provided.') ?></p>
+                
+                <div class="form-row">
+                    <div class="form-label">Name</div>
+                    <div class="form-value">
+                        <input type="text" name="name" class="form-input" value="<?= htmlspecialchars($user['full_name'] ?? '') ?>" placeholder="Enter your name" required>
+                    </div>
                 </div>
-                <div class="info-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                
+                <div class="form-row">
+                    <div class="form-label">Email</div>
+                    <div class="form-value">
+                        <?php if(empty($user['email'])): ?>
+                            <button type="button" class="text-link" onclick="openChangeFieldModal('email', '')">Add</button>
+                        <?php else: ?>
+                            <span class="form-text" style="color: var(--text-light);"><?= htmlspecialchars(substr($user['email'], 0, 2) . '***@' . (strpos($user['email'], '@') !== false ? explode('@', $user['email'])[1] : '')) ?></span>
+                            <button type="button" class="text-link" onclick="openChangeFieldModal('email', '<?= htmlspecialchars($user['email']) ?>')">Change</button>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="section-header">
-                <h2>Marketing preferences</h2>
-            </div>
-            
-            <div class="info-box">
-                <div class="info-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                
+                <div class="form-row">
+                    <div class="form-label">Phone Number</div>
+                    <div class="form-value">
+                        <?php if(empty($user['phone'])): ?>
+                            <button type="button" class="text-link" onclick="openChangeFieldModal('phone', '')">Add</button>
+                        <?php else: ?>
+                            <span class="form-text" style="color: var(--text-light);">**********<?= htmlspecialchars(substr($user['phone'], -2)) ?></span>
+                            <button type="button" class="text-link" onclick="openChangeFieldModal('phone', '<?= htmlspecialchars($user['phone']) ?>')">Change</button>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <div class="info-content" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="info-label">Email</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
+                
+                <div class="form-row">
+                    <div class="form-label">Gender <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                    <div class="form-value">
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="Male" <?= (isset($user['gender']) && $user['gender'] === 'Male') ? 'checked' : '' ?>> Male
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="Female" <?= (isset($user['gender']) && $user['gender'] === 'Female') ? 'checked' : '' ?>> Female
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="Other" <?= (isset($user['gender']) && $user['gender'] === 'Other') ? 'checked' : '' ?>> Other
+                            </label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="actions-row">
-                <button class="btn-outline" id="logoutBtn">Sign out</button>
-                <a href="#" class="text-link">Sign out of all devices</a>
-            </div>
+                
+                <div class="form-row">
+                    <div class="form-label">Date of birth <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                    <div class="form-value">
+                        <div class="dob-group">
+                            <?php
+                            $dob_date = '';
+                            $dob_month = '';
+                            $dob_year = '';
+                            if (!empty($user['dob'])) {
+                                $parts = explode('-', $user['dob']);
+                                if (count($parts) === 3) {
+                                    $dob_year = (int)$parts[0];
+                                    $dob_month = (int)$parts[1];
+                                    $dob_date = (int)$parts[2];
+                                }
+                            }
+                            ?>
+                            <div class="select-wrapper">
+                                <select name="dob_date" class="form-select">
+                                    <option value="">Date</option>
+                                    <?php 
+                                    for($i=1; $i<=31; $i++) {
+                                        $sel = ($dob_date == $i) ? 'selected' : '';
+                                        echo "<option value='$i' $sel>$i</option>"; 
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="select-wrapper">
+                                <select name="dob_month" class="form-select">
+                                    <option value="">Month</option>
+                                    <?php 
+                                    $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                    foreach($months as $index => $m) {
+                                        $m_val = $index + 1;
+                                        $sel = ($dob_month == $m_val) ? 'selected' : '';
+                                        echo "<option value='$m_val' $sel>$m</option>"; 
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="select-wrapper">
+                                <select name="dob_year" class="form-select">
+                                    <option value="">Year</option>
+                                    <?php 
+                                    for($i=date('Y'); $i>=1900; $i--) {
+                                        $sel = ($dob_year == $i) ? 'selected' : '';
+                                        echo "<option value='$i' $sel>$i</option>"; 
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-save" id="inlineModalSubmit">Save</button>
+            </form>
         </div>
         
         <!-- ORDERS TAB -->
         <div class="tab-content" id="tab-orders">
+            <div class="main-header">
+                <h2>My Orders</h2>
+                <p>View and track your purchases</p>
+            </div>
+            
+            <div class="divider"></div>
+            
             <?php if (empty($orders)): ?>
                 <p style="color: var(--text-light);">You haven't placed any orders yet.</p>
             <?php else: ?>
@@ -212,22 +330,308 @@ $socials = [
                                     <?= $order['id'] ?> &middot; &#8369;<?= number_format($order['total_amount'], 2) ?> PHP
                                 </div>
                             </div>
-                            <button class="order-card-btn" onclick="event.preventDefault(); window.location.href='shop.php';">Buy again</button>
+                            <div style="display:flex; gap:10px;">
+                                <?php if ($order['status'] === 'Pending'): ?>
+                                    <button class="order-card-btn" style="background:transparent; border:1px solid var(--border); color:var(--text-main);" onclick="event.preventDefault(); cancelOrder(<?= $order['id'] ?>);">Cancel</button>
+                                <?php endif; ?>
+                                <button class="order-card-btn" onclick="event.preventDefault(); window.location.href='shop.php';">Buy again</button>
+                            </div>
                         </div>
                     </a>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
         
+        <!-- ADDRESSES TAB -->
+        <div class="tab-content" id="tab-addresses">
+            <div class="main-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <h2>My Addresses</h2>
+                    <p>Manage your shipping addresses</p>
+                </div>
+                <button class="btn-save" style="margin-top:0;" onclick="openAddressModal()">+ Add New Address</button>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div id="addressList">
+                <?php if (empty($addresses)): ?>
+                    <p style="color: var(--text-light);">You haven't saved any addresses yet.</p>
+                <?php else: ?>
+                    <?php foreach ($addresses as $addr): ?>
+                        <div class="address-card <?= $addr['is_default'] ? 'default-address' : '' ?>">
+                            <div class="address-card-main">
+                                <div class="address-icon">
+                                    <?php if ($addr['is_default']): ?>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                    <?php else: ?>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="address-info">
+                                    <div class="address-card-header">
+                                        <h3><?= htmlspecialchars($addr['full_name']) ?></h3>
+                                        <?php if ($addr['is_default']): ?>
+                                            <span class="badge-default">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                                DEFAULT
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="address-card-body">
+                                        <p>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                            <?= htmlspecialchars($addr['phone']) ?>
+                                        </p>
+                                        <p>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                            <?= htmlspecialchars($addr['address_line']) ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="address-card-actions">
+                                <div>
+                                    <button class="text-link" onclick="openAddressModal(<?= htmlspecialchars(json_encode($addr)) ?>)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                        Edit
+                                    </button>
+                                    <?php if (!$addr['is_default']): ?>
+                                        <button class="text-link delete-btn" onclick="deleteAddress(<?= $addr['id'] ?>)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            Delete
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if (!$addr['is_default']): ?>
+                                    <button class="btn-outline" onclick="setDefaultAddress(<?= $addr['id'] ?>)">Set as Default</button>
+                                <?php else: ?>
+                                    <button class="btn-outline is-default" disabled>
+                                        <svg style="vertical-align: text-bottom; margin-right: 4px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                        Default Address
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+        
     </div>
 </div>
 </div> <!-- Close account-layout -->
 
+<!-- Change Field Modal (Email/Phone) -->
+<div class="edit-modal-overlay" id="changeFieldModalOverlay">
+    <div class="edit-modal" style="max-width: 400px;">
+        <button class="edit-close" onclick="closeChangeFieldModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 id="changeFieldModalTitle">Change</h2>
+        <form id="changeFieldForm">
+            <input type="hidden" name="action" value="update_profile">
+            <!-- We also need to send empty values for other fields to prevent the API from falling back to old ones... Wait, the API only falls back if the field is NOT in POST. So we only send the field we want to update! Wait, if we send ONLY email, the API falls back to the database for name, phone, etc. Yes! That's exactly what we want. -->
+            
+            <div class="edit-msg" id="changeFieldMsg"></div>
+            
+            <div class="form-group" id="changeFieldContainer">
+                <label id="changeFieldLabel" for="changeFieldValue">New Value</label>
+                <input type="text" id="changeFieldValue" name="" required>
+            </div>
+            
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px; margin-top:20px;">
+                <button type="button" class="btn-small" style="background:transparent; border:none; color:var(--text-main);" onclick="closeChangeFieldModal()">Cancel</button>
+                <button type="submit" class="btn-save" id="changeFieldSubmitBtn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="edit-modal-overlay" id="passwordModalOverlay">
+    <div class="edit-modal pw-modal" style="max-width: 460px; background: #121216; border: 1px solid rgba(113,65,107,0.3); border-radius: 12px; padding: 24px 30px;">
+        <button class="edit-close" onclick="closePasswordModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 style="font-family: var(--font-body); font-weight: 600; font-size: 1.25rem; color: var(--brand-light); margin-bottom: 16px; text-transform: none; text-align: left;">Change Password</h2>
+        
+        <div class="pw-icon-wrapper" style="text-align: center; margin-bottom: 24px; position: relative;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid rgba(113,65,107,0.2); display: inline-flex; justify-content: center; align-items: center; position: relative;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(113,65,107,0.4); display: flex; justify-content: center; align-items: center; color: var(--brand-light); box-shadow: 0 0 15px rgba(113,65,107,0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm4 10.723V19h-2v-1.277a1.993 1.993 0 0 1 .567-3.677A2.001 2.001 0 0 1 14 16a1.99 1.99 0 0 1-1 1.723z"/></svg>
+                </div>
+                <!-- Small decorative dots -->
+                <div style="position: absolute; top: 0px; left: 30%; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: 8px; left: -2px; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: 4px; right: 8px; width: 5px; height: 5px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; top: 20px; right: -2px; width: 3px; height: 3px; background: var(--brand-light); border-radius: 50%;"></div>
+            </div>
+        </div>
+
+        <form id="passwordForm">
+            <input type="hidden" name="action" value="change_password">
+            
+            <div class="edit-msg" id="passwordMsg"></div>
+            
+            <div class="pw-form-group">
+                <label for="current_password">Current Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="current_password" name="current_password" required>
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('current_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="pw-form-group">
+                <label for="new_password">New Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="new_password" name="new_password" required minlength="6" oninput="checkPwStrength(this.value)">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('new_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pw-form-group">
+                <label for="confirm_password">Confirm New Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('confirm_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="pw-strength-container" style="display:flex; align-items:center; gap: 12px; margin-bottom: 24px; margin-top: 16px;">
+                <div style="display:flex; align-items:center; gap:6px; color: #4CAF50; font-size: 0.8rem; font-weight: 600;" id="pwStrengthLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                    <span id="pwStrengthText">Strong</span>
+                </div>
+                <div style="display:flex; gap: 4px; flex: 1;" id="pwStrengthBars">
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: var(--brand-light); border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: var(--brand-light); border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: var(--brand-light); border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: var(--brand-light); border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:12px;">
+                <button type="button" class="pw-btn-cancel" onclick="closePasswordModal()">Cancel</button>
+                <button type="submit" class="pw-btn-save" id="passwordSubmitBtn">Save Password</button>
+            </div>
+        </form>
+        
+        <script>
+            function togglePw(id) {
+                const input = document.getElementById(id);
+                if(input.type === 'password') {
+                    input.type = 'text';
+                } else {
+                    input.type = 'password';
+                }
+            }
+            
+            function checkPwStrength(val) {
+                const bars = document.querySelectorAll('#pwStrengthBars .pw-strength-bar');
+                const label = document.getElementById('pwStrengthLabel');
+                const text = document.getElementById('pwStrengthText');
+                
+                let score = 0;
+                if(val.length > 5) score++;
+                if(val.length > 8) score++;
+                if(/[A-Z]/.test(val)) score++;
+                if(/[0-9]/.test(val)) score++;
+                if(/[^A-Za-z0-9]/.test(val)) score++;
+                
+                // Color mapping
+                const colors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', 'var(--brand-light)', 'var(--brand-light)'];
+                const labels = ['None', 'Weak', 'Fair', 'Good', 'Strong', 'Strong'];
+                const labelColors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', '#4CAF50', '#4CAF50'];
+                
+                // update bars
+                bars.forEach((bar, idx) => {
+                    bar.style.background = idx < score ? colors[score] : '#2E2E2E';
+                });
+                
+                text.textContent = val.length === 0 ? 'None' : labels[score];
+                label.style.color = val.length === 0 ? '#8A8A8A' : labelColors[score];
+            }
+        </script>
+    </div>
+</div>
+
+<!-- Address Modal -->
+<div class="edit-modal-overlay" id="addressModalOverlay">
+    <div class="edit-modal">
+        <button class="edit-close" onclick="closeAddressModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 id="addressModalTitle">New Address</h2>
+        <form id="addressForm">
+            <input type="hidden" name="id" id="addr_id">
+            <input type="hidden" name="action" id="addr_action" value="add">
+            <div class="edit-msg" id="addrMsg"></div>
+            
+            <div class="form-group">
+                <label for="addr_full_name">Full Name</label>
+                <input type="text" id="addr_full_name" name="full_name" required>
+            </div>
+            <div class="form-group">
+                <label for="addr_phone">Phone Number</label>
+                <input type="text" id="addr_phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="addr_line">Address</label>
+                <textarea id="addr_line" name="address_line" rows="3" required style="width: 100%; background: transparent; border: 1px solid var(--border-light); color: var(--text-main); padding: 10px 16px; border-radius: 4px; font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+            </div>
+            <div class="form-group">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="is_default" id="addr_is_default" value="1">
+                    <span style="font-size:0.9rem; color:var(--text-light);">Set as default address</span>
+                </label>
+            </div>
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px; margin-top:20px;">
+                <button type="button" class="btn-small" style="background:transparent; border:none; color:var(--text-main);" onclick="closeAddressModal()">Cancel</button>
+                <button type="submit" class="btn-save" id="addrSubmitBtn">Save Address</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="edit-modal-overlay" id="cancelOrderModalOverlay">
+    <div class="edit-modal" style="max-width: 400px; text-align: center; padding: 40px 30px;">
+        <button class="edit-close" onclick="closeCancelOrderModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <div style="background: rgba(229, 57, 53, 0.1); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        
+        <h2 style="font-size: 1.5rem; margin-bottom: 10px;">Cancel Order?</h2>
+        <p style="color: var(--text-light); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5;">Are you sure you want to cancel this order? This action cannot be undone and your items will be removed from your purchases.</p>
+        
+        <div class="edit-msg" id="cancelOrderMsg" style="text-align: left;"></div>
+        
+        <div class="modal-actions" style="display:flex; gap:16px; margin-top:10px;">
+            <button type="button" class="btn-save" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main);" onclick="closeCancelOrderModal()">Keep Order</button>
+            <button type="button" class="btn-save" style="flex: 1; background: #e53935; border: 1px solid #e53935;" id="confirmCancelOrderBtn">Yes, Cancel</button>
+        </div>
+    </div>
+</div>
+
     </div> <!-- Close account-page-wrapper -->
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    <!-- â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
      FOOTER
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â•  -->
     <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-top">
@@ -317,11 +721,31 @@ $socials = [
         </div>
         <div class="cart-panel__footer" id="cartFooter">
             <div class="cart-total-row">
-                <span>Subtotal</span>
-                <span id="cartTotal">.00</span>
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Subtotal</span>
+                <span id="cartSubtotal" style="font-size: 0.95rem; color: #F5F5F5; font-family: var(--font-body);">₱0.00</span>
             </div>
-            <p class="cart-tax-note">Shipping & taxes calculated at checkout</p>
-            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="text-align:center; display:block;">CHECK OUT</a>
+            <div class="cart-total-row" style="margin-bottom: 20px;">
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Shipping</span>
+                <span style="font-size: 0.8rem; color: #C2C2C2; font-family: var(--font-body);">Calculated at checkout</span>
+            </div>
+            <div class="cart-total-box" style="background: rgba(113, 65, 107, 0.05); border: 1px solid rgba(113, 65, 107, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px;">
+                <span style="display:block; font-size: 0.75rem; letter-spacing: 3px; color: #8A8A8A; text-transform: uppercase; margin-bottom: 8px;">TOTAL</span>
+                <div id="cartTotal" style="font-size: 1.8rem; color: var(--accent); font-family: var(--font-heading);">₱0.00</div>
+            </div>
+            <div style="text-align: center; color: #8A8A8A; font-size: 0.75rem; margin-bottom: 15px;">
+                <svg style="vertical-align: middle; margin-right: 4px; margin-top:-2px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Secure checkout • 100% Authentic
+            </div>
+            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="display:flex; justify-content:center; align-items:center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                CHECK OUT
+            </a>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#" onclick="document.getElementById('cartClose').click(); return false;" style="color: #999; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Continue Shopping
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -358,38 +782,6 @@ $socials = [
         </div>
     </div>
 
-<!-- Edit Profile Modal -->
-<div class="edit-modal-overlay" id="editModalOverlay">
-    <div class="edit-modal">
-        <button class="edit-close" id="editModalClose">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-        <h2>Edit Profile</h2>
-        <form id="editProfileForm">
-            <div class="edit-msg" id="editMsg"></div>
-            <div class="form-group">
-                <label for="editName">Full Name</label>
-                <input type="text" id="editName" name="name" value="<?= htmlspecialchars($user['full_name'] ?? '') ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="editEmail">Email</label>
-                <input type="email" id="editEmail" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="editPhone">Phone Number</label>
-                <input type="text" id="editPhone" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>">
-            </div>
-            <div class="form-group">
-                <label for="editAddress">Shipping Address</label>
-                <input type="text" id="editAddress" name="address" value="<?= htmlspecialchars($user['address'] ?? '') ?>">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-small" id="editModalCancel" style="border:none;">Cancel</button>
-                <button type="submit" class="btn-outline" id="editModalSubmit">Save Changes</button>
-            </div>
-        </form>
-    </div>
-</div>
 
     <!-- Scroll-to-Top Button -->
     <button class="scroll-to-top" aria-label="Scroll to top">
@@ -399,11 +791,11 @@ $socials = [
     </button>
 
     <script src="js/main.js?v=4"></script>
-    <script src="js/cart.js?v=3"></script>
+    <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
-    <script src="js/account-page.js?v=2"></script>
+    <script src="js/account-page.js?v=8"></script>
 </body>
 </html>
 

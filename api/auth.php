@@ -196,35 +196,110 @@ switch ($action) {
     // ═══════════════════════
     case 'update_profile':
         require_auth();
+        
+        $userId = (int) $_SESSION['user_id'];
+        $currentUser = db_fetch($pdo, 'SELECT * FROM users WHERE id = :id', [':id' => $userId]);
 
-        $phone   = sanitize_raw($_POST['phone']   ?? '');
-        $address = sanitize_raw($_POST['address'] ?? '');
-
-        // Phone — required and must match valid format
-        if ($phone !== '' && !validate_phone($phone)) {
-            json_response(false, 'Please enter a valid phone number (e.g., 09XX-XXX-XXXX).');
+        $name      = isset($_POST['name']) ? sanitize_raw($_POST['name']) : $currentUser['full_name'];
+        $email     = isset($_POST['email']) ? sanitize_raw($_POST['email']) : $currentUser['email'];
+        $phone     = isset($_POST['phone']) ? sanitize_raw($_POST['phone']) : $currentUser['phone'];
+        $address   = isset($_POST['address']) ? sanitize_raw($_POST['address']) : $currentUser['address'];
+        $gender    = isset($_POST['gender']) ? sanitize_raw($_POST['gender']) : $currentUser['gender'];
+        
+        $dob_date  = sanitize_raw($_POST['dob_date']  ?? '');
+        $dob_month = sanitize_raw($_POST['dob_month'] ?? '');
+        $dob_year  = sanitize_raw($_POST['dob_year']  ?? '');
+        $dob = $currentUser['dob'];
+        if ($dob_date && $dob_month && $dob_year) {
+            $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_date);
         }
 
-        // Address — max length guard
-        if (mb_strlen($address) > 500) {
+        // Validation
+        if ($name === '' || $email === '') {
+            json_response(false, 'Name and email are required.');
+        }
+        if (!validate_name($name)) {
+            json_response(false, 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        }
+        if (!validate_email($email)) {
+            json_response(false, 'Please enter a valid email address.');
+        }
+        if ($phone !== '' && $phone !== null && !validate_phone($phone)) {
+            json_response(false, 'Please enter a valid phone number (e.g., 09XX-XXX-XXXX).');
+        }
+        if ($address !== null && mb_strlen($address) > 500) {
             json_response(false, 'Address is too long (maximum 500 characters).');
         }
 
+        $safeName = sanitize_string($name);
+
         try {
             db_execute($pdo,
-                'UPDATE users SET phone = :phone, address = :address WHERE id = :id',
+                'UPDATE users SET full_name = :name, email = :email, phone = :phone, address = :address, gender = :gender, dob = :dob WHERE id = :id',
                 [
+                    ':name'    => $safeName,
+                    ':email'   => $email,
                     ':phone'   => $phone   ?: null,
                     ':address' => $address ?: null,
+                    ':gender'  => $gender  ?: null,
+                    ':dob'     => $dob     ?: null,
                     ':id'      => (int) $_SESSION['user_id'],
                 ]
             );
+            
+            // Update session if needed
+            $_SESSION['user_name']  = $safeName;
+            $_SESSION['user_email'] = $email;
+            
         } catch (PDOException $e) {
             error_log('[Maison Ungod] Profile update failed: ' . $e->getMessage());
             json_response(false, 'Failed to update profile. Please try again.');
         }
 
         json_response(true, 'Profile updated successfully.');
+        break;
+
+    // ═══════════════════════
+    // CHANGE PASSWORD
+    // ═══════════════════════
+    case 'change_password':
+        require_auth();
+
+        $current_password = $_POST['current_password'] ?? '';
+        $new_password     = $_POST['new_password']     ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
+
+        if ($current_password === '' || $new_password === '' || $confirm_password === '') {
+            json_response(false, 'All fields are required.');
+        }
+
+        if ($new_password !== $confirm_password) {
+            json_response(false, 'New passwords do not match.');
+        }
+
+        if (strlen($new_password) < 6) {
+            json_response(false, 'New password must be at least 6 characters.');
+        }
+
+        $userId = (int) $_SESSION['user_id'];
+        $user = db_fetch($pdo, 'SELECT password FROM users WHERE id = :id', [':id' => $userId]);
+
+        if (!$user || !password_verify($current_password, $user['password'])) {
+            json_response(false, 'Incorrect current password.');
+        }
+
+        $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
+
+        try {
+            db_execute($pdo, 'UPDATE users SET password = :password WHERE id = :id', [
+                ':password' => $hashedPassword,
+                ':id'       => $userId,
+            ]);
+            json_response(true, 'Password changed successfully.');
+        } catch (PDOException $e) {
+            error_log('[Maison Ungod] Password change failed: ' . $e->getMessage());
+            json_response(false, 'Failed to change password. Please try again.');
+        }
         break;
 
     // ═══════════════════════

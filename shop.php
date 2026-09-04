@@ -33,7 +33,7 @@ foreach ($rows as $row) {
         'id'    => $row['id'],
         'image' => $row['image'],
         'label' => $row['name'],
-        'price' => 'â‚±' . number_format($row['price'], 2),
+        'price' => '₱' . number_format($row['price'], 2),
     ];
 }
 
@@ -62,7 +62,7 @@ $socials = [
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Shop</title>
 
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="stylesheet" href="css/animations.css?v=2">
 
     <link rel="stylesheet" href="css/pages/shop.css?v=1">
@@ -259,11 +259,31 @@ $socials = [
         </div>
         <div class="cart-panel__footer" id="cartFooter">
             <div class="cart-total-row">
-                <span>Subtotal</span>
-                <span id="cartTotal">$0.00</span>
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Subtotal</span>
+                <span id="cartSubtotal" style="font-size: 0.95rem; color: #F5F5F5; font-family: var(--font-body);">₱0.00</span>
             </div>
-            <p class="cart-tax-note">Shipping & taxes calculated at checkout</p>
-            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="text-align:center; display:block;">CHECK OUT</a>
+            <div class="cart-total-row" style="margin-bottom: 20px;">
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Shipping</span>
+                <span style="font-size: 0.8rem; color: #C2C2C2; font-family: var(--font-body);">Calculated at checkout</span>
+            </div>
+            <div class="cart-total-box" style="background: rgba(113, 65, 107, 0.05); border: 1px solid rgba(113, 65, 107, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px;">
+                <span style="display:block; font-size: 0.75rem; letter-spacing: 3px; color: #8A8A8A; text-transform: uppercase; margin-bottom: 8px;">TOTAL</span>
+                <div id="cartTotal" style="font-size: 1.8rem; color: var(--accent); font-family: var(--font-heading);">₱0.00</div>
+            </div>
+            <div style="text-align: center; color: #8A8A8A; font-size: 0.75rem; margin-bottom: 15px;">
+                <svg style="vertical-align: middle; margin-right: 4px; margin-top:-2px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Secure checkout • 100% Authentic
+            </div>
+            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="display:flex; justify-content:center; align-items:center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                CHECK OUT
+            </a>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#" onclick="document.getElementById('cartClose').click(); return false;" style="color: #999; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Continue Shopping
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -368,13 +388,25 @@ $socials = [
     </button>
 
     <script src="js/main.js?v=4"></script>
-    <script src="js/cart.js?v=3"></script>
+    <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/account.js?v=3"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
 
     <script src="js/shop-sort.js?v=2"></script>
+
+    <?php if (isset($_GET['cart']) && $_GET['cart'] === 'open'): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartToggle = document.getElementById('cartToggle');
+            if (cartToggle) {
+                // Ensure cart.js has had time to bind its listeners.
+                setTimeout(() => cartToggle.click(), 150);
+            }
+        });
+    </script>
+    <?php endif; ?>
 
 </body>
 

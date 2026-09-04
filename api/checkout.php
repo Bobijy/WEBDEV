@@ -20,9 +20,23 @@ require_auth();
 $userId = (int) $_SESSION['user_id'];
 
 // ── Read & Sanitize Inputs ────────────────────────────────────────────────────
+$selectedAddressId = sanitize_raw($_POST['selected_address_id'] ?? 'new');
 $address       = sanitize_raw($_POST['address']        ?? '');
 $phone         = sanitize_raw($_POST['phone']          ?? '');
 $paymentMethod = sanitize_raw($_POST['payment_method'] ?? '');
+
+if ($selectedAddressId !== 'new') {
+    $savedAddr = db_fetch($pdo, 'SELECT * FROM user_addresses WHERE id = :id AND user_id = :uid', [
+        ':id' => (int) $selectedAddressId,
+        ':uid' => $userId
+    ]);
+    if ($savedAddr) {
+        $address = $savedAddr['address_line'];
+        $phone = $savedAddr['phone'];
+    } else {
+        json_response(false, 'Selected address not found.');
+    }
+}
 
 // ── Allowed Payment Methods (whitelist) ──────────────────────────────────────
 const ALLOWED_PAYMENT_METHODS = ['Credit Card', 'PayMongo', 'Cash On Delivery'];
@@ -33,7 +47,7 @@ const ALLOWED_PAYMENT_METHODS = ['Credit Card', 'PayMongo', 'Cash On Delivery'];
 if ($address === '') {
     json_response(false, 'Shipping address is required.');
 }
-if (mb_strlen($address) < 10) {
+if (mb_strlen($address) < 10 && $selectedAddressId === 'new') {
     json_response(false, 'Please enter a complete shipping address (at least 10 characters).');
 }
 if (mb_strlen($address) > 500) {
@@ -78,11 +92,14 @@ if (empty($items)) {
 }
 
 // Calculate total entirely from DB prices
-$totalAmount = array_reduce(
+$subtotal = array_reduce(
     $items,
     fn($carry, $row) => $carry + ((float)$row['price'] * (int)$row['quantity']),
     0.0
 );
+
+$shippingFee = 50.00;
+$totalAmount = $subtotal + $shippingFee;
 
 // ── Transaction: Create Order + Order Items + Deduct Stock + Clear Cart ───────
 try {
@@ -95,13 +112,17 @@ try {
     );
 
     // 2. Create the order record
+    $orderNumber = 'ORD-' . date('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
+    
     $stmt = $pdo->prepare('
-        INSERT INTO orders (user_id, total_amount, shipping_address, payment_method, status)
-        VALUES (:user_id, :total_amount, :shipping_address, :payment_method, :status)
+        INSERT INTO orders (order_number, user_id, total_amount, shipping_fee, shipping_address, payment_method, status)
+        VALUES (:order_number, :user_id, :total_amount, :shipping_fee, :shipping_address, :payment_method, :status)
     ');
     $stmt->execute([
+        ':order_number'     => $orderNumber,
         ':user_id'          => $userId,
         ':total_amount'     => $totalAmount,
+        ':shipping_fee'     => $shippingFee,
         ':shipping_address' => $address,
         ':payment_method'   => $paymentMethod,
         ':status'           => 'Pending',

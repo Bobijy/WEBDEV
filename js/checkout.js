@@ -21,24 +21,52 @@ function togglePayment(radio, panelId) {
     document.getElementById(panelId).classList.add('active');
 }
 
+/**
+ * Toggle between saved addresses and the new address form.
+ */
+function toggleAddressMode(isNew, radioEl) {
+    // Highlight the selected option container
+    if (radioEl) {
+        document.querySelectorAll('.saved-addresses .payment-option').forEach(el => el.classList.remove('active'));
+        radioEl.closest('.payment-option').classList.add('active');
+    }
+
+    const newForm = document.getElementById('newAddressForm');
+    const inputs = newForm.querySelectorAll('input[type="text"]');
+    
+    if (isNew) {
+        newForm.style.display = 'block';
+        inputs.forEach(input => input.required = true);
+    } else {
+        newForm.style.display = 'none';
+        inputs.forEach(input => input.required = false);
+    }
+}
+
 // ── Checkout Form Submit ──────────────────────────────────────────────────────
 document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Aggregate the individual address fields into the single hidden input
-    // that api/checkout.php expects as `address`.
     const form = e.target;
-    const addressParts = [
-        form.addressLine1.value,
-        form.barangay.value,
-        form.city.value,
-        form.region.value,
-        form.postalCode.value,
-        form.country.value,
-    ];
-    document.getElementById('finalAddress').value = addressParts
-        .filter(p => p.trim() !== '')
-        .join(', ');
+    const selectedAddressId = form.selected_address_id ? form.selected_address_id.value : 'new';
+
+    // If "new" is selected, aggregate the individual address fields
+    if (selectedAddressId === 'new') {
+        const addressParts = [
+            form.addressLine1.value,
+            form.barangay.value,
+            form.city.value,
+            form.region.value,
+            form.postalCode.value,
+            form.country.value,
+        ];
+        document.getElementById('finalAddress').value = addressParts
+            .filter(p => p.trim() !== '')
+            .join(', ');
+    } else {
+        // We will just let the backend fetch the address string from the DB using selected_address_id
+        document.getElementById('finalAddress').value = 'saved_address'; 
+    }
 
     const btn = document.getElementById('checkoutSubmit');
     const msg = document.getElementById('checkoutMsg');
@@ -58,7 +86,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
             msg.style.display = 'block';
 
             setTimeout(() => {
-                window.location.href = 'account.php';
+                window.location.href = 'account.php#orders';
             }, 1500);
         } else {
             msg.className = 'alert error';

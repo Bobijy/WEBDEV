@@ -71,8 +71,25 @@ try {
             password   VARCHAR(255)  NOT NULL,
             phone      VARCHAR(20)   DEFAULT NULL,
             address    TEXT          DEFAULT NULL,
+            gender     VARCHAR(20)   DEFAULT NULL,
+            dob        DATE          DEFAULT NULL,
             role       VARCHAR(20)   DEFAULT 'customer',
             created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    // User Addresses
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS user_addresses (
+            id           INT AUTO_INCREMENT PRIMARY KEY,
+            user_id      INT NOT NULL,
+            label        VARCHAR(50) DEFAULT 'Home',
+            full_name    VARCHAR(100) NOT NULL,
+            phone        VARCHAR(20) NOT NULL,
+            address_line TEXT NOT NULL,
+            is_default   BOOLEAN DEFAULT FALSE,
+            created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
 

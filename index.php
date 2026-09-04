@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 /**
  * Maison Ungod &mdash; Luxury Perfume House
  * Pure PHP Landing Page
@@ -23,44 +22,19 @@ $navLinks = [
 ];
 
 // â”€â”€â”€ Product Categories â”€â”€â”€
-=======
-
-$site = [
-    'name' => 'Maison Ungod',
-    'tagline' => 'Find Your Signature Scent',
-    'description' => 'Maison Ungod',
-    'year' => date('Y'),
-];
-
-// Navigation Links 
-$navLinks = [
-    ['label' => 'Home'],
-    ['label' => 'Shop'],
-    ['label' => 'Best Seller'],
-    ['label' => 'Our Story'],
-    ['label' => 'Contact'],
-];
-
-// Product Categories 
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
 $categories = [
     [
         'title' => 'Pour Homme',
         'subtitle' => 'Fragrance For Him',
         'image' => 'assets/images/pour-homme.png',
-        'price' => '$145.00',
-<<<<<<< HEAD
+        'price' => '₱145.00',
         'link' => 'shop.php',
-=======
-        'link' => 'javascript:void(0)',
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     ],
     [
         'title' => 'Pour Femme',
         'subtitle' => 'Fragrance For Her',
         'image' => 'assets/images/pour-femme.png',
-        'price' => '$145.00',
-<<<<<<< HEAD
+        'price' => '₱145.00',
         'link' => 'shop.php',
     ],
 ];
@@ -74,10 +48,10 @@ $collections = [];
 $rows = db_fetch_all($pdo, "SELECT id, image, name, price FROM products WHERE status = 'Active' ORDER BY id ASC");
 foreach ($rows as $row) {
     $collections[] = [
-        'id'    => $row['id'],
+        'id' => $row['id'],
         'image' => $row['image'],
         'label' => $row['name'],
-        'price' => 'â‚±' . number_format($row['price'], 2),
+        'price' => '₱' . number_format($row['price'], 2),
     ];
 }
 
@@ -88,21 +62,6 @@ if (count($collections) > 0 && count($collections) <= 3) {
 }
 
 // â”€â”€â”€ Features â”€â”€â”€
-=======
-        'link' => 'javascript:void(0)',
-    ],
-];
-
-// Collections 
-$collections = [
-    ['image' => 'assets/images/collection-1.png', 'label' => 'Fragrance 1', 'price' => '$145.00'],
-    ['image' => 'assets/images/collection-2.png', 'label' => 'Fragrance 2', 'price' => '$145.00'],
-    ['image' => 'assets/images/collection-3.png', 'label' => 'Fragrance 3', 'price' => '$145.00'],
-    ['image' => 'assets/images/collection-4.png', 'label' => 'Fragrance 4', 'price' => '$165.00'],
-];
-
-// Features 
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
 $features = [
     [
         'title' => 'Rare Ingredients',
@@ -118,11 +77,7 @@ $features = [
     ],
 ];
 
-<<<<<<< HEAD
 // â”€â”€â”€ SVG Icons â”€â”€â”€
-=======
-// SVG Icons   
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
 $icons = [
     'instagram' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
     'facebook' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
@@ -132,15 +87,9 @@ $icons = [
 ];
 
 $socials = [
-<<<<<<< HEAD
     ['icon' => 'instagram', 'url' => '#'],
     ['icon' => 'facebook', 'url' => '#'],
     ['icon' => 'x', 'url' => '#'],
-=======
-    ['icon' => 'instagram'],
-    ['icon' => 'facebook'],
-    ['icon' => 'x'],
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
 ];
 ?>
 <!DOCTYPE html>
@@ -149,21 +98,14 @@ $socials = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Luxury Fragrances</title>
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="stylesheet" href="css/animations.css?v=2">
-=======
-    <meta name="description" content="<?= $site['description'] ?>">
-    <title>Maison Ungod</title>
-    <link rel="stylesheet" href="css/style.css">
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
 </head>
 
 <body>
 
-<<<<<<< HEAD
 
 
     <!-- Scroll Progress Bar -->
@@ -175,51 +117,31 @@ $socials = [
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      NAVBAR
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-=======
-    <!-- NAVBAR -->
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     <nav class="navbar" id="navbar">
         <div class="container">
             <!-- Top Row: Logo | Brand | Icons -->
             <div class="nav-top">
-<<<<<<< HEAD
                 <a href="/" class="nav-logo">
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
                 </a>
                 <span class="nav-brand">&mdash;<?= strtoupper($site['name']) ?>&mdash;</span>
                 <div class="nav-icons">
-                    <a href="#" class="nav-icon" id="searchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
+                    <a href="#" class="nav-icon" id="searchToggle" aria-label="Search"
+                        onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
                     <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
-=======
-                <a class="nav-logo">
-                    <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
-                </a>
-                <span class="nav-brand">—<?= strtoupper($site['name']) ?>—</span>
-                <div class="nav-icons">
-                    <a class="nav-icon" aria-label="Search"><?= $icons['search'] ?></a>
-                    <a class="nav-icon" aria-label="Account">
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
                     </a>
-<<<<<<< HEAD
                     <a href="#" class="nav-icon" id="cartToggle" aria-label="Cart"><?= $icons['bag'] ?></a>
-=======
-                    <a class="nav-icon" aria-label="Cart"><?= $icons['bag'] ?></a>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                 </div>
             </div>
             <!-- Bottom Row: Centered Nav Links -->
             <div class="nav-bottom" id="navLinks">
                 <?php foreach ($navLinks as $link): ?>
-<<<<<<< HEAD
-                    <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="'.$link['id'].'"' : '' ?> <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
-=======
-                    <a><?= $link['label'] ?></a>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
+                    <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="' . $link['id'] . '"' : '' ?>     <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -229,7 +151,6 @@ $socials = [
         </button>
     </nav>
 
-<<<<<<< HEAD
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      HERO
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
@@ -247,32 +168,18 @@ $socials = [
                 <a href="shop.php" class="btn-shop">Shop Now</a>
             </div>
             <div class="hero-image">
-                <img src="assets/images/hero-product.png" alt="<?= $site['name'] ?> Signature Fragrance" data-parallax="0.4">
-=======
-    <!-- HERO -->
-    <section class="hero" id="hero">
-        <div class="container hero-grid">
-            <div class="hero-content">
-                <h1><?= $site['tagline'] ?></h1>
-                <a class="btn-shop">Shop Now</a>
-            </div>
-            <div class="hero-image">
-                <img src="assets/images/hero-product.png" alt="<?= $site['name'] ?> Signature Fragrance">
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
+                <img src="assets/images/hero-product.png" alt="<?= $site['name'] ?> Signature Fragrance"
+                    data-parallax="0.4">
             </div>
         </div>
     </section>
 
-<<<<<<< HEAD
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      CATEGORIES &mdash; Pour Homme / Pour Femme
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-=======
-    <!--CATEGORIES — Pour Homme / Pour Femme-->
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     <section class="categories" id="categories">
         <div class="container categories-grid">
             <?php foreach ($categories as $i => $cat): ?>
@@ -287,16 +194,12 @@ $socials = [
         </div>
     </section>
 
-<<<<<<< HEAD
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      THE COLLECTIONS
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-=======
-    <!-- THE COLLECTIONS-->
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     <section class="collections" id="collections">
         <div class="container">
             <div class="section-title reveal">
@@ -328,21 +231,19 @@ $socials = [
                         </div>
                         <div class="coll-card__footer">
                             <span class="coll-card__price"><?= $col['price'] ?></span>
-<<<<<<< HEAD
-                            <button class="coll-card__bag add-to-cart-btn" data-id="<?= $col['id'] ?>" data-name="<?= $col['label'] ?>"
-                                data-price="<?= $col['price'] ?>" data-image="<?= $col['image'] ?>" aria-label="Add to bag">
-=======
-                            <button class="coll-card__bag" aria-label="Add to bag">
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
+                            <button class="coll-card__bag add-to-cart-btn" data-id="<?= $col['id'] ?>"
+                                data-name="<?= $col['label'] ?>" data-price="<?= $col['price'] ?>"
+                                data-image="<?= $col['image'] ?>" aria-label="Add to bag">
                                 <?= $icons['bag'] ?>
                             </button>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
-<<<<<<< HEAD
             <!-- Slider Auto-play Progress -->
-            <div class="slider-progress"><div class="slider-progress__bar"></div></div>
+            <div class="slider-progress">
+                <div class="slider-progress__bar"></div>
+            </div>
         </div>
     </section>
 
@@ -353,26 +254,12 @@ $socials = [
         <div class="container story-grid">
             <div class="story-img-wrap reveal">
                 <img src="assets/images/story-perfume.png" alt="Maison Ungod Heritage" data-parallax="0.3">
-=======
-        </div>
-    </section>
-
-    <!-- THE STORY OF THE MAISON-->
-    <section class="story" id="story">
-        <div class="container story-grid">
-            <div class="story-img-wrap reveal">
-                <img src="assets/images/story-perfume.png" alt="Maison Ungod Heritage">
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
             </div>
             <div class="story-content reveal reveal-d2">
                 <h2>The Story of<br>the Maison</h2>
                 <div class="story-bar"></div>
                 <p>
-<<<<<<< HEAD
                     At Maison Ungod, we believe a fragrance is more than a scent &mdash; it is an art of expression. The
-=======
-                    At Maison Ungod, we believe a fragrance is more than a scent — it is an art of expression. The
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                     Maison represents an unwavering dedication to the timeless art of perfumery, merging age-old methods
                     and modern sophistication.
                 </p>
@@ -384,16 +271,12 @@ $socials = [
         </div>
     </section>
 
-<<<<<<< HEAD
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      FEATURES
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-=======
-    <!--FEATURES-->
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     <section class="features" id="features">
         <div class="container">
             <?php foreach ($features as $feat): ?>
@@ -410,13 +293,9 @@ $socials = [
         </div>
     </section>
 
-<<<<<<< HEAD
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      FOOTER
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-=======
-    <!--FOOTER -->
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
     <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-top">
@@ -424,11 +303,7 @@ $socials = [
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?>">
                     <div class="footer-social">
                         <?php foreach ($socials as $s): ?>
-<<<<<<< HEAD
                             <a href="<?= $s['url'] ?>" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
-=======
-                            <a><?= $icons[$s['icon']] ?></a>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -436,45 +311,26 @@ $socials = [
                 <div class="footer-col">
                     <h4>Menu</h4>
                     <ul>
-<<<<<<< HEAD
                         <li><a href="index.php">Home</a></li>
                         <li><a href="index.php#collections">Collections</a></li>
                         <li><a href="index.php#story">Our Story</a></li>
-=======
-                        <li><a>Home</a></li>
-                        <li><a>Collections</a></li>
-                        <li><a>Our Story</a></li>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                     </ul>
                 </div>
 
                 <div class="footer-col">
-<<<<<<< HEAD
                     <h4>Legalities</h4>
                     <ul>
                         <li><a href="#">Privacy Policy</a></li>
                         <li><a href="#">Terms of Service</a></li>
                         <li><a href="#">Cookie Policy</a></li>
-=======
-                    <h4>Legal Page</h4>
-                    <ul>
-                        <li><a>Privacy Policy</a></li>
-                        <li><a>Terms of Service</a></li>
-                        <li><a>Cookie Policy</a></li>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <ul>
-<<<<<<< HEAD
                         <li><a href="#">Phone: (0912) 0858</a></li>
                         <li><a href="mailto:bobjoshuaungod26@gmail.com">Email: bobjoshuaungod26@gmail.com</a></li>
-=======
-                        <li><a href="mailto:bobjoshuaungod08@gmail.com">bobjoshuaungod08@gmail.com</a></li>
-                        <li><a href="tel:+639812106561">09812106561</a></li>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
                     </ul>
                 </div>
             </div>
@@ -485,7 +341,6 @@ $socials = [
         </div>
     </footer>
 
-<<<<<<< HEAD
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      SEARCH OVERLAY
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
@@ -531,11 +386,31 @@ $socials = [
         </div>
         <div class="cart-panel__footer" id="cartFooter">
             <div class="cart-total-row">
-                <span>Subtotal</span>
-                <span id="cartTotal">$0.00</span>
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Subtotal</span>
+                <span id="cartSubtotal" style="font-size: 0.95rem; color: #F5F5F5; font-family: var(--font-body);">₱0.00</span>
             </div>
-            <p class="cart-tax-note">Shipping & taxes calculated at checkout</p>
-            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="text-align:center; display:block;">CHECK OUT</a>
+            <div class="cart-total-row" style="margin-bottom: 20px;">
+                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Shipping</span>
+                <span style="font-size: 0.8rem; color: #C2C2C2; font-family: var(--font-body);">Calculated at checkout</span>
+            </div>
+            <div class="cart-total-box" style="background: rgba(113, 65, 107, 0.05); border: 1px solid rgba(113, 65, 107, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px;">
+                <span style="display:block; font-size: 0.75rem; letter-spacing: 3px; color: #8A8A8A; text-transform: uppercase; margin-bottom: 8px;">TOTAL</span>
+                <div id="cartTotal" style="font-size: 1.8rem; color: var(--accent); font-family: var(--font-heading);">₱0.00</div>
+            </div>
+            <div style="text-align: center; color: #8A8A8A; font-size: 0.75rem; margin-bottom: 15px;">
+                <svg style="vertical-align: middle; margin-right: 4px; margin-top:-2px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Secure checkout • 100% Authentic
+            </div>
+            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="display:flex; justify-content:center; align-items:center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                CHECK OUT
+            </a>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#" onclick="document.getElementById('cartClose').click(); return false;" style="color: #999; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Continue Shopping
+                </a>
+            </div>
         </div>
     </aside>
 
@@ -551,12 +426,12 @@ $socials = [
                 <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
         </button>
-        
+
         <div class="account-modal__inner">
             <div class="auth-header">
                 <h2>Sign In</h2>
             </div>
-            
+
             <form class="account-form" id="loginForm">
                 <div class="account-msg" id="loginMsg"></div>
                 <div class="account-field">
@@ -565,7 +440,8 @@ $socials = [
                 </div>
                 <div class="account-field">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" name="password" placeholder="Enter your password"
+                        required>
                 </div>
                 <button type="submit" class="account-submit" id="loginSubmit">Sign In</button>
                 <div class="auth-links">
@@ -585,7 +461,8 @@ $socials = [
                 </div>
                 <div class="account-field">
                     <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" name="password" placeholder="Min. 6 characters" required>
+                    <input type="password" id="registerPassword" name="password" placeholder="Min. 6 characters"
+                        required>
                 </div>
                 <button type="submit" class="account-submit" id="registerSubmit">Create Account</button>
                 <div class="auth-links">
@@ -622,7 +499,8 @@ $socials = [
                 </div>
                 <div class="account-field">
                     <label for="contactMessage">Message</label>
-                    <textarea id="contactMessage" name="message" required style="width: 100%; background: #171717; border: 1px solid #2E2E2E; color: #F5F5F5; padding: 12px; border-radius: 4px; font-family: var(--font-body); resize: vertical; min-height: 100px;"></textarea>
+                    <textarea id="contactMessage" name="message" required
+                        style="width: 100%; background: #171717; border: 1px solid #2E2E2E; color: #F5F5F5; padding: 12px; border-radius: 4px; font-family: var(--font-body); resize: vertical; min-height: 100px;"></textarea>
                 </div>
                 <button type="submit" class="account-submit" id="contactSubmit">Send Message</button>
             </form>
@@ -634,8 +512,9 @@ $socials = [
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
     <!-- Scroll-to-Top Button -->
     <button class="scroll-to-top" aria-label="Scroll to top">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="18 15 12 9 6 15"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15" />
         </svg>
     </button>
 
@@ -643,7 +522,7 @@ $socials = [
     <!-- (injected by transitions.js) -->
 
     <script src="js/main.js?v=4"></script>
-    <script src="js/cart.js?v=3"></script>
+    <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/account.js?v=3"></script>
     <script src="js/contact.js?v=3"></script>
@@ -652,9 +531,3 @@ $socials = [
 </body>
 
 </html>
-=======
-
-</body>
-
-</html>
->>>>>>> 94afa21701793464142b89dfca6b68f9dec2b3e5
