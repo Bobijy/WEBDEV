@@ -241,6 +241,7 @@
     // ── Update Item API ──
     async function updateCartItem(id, qty) {
         const formData = new FormData();
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
         formData.append('item_id', id);
         if (qty > 0) {
             formData.append('action', 'update');
@@ -270,6 +271,7 @@
 
             try {
                 const formData = new FormData();
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
                 formData.append('action', 'add');
                 formData.append('product_id', id);
 

@@ -52,8 +52,11 @@ if (inlineProfileForm) {
         inlineModalSubmit.disabled = true;
         inlineModalSubmit.textContent = 'Saving...';
 
+        window.MaisonUngod.clearFieldErrors(inlineProfileForm);
+
         const formData = new FormData(inlineProfileForm);
         formData.append('action', 'update_profile');
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
 
         try {
             const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -70,6 +73,9 @@ if (inlineProfileForm) {
                 editMsg.className = 'edit-msg error';
                 editMsg.textContent = data.message || 'Error updating profile.';
                 editMsg.style.display = 'block';
+                if (data.data && data.data.errors) {
+                    window.MaisonUngod.displayFieldErrors(inlineProfileForm, data.data.errors);
+                }
             }
         } catch (err) {
             editMsg.className = 'edit-msg error';
@@ -121,7 +127,9 @@ if (addressForm) {
         btn.disabled = true;
         btn.textContent = 'Saving...';
         
+        window.MaisonUngod.clearFieldErrors(addressForm);
         const formData = new FormData(addressForm);
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
         
         try {
             const response = await fetch('api/address.php', { method: 'POST', body: formData });
@@ -139,6 +147,9 @@ if (addressForm) {
                 addrMsg.className = 'edit-msg error';
                 addrMsg.textContent = data.message || 'Error saving address.';
                 addrMsg.style.display = 'block';
+                if (data.data && data.data.errors) {
+                    window.MaisonUngod.displayFieldErrors(addressForm, data.data.errors);
+                }
                 btn.disabled = false;
                 btn.textContent = 'Save';
             }
@@ -157,6 +168,7 @@ async function deleteAddress(id) {
     const formData = new FormData();
     formData.append('action', 'delete');
     formData.append('id', id);
+    formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
     
     try {
         const response = await fetch('api/address.php', { method: 'POST', body: formData });
@@ -176,6 +188,7 @@ async function setDefaultAddress(id) {
     const formData = new FormData();
     formData.append('action', 'set_default');
     formData.append('id', id);
+    formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
     
     try {
         const response = await fetch('api/address.php', { method: 'POST', body: formData });
@@ -229,7 +242,9 @@ if (changeFieldForm) {
         btn.disabled = true;
         btn.textContent = 'Saving...';
         
+        window.MaisonUngod.clearFieldErrors(changeFieldForm);
         const formData = new FormData(changeFieldForm);
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
         
         try {
             const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -244,6 +259,9 @@ if (changeFieldForm) {
                 changeFieldMsg.className = 'edit-msg error';
                 changeFieldMsg.textContent = data.message || 'Error updating field.';
                 changeFieldMsg.style.display = 'block';
+                if (data.data && data.data.errors) {
+                    window.MaisonUngod.displayFieldErrors(changeFieldForm, data.data.errors);
+                }
                 btn.disabled = false;
                 btn.textContent = 'Save';
             }
@@ -280,10 +298,13 @@ if (passwordForm) {
         const newPass = document.getElementById('new_password').value;
         const confirmPass = document.getElementById('confirm_password').value;
         
+        window.MaisonUngod.clearFieldErrors(passwordForm);
+        
         if (newPass !== confirmPass) {
             passwordMsg.className = 'edit-msg error';
             passwordMsg.textContent = 'New passwords do not match.';
             passwordMsg.style.display = 'block';
+            window.MaisonUngod.displayFieldErrors(passwordForm, { confirm_password: 'New passwords do not match.' });
             return;
         }
 
@@ -292,6 +313,8 @@ if (passwordForm) {
         btn.textContent = 'Saving...';
         
         const formData = new FormData(passwordForm);
+        formData.append('action', 'change_password');
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
         
         try {
             const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -306,6 +329,9 @@ if (passwordForm) {
                 passwordMsg.className = 'edit-msg error';
                 passwordMsg.textContent = data.message || 'Error updating password.';
                 passwordMsg.style.display = 'block';
+                if (data.data && data.data.errors) {
+                    window.MaisonUngod.displayFieldErrors(passwordForm, data.data.errors);
+                }
                 btn.disabled = false;
                 btn.textContent = 'Save Password';
             }
@@ -346,6 +372,7 @@ if (confirmCancelOrderBtn) {
         const formData = new FormData();
         formData.append('action', 'cancel_order');
         formData.append('order_id', currentCancelOrderId);
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
 
         try {
             const response = await fetch('api/orders.php', {

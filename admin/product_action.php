@@ -7,14 +7,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
-require_once __DIR__ . '/../includes/product_validator.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
+require_once __DIR__ . '/../database/product_validator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: products.php");
     exit;
 }
+
+require_csrf();
 
 $action = $_POST['action'] ?? '';
 
@@ -42,8 +44,54 @@ if ($action === 'add' || $action === 'update') {
         exit;
     }
 
-    // Default image
-    $image = 'assets/images/default.png';
+    // Image handling
+    $imagePath = 'assets/images/default.png'; // default fallback
+    
+    // If it's an update, preserve the existing image first
+    if ($is_update) {
+        $existingProduct = db_fetch($pdo, 'SELECT image FROM products WHERE id = :id', [':id' => $id]);
+        if ($existingProduct) {
+            $imagePath = $existingProduct['image'];
+        }
+    }
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $file_type = $_FILES['image']['type'];
+        $file_size = $_FILES['image']['size'];
+        
+        if (!in_array($file_type, $allowed_types)) {
+            $errors['image'] = 'Invalid image type. Only JPG, PNG, WEBP, and GIF are allowed.';
+        } elseif ($file_size > 5 * 1024 * 1024) { // 5MB limit
+            $errors['image'] = 'Image size must be less than 5MB.';
+        } else {
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('prod_', true) . '.' . strtolower($ext);
+            $upload_dir = __DIR__ . '/../assets/images/';
+            
+            // Create dir if not exists
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            
+            $target_file = $upload_dir . $filename;
+            
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+                $imagePath = 'assets/images/' . $filename;
+            } else {
+                $errors['image'] = 'Failed to save uploaded image.';
+            }
+        }
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['form_errors'] = $errors;
+        $_SESSION['form_data'] = $_POST;
+        
+        $redirect = 'product_form.php' . ($is_update ? '?id=' . $id : '');
+        header("Location: $redirect");
+        exit;
+    }
 
     try {
         if ($is_update) {
@@ -54,7 +102,8 @@ if ($action === 'add' || $action === 'update') {
                        price = :price,
                        stock = :stock,
                        category = :category,
-                       status = :status
+                       status = :status,
+                       image = :image
                 WHERE  id = :id
             ');
             $stmt->execute([
@@ -64,6 +113,7 @@ if ($action === 'add' || $action === 'update') {
                 ':stock'       => $data['stock'],
                 ':category'    => $data['category'],
                 ':status'      => $data['status'],
+                ':image'       => $imagePath,
                 ':id'          => $id,
             ]);
             $_SESSION['msg'] = 'Product updated successfully.';
@@ -79,7 +129,7 @@ if ($action === 'add' || $action === 'update') {
                 ':stock'       => $data['stock'],
                 ':category'    => $data['category'],
                 ':status'      => $data['status'],
-                ':image'       => $image,
+                ':image'       => $imagePath,
             ]);
             $_SESSION['msg'] = 'Product added successfully.';
         }

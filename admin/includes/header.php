@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../database/helpers.php';
 // Protect routes: Redirect to admin login if not logged in or not admin
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     if (basename($_SERVER['PHP_SELF']) !== 'login.php') {
@@ -15,6 +16,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maison Ungod — Admin Dashboard</title>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
 </head>

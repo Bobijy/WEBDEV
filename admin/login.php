@@ -54,6 +54,9 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin') {
 
         const formData = new FormData(e.target);
         formData.append('action', 'login');
+        
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) formData.append('csrf_token', csrfMeta.content);
 
         try {
             const res = await fetch('../api/auth.php', { method: 'POST', body: formData });

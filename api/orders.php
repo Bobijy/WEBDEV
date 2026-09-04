@@ -1,12 +1,16 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 require_auth();
 
 $action = $_POST['action'] ?? '';
 $userId = (int) $_SESSION['user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+}
 
 switch ($action) {
     case 'cancel_order':

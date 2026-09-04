@@ -5,8 +5,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/database/db.php';
+require_once __DIR__ . '/database/helpers.php';
 
 // Fetch user data for pre-filling the delivery form
 $user = db_fetch($pdo,
@@ -55,6 +55,7 @@ $site = ['name' => 'Maison Ungod'];
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($site['name']) ?> — Checkout</title>
@@ -296,6 +297,7 @@ $site = ['name' => 'Maison Ungod'];
     </div>
 </div>
 
+<script src="js/main.js?v=3"></script>
 <script src="js/checkout.js?v=3"></script>
 </body>
 </html>

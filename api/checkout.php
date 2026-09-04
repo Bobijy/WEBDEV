@@ -11,13 +11,17 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 
 // Require a valid session
 require_auth();
 
 $userId = (int) $_SESSION['user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+}
 
 // ── Read & Sanitize Inputs ────────────────────────────────────────────────────
 $selectedAddressId = sanitize_raw($_POST['selected_address_id'] ?? 'new');

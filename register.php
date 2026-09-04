@@ -1,4 +1,4 @@
-<?php
+ __DIR__ . '/database/helpers.php';
 session_start();
 if (isset($_SESSION['user_id'])) {
     header("Location: account.php");
@@ -10,6 +10,7 @@ $site = ['name' => 'Maison Ungod'];
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $site['name'] ?> — Register</title>
@@ -52,6 +53,7 @@ $site = ['name' => 'Maison Ungod'];
         </div>
     </div>
 
-    <script src="js/register.js?v=1"></script>
+    <script src="js/main.js"></script>
+    <script src="js/register.js?v=2"></script>
 </body>
 </html>

@@ -11,6 +11,8 @@ document.getElementById('pageRegisterForm').addEventListener('submit', async (e)
     const msg  = document.getElementById('pageRegisterMsg');
     const form = e.target;
 
+    window.MaisonUngod.clearFieldErrors(form);
+
     // Client-side confirm password check (server also validates this)
     const pwd        = document.getElementById('password').value;
     const confirmPwd = document.getElementById('confirm_password').value;
@@ -27,6 +29,7 @@ document.getElementById('pageRegisterForm').addEventListener('submit', async (e)
 
     const formData = new FormData(form);
     formData.append('action', 'register');
+    formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
 
     try {
         const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -41,6 +44,11 @@ document.getElementById('pageRegisterForm').addEventListener('submit', async (e)
             msg.className = 'account-msg error';
             msg.textContent = data.message;
             msg.style.display = 'block';
+            
+            if (data.data && data.data.errors) {
+                window.MaisonUngod.displayFieldErrors(form, data.data.errors);
+            }
+            
             btn.disabled = false;
             btn.textContent = 'REGISTER';
         }

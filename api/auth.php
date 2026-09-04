@@ -1,73 +1,56 @@
 <?php
 /**
  * Maison Ungod — Authentication API
- *
- * Actions : register, login, logout, status, update_profile
- * Driver  : PDO with named parameters
- * Security: server-side validation + sanitization on all user input
  */
 
 session_start();
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 
-// ── Action Router ─────────────────────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+}
+
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 switch ($action) {
 
-    // ═══════════════════════
-    // REGISTER
-    // ═══════════════════════
     case 'register':
-        // 1. Read raw inputs
         $name            = sanitize_raw($_POST['name']             ?? '');
         $email           = sanitize_raw($_POST['email']            ?? '');
         $password        = $_POST['password']                       ?? '';
         $confirmPassword = $_POST['confirm_password']               ?? '';
 
-        // 2. Required field check
-        if ($name === '' || $email === '' || $password === '') {
-            json_response(false, 'All fields are required.');
+        $errors = [];
+
+        if ($name === '') $errors['name'] = 'Name is required.';
+        elseif (!validate_name($name)) $errors['name'] = 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.';
+        
+        if ($email === '') $errors['email'] = 'Email is required.';
+        elseif (!validate_email($email)) $errors['email'] = 'Please enter a valid email address.';
+        else {
+            $existing = db_fetch($pdo, 'SELECT id FROM users WHERE email = :email', [':email' => $email]);
+            if ($existing) $errors['email'] = 'An account with this email already exists.';
         }
 
-        // 3. Name validation — length and character rules
-        if (!validate_name($name)) {
-            json_response(false, 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
-        }
+        if ($password === '') $errors['password'] = 'Password is required.';
+        elseif (!validate_password($password)) $errors['password'] = 'Password must be at least 6 characters.';
 
-        // 4. Email validation
-        if (!validate_email($email)) {
-            json_response(false, 'Please enter a valid email address.');
-        }
-
-        // 5. Password length
-        if (!validate_password($password)) {
-            json_response(false, 'Password must be at least 6 characters.');
-        }
-
-        // 6. Server-side confirm password check (never trust client only)
         if ($confirmPassword !== '' && $password !== $confirmPassword) {
-            json_response(false, 'Passwords do not match.');
+            $errors['confirm_password'] = 'Passwords do not match.';
         }
 
-        // 7. Sanitize name for storage (encode HTML entities)
+        if (!empty($errors)) {
+            json_response(false, 'Please fix the errors below.', ['errors' => $errors]);
+        }
+
         $safeName = sanitize_string($name);
-
-        // 8. Check for duplicate email
-        $existing = db_fetch($pdo, 'SELECT id FROM users WHERE email = :email', [':email' => $email]);
-        if ($existing) {
-            json_response(false, 'An account with this email already exists.');
-        }
-
-        // 9. Hash password and insert
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $stmt = $pdo->prepare('INSERT INTO users (full_name, email, password) VALUES (:name, :email, :password)');
-            $stmt->execute([
+            db_execute($pdo, 'INSERT INTO users (full_name, email, password) VALUES (:name, :email, :password)', [
                 ':name'     => $safeName,
                 ':email'    => $email,
                 ':password' => $hashedPassword,
@@ -78,7 +61,6 @@ switch ($action) {
             json_response(false, 'Registration failed. Please try again.');
         }
 
-        // 10. Auto-login after registration
         $_SESSION['user_id']    = $newId;
         $_SESSION['user_name']  = $safeName;
         $_SESSION['user_email'] = $email;
@@ -89,40 +71,31 @@ switch ($action) {
         ]);
         break;
 
-    // ═══════════════════════
-    // LOGIN
-    // ═══════════════════════
     case 'login':
         $email    = sanitize_raw($_POST['email']    ?? '');
         $password = $_POST['password']               ?? '';
 
-        // Validate required fields
-        if ($email === '' || $password === '') {
-            json_response(false, 'Email and password are required.');
+        $errors = [];
+
+        if ($email === '') $errors['email'] = 'Email is required.';
+        elseif (!validate_email($email)) $errors['email'] = 'Please enter a valid email address.';
+
+        if ($password === '') $errors['password'] = 'Password is required.';
+
+        if (!empty($errors)) {
+            json_response(false, 'Please fix the errors below.', ['errors' => $errors]);
         }
 
-        // Validate email format before hitting the DB
-        if (!validate_email($email)) {
-            json_response(false, 'Please enter a valid email address.');
-        }
-
-        // Lookup user by email
-        $user = db_fetch(
-            $pdo,
-            'SELECT id, full_name, email, password, role FROM users WHERE email = :email',
-            [':email' => $email]
-        );
+        $user = db_fetch($pdo, 'SELECT id, full_name, email, password, role FROM users WHERE email = :email', [':email' => $email]);
 
         if (!$user) {
-            json_response(false, 'No account found with this email.');
+            json_response(false, 'No account found with this email.', ['errors' => ['email' => 'No account found with this email.']]);
         }
 
-        // Verify password against stored hash
         if (!password_verify($password, $user['password'])) {
-            json_response(false, 'Incorrect password.');
+            json_response(false, 'Incorrect password.', ['errors' => ['password' => 'Incorrect password.']]);
         }
 
-        // Set session
         $_SESSION['user_id']    = $user['id'];
         $_SESSION['user_name']  = $user['full_name'];
         $_SESSION['user_email'] = $user['email'];
@@ -137,120 +110,95 @@ switch ($action) {
         ]);
         break;
 
-    // ═══════════════════════
-    // LOGOUT
-    // ═══════════════════════
     case 'logout':
-        // Destroy session data completely
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-            setcookie(
-                session_name(), '', time() - 42000,
-                $params['path'], $params['domain'],
-                $params['secure'], $params['httponly']
-            );
+            setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
         }
         session_destroy();
         json_response(true, 'Logged out successfully.');
         break;
 
-    // ═══════════════════════
-    // STATUS (check if logged in)
-    // ═══════════════════════
     case 'status':
         if (!isset($_SESSION['user_id'])) {
             json_response(false, '', ['loggedIn' => false]);
         }
-
         $userId = (int) $_SESSION['user_id'];
-
-        $user = db_fetch(
-            $pdo,
-            'SELECT id, full_name, email, phone, address, role FROM users WHERE id = :id',
-            [':id' => $userId]
-        );
-
-        $orders = db_fetch_all(
-            $pdo,
-            'SELECT id, total_amount, status, created_at FROM orders WHERE user_id = :id ORDER BY created_at DESC',
-            [':id' => $userId]
-        );
-
+        $user = db_fetch($pdo, 'SELECT id, full_name, email, phone, address, role FROM users WHERE id = :id', [':id' => $userId]);
+        
+        // Use order_items joined, since order_number is not in the db bootstrap schema it's added during checkout
+        $orders = db_fetch_all($pdo, 'SELECT id, total_amount, status, created_at FROM orders WHERE user_id = :id ORDER BY created_at DESC', [':id' => $userId]);
+        
         echo json_encode([
             'loggedIn' => true,
-            'user'     => [
-                'id'      => $user['id'],
-                'name'    => $user['full_name'],
-                'email'   => $user['email'],
-                'phone'   => $user['phone'],
-                'address' => $user['address'],
-                'role'    => $user['role'],
-            ],
-            'orders' => $orders,
+            'user'     => $user,
+            'orders'   => $orders,
         ]);
         break;
 
-    // ═══════════════════════
-    // UPDATE PROFILE
-    // ═══════════════════════
     case 'update_profile':
         require_auth();
-        
         $userId = (int) $_SESSION['user_id'];
         $currentUser = db_fetch($pdo, 'SELECT * FROM users WHERE id = :id', [':id' => $userId]);
 
-        $name      = isset($_POST['name']) ? sanitize_raw($_POST['name']) : $currentUser['full_name'];
-        $email     = isset($_POST['email']) ? sanitize_raw($_POST['email']) : $currentUser['email'];
-        $phone     = isset($_POST['phone']) ? sanitize_raw($_POST['phone']) : $currentUser['phone'];
-        $address   = isset($_POST['address']) ? sanitize_raw($_POST['address']) : $currentUser['address'];
-        $gender    = isset($_POST['gender']) ? sanitize_raw($_POST['gender']) : $currentUser['gender'];
+        $name      = sanitize_raw($_POST['name'] ?? $currentUser['full_name']);
+        $email     = sanitize_raw($_POST['email'] ?? $currentUser['email']);
+        $phone     = sanitize_raw($_POST['phone'] ?? $currentUser['phone'] ?? '');
+        $address   = sanitize_raw($_POST['address'] ?? $currentUser['address'] ?? '');
+        $gender    = sanitize_raw($_POST['gender'] ?? $currentUser['gender'] ?? '');
         
-        $dob_date  = sanitize_raw($_POST['dob_date']  ?? '');
+        $errors = [];
+
+        $dob_year  = sanitize_raw($_POST['dob_year'] ?? '');
         $dob_month = sanitize_raw($_POST['dob_month'] ?? '');
-        $dob_year  = sanitize_raw($_POST['dob_year']  ?? '');
+        $dob_date  = sanitize_raw($_POST['dob_date'] ?? '');
+        
         $dob = $currentUser['dob'];
-        if ($dob_date && $dob_month && $dob_year) {
-            $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_date);
+        if ($dob_year !== '' && $dob_month !== '' && $dob_date !== '') {
+            if (checkdate((int)$dob_month, (int)$dob_date, (int)$dob_year)) {
+                $dob = sprintf('%04d-%02d-%02d', $dob_year, $dob_month, $dob_date);
+            } else {
+                $errors['dob_date'] = 'Please enter a valid date of birth.';
+            }
+        } elseif ($dob_year === '' && $dob_month === '' && $dob_date === '') {
+            $dob = null;
+        } else {
+            $errors['dob_date'] = 'Please completely fill or clear your date of birth.';
         }
 
-        // Validation
-        if ($name === '' || $email === '') {
-            json_response(false, 'Name and email are required.');
+        if ($name === '') $errors['name'] = 'Name is required.';
+        elseif (!validate_name($name)) $errors['name'] = 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.';
+        
+        if ($email === '') $errors['email'] = 'Email is required.';
+        elseif (!validate_email($email)) $errors['email'] = 'Please enter a valid email address.';
+        
+        if ($phone !== '' && !validate_phone($phone)) {
+            $errors['phone'] = 'Please enter a valid phone number.';
         }
-        if (!validate_name($name)) {
-            json_response(false, 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        
+        if ($address !== '' && mb_strlen($address) > 500) {
+            $errors['address'] = 'Address is too long (maximum 500 characters).';
         }
-        if (!validate_email($email)) {
-            json_response(false, 'Please enter a valid email address.');
-        }
-        if ($phone !== '' && $phone !== null && !validate_phone($phone)) {
-            json_response(false, 'Please enter a valid phone number (e.g., 09XX-XXX-XXXX).');
-        }
-        if ($address !== null && mb_strlen($address) > 500) {
-            json_response(false, 'Address is too long (maximum 500 characters).');
+
+        if (!empty($errors)) {
+            json_response(false, 'Please fix the errors below.', ['errors' => $errors]);
         }
 
         $safeName = sanitize_string($name);
 
         try {
-            db_execute($pdo,
-                'UPDATE users SET full_name = :name, email = :email, phone = :phone, address = :address, gender = :gender, dob = :dob WHERE id = :id',
-                [
-                    ':name'    => $safeName,
-                    ':email'   => $email,
-                    ':phone'   => $phone   ?: null,
-                    ':address' => $address ?: null,
-                    ':gender'  => $gender  ?: null,
-                    ':dob'     => $dob     ?: null,
-                    ':id'      => (int) $_SESSION['user_id'],
-                ]
-            );
-            
-            // Update session if needed
+            db_execute($pdo, 'UPDATE users SET full_name = :name, email = :email, phone = :phone, address = :address, gender = :gender, dob = :dob WHERE id = :id', [
+                ':name'    => $safeName,
+                ':email'   => $email,
+                ':phone'   => $phone ?: null,
+                ':address' => $address ?: null,
+                ':gender'  => $gender ?: null,
+                ':dob'     => $dob,
+                ':id'      => $userId,
+            ]);
             $_SESSION['user_name']  = $safeName;
             $_SESSION['user_email'] = $email;
-            
         } catch (PDOException $e) {
             error_log('[Maison Ungod] Profile update failed: ' . $e->getMessage());
             json_response(false, 'Failed to update profile. Please try again.');
@@ -259,9 +207,6 @@ switch ($action) {
         json_response(true, 'Profile updated successfully.');
         break;
 
-    // ═══════════════════════
-    // CHANGE PASSWORD
-    // ═══════════════════════
     case 'change_password':
         require_auth();
 
@@ -269,23 +214,24 @@ switch ($action) {
         $new_password     = $_POST['new_password']     ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
 
-        if ($current_password === '' || $new_password === '' || $confirm_password === '') {
-            json_response(false, 'All fields are required.');
-        }
+        $errors = [];
 
-        if ($new_password !== $confirm_password) {
-            json_response(false, 'New passwords do not match.');
-        }
+        if ($current_password === '') $errors['current_password'] = 'Current password is required.';
+        if ($new_password === '') $errors['new_password'] = 'New password is required.';
+        elseif (!validate_password($new_password)) $errors['new_password'] = 'New password must be at least 6 characters.';
 
-        if (strlen($new_password) < 6) {
-            json_response(false, 'New password must be at least 6 characters.');
-        }
+        if ($confirm_password === '') $errors['confirm_password'] = 'Please confirm your new password.';
+        elseif ($new_password !== $confirm_password) $errors['confirm_password'] = 'New passwords do not match.';
 
         $userId = (int) $_SESSION['user_id'];
         $user = db_fetch($pdo, 'SELECT password FROM users WHERE id = :id', [':id' => $userId]);
 
         if (!$user || !password_verify($current_password, $user['password'])) {
-            json_response(false, 'Incorrect current password.');
+            $errors['current_password'] = 'Incorrect current password.';
+        }
+
+        if (!empty($errors)) {
+            json_response(false, 'Please fix the errors below.', ['errors' => $errors]);
         }
 
         $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
@@ -302,9 +248,6 @@ switch ($action) {
         }
         break;
 
-    // ═══════════════════════
-    // DEFAULT
-    // ═══════════════════════
     default:
         json_response(false, 'Invalid action.');
         break;

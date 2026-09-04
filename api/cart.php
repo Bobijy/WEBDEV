@@ -10,15 +10,19 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 
 // Require a valid session — cart actions are never public
 require_auth();
 
 $userId = (int) $_SESSION['user_id'];
-$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+}
+
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 // ── Cart Retrieval / Creation ─────────────────────────────────────────────────
 /**
  * Return the cart ID for the given user.

@@ -10,8 +10,8 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 
 // Require admin role — will 403 and exit otherwise
 require_admin();

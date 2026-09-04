@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once __DIR__ . '/database/helpers.php';
 /**
  * Maison Ungod &mdash; Shop Page
  * Reproduces the reference design with maximum visual fidelity
@@ -23,8 +25,8 @@ $navLinks = [
 
 // â”€â”€â”€ Products (from DB) â”€â”€â”€
 // Only Active products are shown to customers; Draft products are hidden.
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/database/db.php';
+require_once __DIR__ . '/database/helpers.php';
 
 $products = [];
 $rows = db_fetch_all($pdo, "SELECT id, image, name, price FROM products WHERE status = 'Active' ORDER BY id ASC");
@@ -56,6 +58,7 @@ $socials = [
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
@@ -137,10 +140,10 @@ $socials = [
                     </span>
                     <div class="sort-dropdown" id="sortDropdown">
                         <button data-sort="default" class="active">Default</button>
-                        <button data-sort="price-asc">Price: Low â†’ High</button>
-                        <button data-sort="price-desc">Price: High â†’ Low</button>
-                        <button data-sort="name-asc">Name: A â†’ Z</button>
-                        <button data-sort="name-desc">Name: Z â†’ A</button>
+                        <button data-sort="price-asc">Price: Low &rarr; High</button>
+                        <button data-sort="price-desc">Price: High &rarr; Low</button>
+                        <button data-sort="name-asc">Name: A &rarr; Z</button>
+                        <button data-sort="name-desc">Name: Z &rarr; A</button>
                     </div>
                 </div>
             </div>

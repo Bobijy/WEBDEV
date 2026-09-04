@@ -13,6 +13,7 @@
  */
 async function updateCart(id, qty, action) {
     const formData = new FormData();
+        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
     formData.append('action', action);
     formData.append('item_id', id);
     if (action === 'update') formData.append('quantity', qty);

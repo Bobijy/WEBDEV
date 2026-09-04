@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once __DIR__ . '/database/helpers.php';
 /**
  * Maison Ungod &mdash; Luxury Perfume House
  * Pure PHP Landing Page
@@ -41,8 +43,8 @@ $categories = [
 
 // â”€â”€â”€ Collections (from DB) â”€â”€â”€
 // Only Active products are shown to homepage visitors.
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/database/db.php';
+require_once __DIR__ . '/database/helpers.php';
 
 $collections = [];
 $rows = db_fetch_all($pdo, "SELECT id, image, name, price FROM products WHERE status = 'Active' ORDER BY id ASC");
@@ -96,6 +98,7 @@ $socials = [
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">

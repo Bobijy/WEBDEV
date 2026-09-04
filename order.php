@@ -10,8 +10,8 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit;
 }
 
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/database/db.php';
+require_once __DIR__ . '/database/helpers.php';
 
 $order_id = (int) $_GET['id'];
 
@@ -56,6 +56,7 @@ $is_canceled = (strtolower($order['status']) === 'canceled');
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($site['name']) ?> — Order <?= $order_id ?></title>

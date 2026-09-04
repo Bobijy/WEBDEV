@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 require_once __DIR__ . '/includes/header.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -44,8 +44,9 @@ unset($_SESSION['form_errors']);
 </div>
 
 <div class="admin-modal" style="display: block; position: static; transform: none; width: 100%; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-    <form action="product_action.php" method="POST">
+    <form action="product_action.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="action" value="<?= $is_edit ? 'update' : 'add' ?>">
+        <input type="hidden" name="csrf_token" value="<?= CSRF::generate() ?>">
         <?php if ($is_edit): ?>
             <input type="hidden" name="id" value="<?= htmlspecialchars((string)$id) ?>">
         <?php endif; ?>
@@ -61,6 +62,14 @@ unset($_SESSION['form_errors']);
         <div class="form-group">
             <label>Description</label>
             <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars((string)$product['description']) ?></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Product Image <?= $is_edit ? '' : '<span style="color:red;">*</span>' ?></label>
+            <input type="file" name="image" class="form-control" accept="image/jpeg, image/png, image/webp, image/gif" <?= $is_edit ? '' : 'required' ?>>
+            <?php if (isset($errors['image'])): ?>
+                <div style="color:red; font-size: 0.85em; margin-top:5px;"><?= htmlspecialchars($errors['image']) ?></div>
+            <?php endif; ?>
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">

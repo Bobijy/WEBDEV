@@ -1,7 +1,7 @@
 <?php 
 require_once __DIR__ . '/includes/header.php'; 
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../database/db.php';
+require_once __DIR__ . '/../database/helpers.php';
 
 // Fetch products from database natively instead of via AJAX
 $products = db_fetch_all($pdo, 'SELECT * FROM products ORDER BY id DESC');
@@ -62,6 +62,7 @@ unset($_SESSION['msg'], $_SESSION['error']);
                                 <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= CSRF::generate() ?>">
                                     <button type="submit" class="btn" style="padding: 4px 8px; font-size: 12px; background-color: #dc3545;">Delete</button>
                                 </form>
                             </div>

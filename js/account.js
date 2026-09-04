@@ -97,11 +97,15 @@
             e.preventDefault();
             const btn = document.getElementById('loginSubmit');
             const msg = document.getElementById('loginMsg');
+            
+            window.MaisonUngod.clearFieldErrors(loginForm);
+            
             btn.disabled = true;
             btn.textContent = 'SIGNING IN...';
             
             const formData = new FormData(loginForm);
             formData.append('action', 'login');
+            formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
             
             try {
                 const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -113,6 +117,9 @@
                     msg.className = 'account-msg error';
                     msg.textContent = data.message;
                     msg.style.display = 'block';
+                    if (data.data && data.data.errors) {
+                        window.MaisonUngod.displayFieldErrors(loginForm, data.data.errors);
+                    }
                 }
             } catch (err) {
                 msg.className = 'account-msg error';
@@ -130,11 +137,15 @@
             e.preventDefault();
             const btn = document.getElementById('registerSubmit');
             const msg = document.getElementById('registerMsg');
+            
+            window.MaisonUngod.clearFieldErrors(registerForm);
+            
             btn.disabled = true;
             btn.textContent = 'CREATING...';
             
             const formData = new FormData(registerForm);
             formData.append('action', 'register');
+            formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
             
             try {
                 const response = await fetch('api/auth.php', { method: 'POST', body: formData });
@@ -146,6 +157,9 @@
                     msg.className = 'account-msg error';
                     msg.textContent = data.message;
                     msg.style.display = 'block';
+                    if (data.data && data.data.errors) {
+                        window.MaisonUngod.displayFieldErrors(registerForm, data.data.errors);
+                    }
                 }
             } catch (err) {
                 msg.className = 'account-msg error';

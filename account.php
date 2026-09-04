@@ -5,8 +5,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/database/db.php';
+require_once __DIR__ . '/database/helpers.php';
 
 // Fetch user data
 $user = db_fetch($pdo,
@@ -80,9 +80,10 @@ $socials = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($site['name']) ?> Ã¢â‚¬â€ My Account</title>
+    <title><?= htmlspecialchars($site['name']) ?> &mdash; My Account</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     

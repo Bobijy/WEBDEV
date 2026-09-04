@@ -11,30 +11,37 @@
     // 1. NAVBAR — Scroll Effect
     // ───────────────────────────────────
     const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 50);
-    });
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    }
 
     // ───────────────────────────────────
     // 2. HAMBURGER TOGGLE
     // ───────────────────────────────────
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        hamburger.classList.toggle('active');
-    });
-
-    // Close mobile nav on link click + transfer active highlight
-    const allNavLinks = navLinks.querySelectorAll('a');
-    allNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
-            hamburger.classList.remove('active');
-            allNavLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
+    
+    if (hamburger && navLinks) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
         });
-    });
+
+        // Close mobile nav on link click + transfer active highlight
+        const allNavLinks = navLinks.querySelectorAll('a');
+        allNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+                allNavLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+    }
+
+    const allNavLinks = navLinks ? navLinks.querySelectorAll('a') : [];
 
     // ── Scroll Spy — only on pages with hash-based nav links ──
     const sections = document.querySelectorAll('section[id]');
@@ -438,3 +445,41 @@
 
 
 })();
+
+// ───────────────────────────────────
+// GLOBAL HELPERS: CSRF & Field Errors
+// ───────────────────────────────────
+window.MaisonUngod = window.MaisonUngod || {};
+
+window.MaisonUngod.getCSRFToken = function() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.content : '';
+};
+
+window.MaisonUngod.displayFieldErrors = function(form, errors) {
+    // Clear old errors
+    form.querySelectorAll('.field-error').forEach(el => el.remove());
+    form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+    
+    if (!errors) return;
+
+    for (const [field, msg] of Object.entries(errors)) {
+        const input = form.querySelector(`[name="${field}"]`);
+        if (input) {
+            input.classList.add('has-error');
+            const errSpan = document.createElement('span');
+            errSpan.className = 'field-error';
+            errSpan.style.color = '#e74c3c';
+            errSpan.style.fontSize = '0.8rem';
+            errSpan.style.display = 'block';
+            errSpan.style.marginTop = '4px';
+            errSpan.textContent = msg;
+            input.parentNode.appendChild(errSpan);
+        }
+    }
+};
+
+window.MaisonUngod.clearFieldErrors = function(form) {
+    form.querySelectorAll('.field-error').forEach(el => el.remove());
+    form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+};
