@@ -185,8 +185,8 @@ $site = ['name' => 'Maison Ungod'];
                 <!-- Option 1 -->
                 <label class="payment-option active" id="label-cc">
                     <div class="payment-label-wrap">
-                        <input type="radio" name="payment_method" value="Credit Card" checked onclick="togglePayment(this, 'panel-cc')">
-                        <span>Credit card</span>
+                        <input type="radio" name="payment_method" value="Card" checked onclick="togglePayment(this, 'panel-cc')">
+                        <span>Card</span>
                     </div>
                     <div class="payment-icons">
                         <span style="background: #1434CB; color: white; padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: bold;">VISA</span>
@@ -214,17 +214,7 @@ $site = ['name' => 'Maison Ungod'];
                     </div>
                 </div>
                 
-                <!-- Option 2 -->
-                <label class="payment-option" id="label-paymongo">
-                    <div class="payment-label-wrap">
-                        <input type="radio" name="payment_method" value="PayMongo" onclick="togglePayment(this, 'panel-paymongo')">
-                        <span>Secure Payments via PayMongo</span>
-                    </div>
-                </label>
-                <div class="payment-panel" id="panel-paymongo">
-                    <p style="font-size: 0.8rem; color: var(--text-light); text-align: center; padding: 20px 0;">After clicking "Pay now", you will be redirected to PayMongo to complete your purchase securely.</p>
-                </div>
-                
+
                 <!-- Option 3 -->
                 <label class="payment-option" id="label-cod">
                     <div class="payment-label-wrap">
@@ -293,7 +283,6 @@ $site = ['name' => 'Maison Ungod'];
             <span>Total</span>
             <span class="val"><span class="currency">PHP</span>₱<?= number_format($grand_total, 2) ?></span>
         </div>
-        <p class="tax-note">Including ₱<?= number_format($taxes, 2) ?> in taxes</p>
     </div>
 </div>
 

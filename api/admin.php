@@ -64,6 +64,27 @@ switch ($action) {
                 LIMIT 5
             ');
 
+            // Sales data (last 7 days)
+            $salesData = db_fetch_all($pdo, "
+                SELECT DATE(created_at) as date, SUM(total_amount) as total
+                FROM orders
+                WHERE status != 'Cancelled' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                GROUP BY DATE(created_at)
+                ORDER BY date ASC
+            ");
+
+            // Best Selling Products (Top 4)
+            $bestSellers = db_fetch_all($pdo, "
+                SELECT p.id, p.name, p.image, p.price, SUM(oi.quantity) as total_sold
+                FROM order_items oi
+                JOIN products p ON oi.product_id = p.id
+                JOIN orders o ON oi.order_id = o.id
+                WHERE o.status != 'Cancelled'
+                GROUP BY p.id
+                ORDER BY total_sold DESC
+                LIMIT 4
+            ");
+
             json_response(true, '', [
                 'stats' => [
                     'total_products'   => (int) $productRow['c'],
@@ -72,8 +93,11 @@ switch ($action) {
                     'approved_orders'  => $orderCounts['Approved'],
                     'completed_orders' => $orderCounts['Completed'],
                     'total_customers'  => (int) $customerRow['c'],
+                    'all_order_counts' => $orderCounts // raw counts for the doughnut chart
                 ],
                 'recent_orders' => $recentOrders,
+                'sales_data'    => $salesData,
+                'best_sellers'  => $bestSellers
             ]);
         } catch (PDOException $e) {
             error_log('[Maison Ungod] Dashboard stats failed: ' . $e->getMessage());

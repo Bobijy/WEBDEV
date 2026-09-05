@@ -43,7 +43,7 @@ if ($selectedAddressId !== 'new') {
 }
 
 // ── Allowed Payment Methods (whitelist) ──────────────────────────────────────
-const ALLOWED_PAYMENT_METHODS = ['Credit Card', 'PayMongo', 'Cash On Delivery'];
+const ALLOWED_PAYMENT_METHODS = ['Card', 'Cash On Delivery'];
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
