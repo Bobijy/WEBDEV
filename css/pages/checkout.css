@@ -12,8 +12,8 @@
     --border: #D9D9D9;
     --text-main: #333333;
     --text-light: #737373;
-    --brand-color: #71416b;
-    --brand-hover: #5d3457;
+    --brand-color: #8E5886;
+    --brand-hover: #71416B;
     --error-color: #e74c3c;
 }
 
@@ -145,8 +145,10 @@ h2:first-of-type { margin-top: 0; }
 .floating-input input:focus + label,
 .floating-input input:not(:placeholder-shown) + label,
 .floating-input select + label {
-    top: 6px;
-    font-size: 0.65rem;
+    top: 8px;
+    font-size: 0.75rem;
+    color: var(--brand-color);
+    font-weight: 500;
 }
 
 /* Payment Selection Boxes */
@@ -236,7 +238,7 @@ h2:first-of-type { margin-top: 0; }
     margin-top: 20px;
 }
 
-.btn-pay:hover { background: var(--brand-hover); }
+.btn-pay:hover, .btn-pay:focus-visible { background: var(--brand-hover); outline: none; }
 .btn-pay:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* Sidebar Cart Items */

@@ -79,6 +79,10 @@
             e.preventDefault();
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
+            if (authHeader) {
+                const h2 = authHeader.querySelector('h2');
+                if (h2) h2.textContent = 'Create Account';
+            }
         });
     }
     if (showLoginBtn) {
@@ -86,6 +90,10 @@
             e.preventDefault();
             registerForm.style.display = 'none';
             loginForm.style.display = 'block';
+            if (authHeader) {
+                const h2 = authHeader.querySelector('h2');
+                if (h2) h2.textContent = 'Sign In';
+            }
         });
     }
 
