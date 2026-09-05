@@ -45,8 +45,8 @@ document.getElementById('pageRegisterForm').addEventListener('submit', async (e)
             msg.textContent = data.message;
             msg.style.display = 'block';
             
-            if (data.data && data.data.errors) {
-                window.MaisonUngod.displayFieldErrors(form, data.data.errors);
+            if (data.errors) {
+                window.MaisonUngod.displayFieldErrors(form, data.errors);
             }
             
             btn.disabled = false;

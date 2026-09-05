@@ -73,8 +73,8 @@ if (inlineProfileForm) {
                 editMsg.className = 'edit-msg error';
                 editMsg.textContent = data.message || 'Error updating profile.';
                 editMsg.style.display = 'block';
-                if (data.data && data.data.errors) {
-                    window.MaisonUngod.displayFieldErrors(inlineProfileForm, data.data.errors);
+                if (data.errors) {
+                    window.MaisonUngod.displayFieldErrors(inlineProfileForm, data.errors);
                 }
             }
         } catch (err) {
@@ -147,8 +147,8 @@ if (addressForm) {
                 addrMsg.className = 'edit-msg error';
                 addrMsg.textContent = data.message || 'Error saving address.';
                 addrMsg.style.display = 'block';
-                if (data.data && data.data.errors) {
-                    window.MaisonUngod.displayFieldErrors(addressForm, data.data.errors);
+                if (data.errors) {
+                    window.MaisonUngod.displayFieldErrors(addressForm, data.errors);
                 }
                 btn.disabled = false;
                 btn.textContent = 'Save';
@@ -259,8 +259,8 @@ if (changeFieldForm) {
                 changeFieldMsg.className = 'edit-msg error';
                 changeFieldMsg.textContent = data.message || 'Error updating field.';
                 changeFieldMsg.style.display = 'block';
-                if (data.data && data.data.errors) {
-                    window.MaisonUngod.displayFieldErrors(changeFieldForm, data.data.errors);
+                if (data.errors) {
+                    window.MaisonUngod.displayFieldErrors(changeFieldForm, data.errors);
                 }
                 btn.disabled = false;
                 btn.textContent = 'Save';
@@ -329,8 +329,8 @@ if (passwordForm) {
                 passwordMsg.className = 'edit-msg error';
                 passwordMsg.textContent = data.message || 'Error updating password.';
                 passwordMsg.style.display = 'block';
-                if (data.data && data.data.errors) {
-                    window.MaisonUngod.displayFieldErrors(passwordForm, data.data.errors);
+                if (data.errors) {
+                    window.MaisonUngod.displayFieldErrors(passwordForm, data.errors);
                 }
                 btn.disabled = false;
                 btn.textContent = 'Save Password';

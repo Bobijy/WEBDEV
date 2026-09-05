@@ -125,8 +125,8 @@
                     msg.className = 'account-msg error';
                     msg.textContent = data.message;
                     msg.style.display = 'block';
-                    if (data.data && data.data.errors) {
-                        window.MaisonUngod.displayFieldErrors(loginForm, data.data.errors);
+                    if (data.errors) {
+                        window.MaisonUngod.displayFieldErrors(loginForm, data.errors);
                     }
                 }
             } catch (err) {
@@ -165,8 +165,8 @@
                     msg.className = 'account-msg error';
                     msg.textContent = data.message;
                     msg.style.display = 'block';
-                    if (data.data && data.data.errors) {
-                        window.MaisonUngod.displayFieldErrors(registerForm, data.data.errors);
+                    if (data.errors) {
+                        window.MaisonUngod.displayFieldErrors(registerForm, data.errors);
                     }
                 }
             } catch (err) {

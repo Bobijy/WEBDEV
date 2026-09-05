@@ -7,7 +7,7 @@ class Validation {
     public static function name(string $name): bool {
         $len = mb_strlen($name);
         if ($len < 2 || $len > 100) return false;
-        return (bool) preg_match("/^[\p{L}\s'\-]+$/u", $name);
+        return (bool) preg_match("/^[\p{L}\s'\-,\.]+$/u", $name);
     }
 
     public static function phone(string $phone): bool {
