@@ -55,13 +55,13 @@ switch ($action) {
             // Customer count
             $customerRow = db_fetch($pdo, "SELECT COUNT(*) AS c FROM users WHERE role = 'customer'");
 
-            // 5 most recent orders
+            // 10 most recent orders
             $recentOrders = db_fetch_all($pdo, '
-                SELECT o.id, o.total_amount, o.status, o.created_at, u.full_name
+                SELECT o.id, o.total_amount, o.status, o.created_at, o.payment_method, u.full_name
                 FROM   orders o
                 JOIN   users u ON o.user_id = u.id
                 ORDER BY o.created_at DESC
-                LIMIT 5
+                LIMIT 10
             ');
 
             // Sales data (last 7 days)
@@ -73,7 +73,7 @@ switch ($action) {
                 ORDER BY date ASC
             ");
 
-            // Best Selling Products (Top 4)
+            // Best Selling Products (Top 5)
             $bestSellers = db_fetch_all($pdo, "
                 SELECT p.id, p.name, p.image, p.price, SUM(oi.quantity) as total_sold
                 FROM order_items oi
@@ -82,8 +82,41 @@ switch ($action) {
                 WHERE o.status != 'Cancelled'
                 GROUP BY p.id
                 ORDER BY total_sold DESC
-                LIMIT 4
+                LIMIT 5
             ");
+
+            // Revenue Statistics (Today, Month, Year, Total, Average)
+            $revStatsRow = db_fetch($pdo, "
+                SELECT 
+                    SUM(CASE WHEN DATE(created_at) = CURDATE() THEN total_amount ELSE 0 END) as today_rev,
+                    SUM(CASE WHEN MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) THEN total_amount ELSE 0 END) as month_rev,
+                    SUM(CASE WHEN YEAR(created_at) = YEAR(CURDATE()) THEN total_amount ELSE 0 END) as year_rev,
+                    SUM(total_amount) as total_rev,
+                    AVG(total_amount) as avg_order_val
+                FROM orders
+                WHERE status != 'Cancelled'
+            ");
+
+            // Notifications
+            $lowStockProducts = db_fetch_all($pdo, "SELECT id, name, stock FROM products WHERE stock <= 10");
+            $newOrdersToday = db_fetch_all($pdo, "SELECT id, created_at FROM orders WHERE DATE(created_at) = CURDATE() ORDER BY created_at DESC");
+            
+            $notifications = [];
+            foreach ($lowStockProducts as $prod) {
+                $notifications[] = [
+                    'type' => 'low_stock',
+                    'message' => 'Low stock for: ' . $prod['name'] . ' (' . $prod['stock'] . ' left)',
+                    'time' => date('Y-m-d H:i:s')
+                ];
+            }
+            foreach ($newOrdersToday as $ord) {
+                $notifications[] = [
+                    'type' => 'new_order',
+                    'message' => 'New order received: #' . str_pad($ord['id'], 5, '0', STR_PAD_LEFT),
+                    'time' => $ord['created_at']
+                ];
+            }
+
 
             json_response(true, '', [
                 'stats' => [
@@ -97,11 +130,68 @@ switch ($action) {
                 ],
                 'recent_orders' => $recentOrders,
                 'sales_data'    => $salesData,
-                'best_sellers'  => $bestSellers
+                'best_sellers'  => $bestSellers,
+                'revenue_stats' => [
+                    'today' => (float) ($revStatsRow['today_rev'] ?? 0),
+                    'month' => (float) ($revStatsRow['month_rev'] ?? 0),
+                    'year'  => (float) ($revStatsRow['year_rev'] ?? 0),
+                    'total' => (float) ($revStatsRow['total_rev'] ?? 0),
+                    'avg'   => (float) ($revStatsRow['avg_order_val'] ?? 0)
+                ],
+                'notifications' => $notifications
             ]);
         } catch (PDOException $e) {
             error_log('[Maison Ungod] Dashboard stats failed: ' . $e->getMessage());
             json_response(false, 'Failed to load dashboard stats.');
+        }
+        break;
+    // ─── SALES CHART ─────────────────────────────────────────────────────────
+    case 'sales_chart':
+        $range = $_GET['range'] ?? 'week';
+        $interval = '6 DAY';
+        if ($range === 'today') $interval = '0 DAY'; // Only today
+        if ($range === 'month') $interval = '1 MONTH';
+        if ($range === 'year')  $interval = '1 YEAR';
+        
+        try {
+            if ($range === 'today') {
+                $query = "SELECT DATE_FORMAT(created_at, '%H:00') as label, SUM(total_amount) as total, COUNT(*) as orders
+                          FROM orders WHERE status != 'Cancelled' AND DATE(created_at) = CURDATE()
+                          GROUP BY HOUR(created_at) ORDER BY created_at ASC";
+            } else {
+                $query = "SELECT DATE(created_at) as label, SUM(total_amount) as total, COUNT(*) as orders
+                          FROM orders WHERE status != 'Cancelled' AND created_at >= DATE_SUB(CURDATE(), INTERVAL $interval)
+                          GROUP BY DATE(created_at) ORDER BY label ASC";
+            }
+            $data = db_fetch_all($pdo, $query);
+            json_response(true, '', ['sales_data' => $data]);
+        } catch (PDOException $e) {
+            json_response(false, 'Failed to load sales chart.');
+        }
+        break;
+
+    // ─── GLOBAL SEARCH ───────────────────────────────────────────────────────
+    case 'global_search':
+        $q = sanitize_raw($_GET['q'] ?? '');
+        if (strlen($q) < 2) json_response(true, '', ['results' => []]);
+        
+        $results = [];
+        try {
+            // Search Products
+            $products = db_fetch_all($pdo, "SELECT id, name, price FROM products WHERE name LIKE :q LIMIT 3", [':q' => "%$q%"]);
+            foreach($products as $p) $results[] = ['type' => 'Product', 'id' => $p['id'], 'label' => $p['name'], 'url' => "products.php?id=".$p['id']];
+            
+            // Search Orders
+            $orders = db_fetch_all($pdo, "SELECT id, total_amount FROM orders WHERE id LIKE :q OR order_number LIKE :q LIMIT 3", [':q' => "%$q%"]);
+            foreach($orders as $o) $results[] = ['type' => 'Order', 'id' => $o['id'], 'label' => 'Order #'.str_pad($o['id'], 5, '0', STR_PAD_LEFT), 'url' => "orders.php?id=".$o['id']];
+            
+            // Search Customers
+            $users = db_fetch_all($pdo, "SELECT id, full_name FROM users WHERE full_name LIKE :q OR email LIKE :q LIMIT 3", [':q' => "%$q%"]);
+            foreach($users as $u) $results[] = ['type' => 'User', 'id' => $u['id'], 'label' => $u['full_name'], 'url' => "users.php?id=".$u['id']];
+            
+            json_response(true, '', ['results' => $results]);
+        } catch(PDOException $e) {
+            json_response(false, 'Search failed.');
         }
         break;
 

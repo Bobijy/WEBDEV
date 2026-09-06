@@ -90,9 +90,10 @@
                         <td>${o.full_name}</td>
                         <td style="color:var(--text-muted);">${formatDate(o.created_at)}</td>
                         <td><span class="badge ${badgeColor(o.status)}">${o.status}</span></td>
+                        <td style="color:var(--text-muted);">${o.payment_method || 'N/A'}</td>
                         <td style="font-weight:500;">$${parseFloat(o.total_amount).toFixed(2)}</td>
                         <td>
-                            <button class="action-btn" title="View Options">
+                            <button class="action-btn" title="View Options" onclick="window.location.href='orders.php?id=${o.id}'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
                             </button>
                         </td>
@@ -134,145 +135,49 @@
             }
         }
 
-        // Initialize Chart.js if loaded
-        if (typeof Chart !== 'undefined') {
-            initCharts(data);
+        // Revenue Stats Widget
+        if (data.revenue_stats) {
+            const revCard = document.getElementById('revToday');
+            if(revCard) revCard.textContent = `$${parseFloat(data.revenue_stats.today).toFixed(2)}`;
+            const revMonth = document.getElementById('revMonth');
+            if(revMonth) revMonth.textContent = `$${parseFloat(data.revenue_stats.month).toFixed(2)}`;
+            const revYear = document.getElementById('revYear');
+            if(revYear) revYear.textContent = `$${parseFloat(data.revenue_stats.year).toFixed(2)}`;
+            const revAvg = document.getElementById('revAvg');
+            if(revAvg) revAvg.textContent = `$${parseFloat(data.revenue_stats.avg).toFixed(2)}`;
         }
-    }
 
-    function initCharts(data) {
-        Chart.defaults.color = '#9CA3AF';
-        Chart.defaults.font.family = "'Inter', sans-serif";
-
-        const salesCtx = document.getElementById('salesLineChart');
-        if (salesCtx && data.sales_data) {
-            const labels = data.sales_data.map(d => {
-                const date = new Date(d.date);
-                return \`\${date.toLocaleString('default', { month: 'short' })} \${date.getDate()}\`;
-            });
-            const amounts = data.sales_data.map(d => parseFloat(d.total));
-
-            const ctx = salesCtx.getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(124, 58, 237, 0.4)');
-            gradient.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
-
-            new Chart(salesCtx, {
-                type: 'line',
-                data: {
-                    labels: labels.length > 0 ? labels : ['No Data'],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: amounts.length > 0 ? amounts : [0],
-                        borderColor: '#7C3AED',
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#18181F',
-                        pointBorderColor: '#7C3AED',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#111116',
-                            titleColor: '#F5F5F5',
-                            bodyColor: '#D4AF37',
-                            borderColor: '#2C2C35',
-                            borderWidth: 1,
-                            padding: 10,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                            ticks: { maxTicksLimit: 6 }
-                        },
-                        x: {
-                            grid: { display: false, drawBorder: false }
-                        }
-                    }
+        // Notifications
+        if (data.notifications) {
+            const notifBadge = document.getElementById('notifBadge');
+            const notifList = document.getElementById('notificationList');
+            if (notifBadge && notifList) {
+                if (data.notifications.length > 0) {
+                    notifBadge.textContent = data.notifications.length;
+                    notifBadge.style.display = 'flex';
+                    let notifHtml = '';
+                    data.notifications.forEach(n => {
+                        const icon = n.type === 'low_stock' 
+                            ? `<svg class="text-warning" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`
+                            : `<svg class="text-success" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+                        notifHtml += `
+                            <div class="notif-item">
+                                <div class="notif-icon">${icon}</div>
+                                <div class="notif-content">
+                                    <div class="notif-msg">${n.message}</div>
+                                    <div class="notif-time">${formatDate(n.time)}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    notifList.innerHTML = notifHtml;
+                } else {
+                    notifBadge.style.display = 'none';
+                    notifList.innerHTML = '<div style="padding: 1rem; text-align: center; color: var(--text-muted);">No new notifications</div>';
                 }
-            });
+            }
         }
 
-        const statusCtx = document.getElementById('orderStatusChart');
-        if (statusCtx && data.stats && data.stats.all_order_counts) {
-            const counts = data.stats.all_order_counts;
-            const pending = parseInt(counts.Pending) || 0;
-            const completed = parseInt(counts.Completed) || 0;
-            const cancelled = parseInt(counts.Cancelled) || 0;
-            const processing = parseInt(counts.Processing) || 0;
-            const total = pending + completed + cancelled + processing;
-
-            new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pending', 'Completed', 'Processing', 'Cancelled'],
-                    datasets: [{
-                        data: [pending, completed, processing, cancelled],
-                        backgroundColor: ['#F59E0B', '#22C55E', '#3B82F6', '#EF4444'],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' }
-                        },
-                        tooltip: {
-                            backgroundColor: '#111116',
-                            borderColor: '#2C2C35',
-                            borderWidth: 1,
-                            padding: 12
-                        }
-                    }
-                },
-                plugins: [{
-                    id: 'textCenter',
-                    beforeDraw: function(chart) {
-                        var width = chart.width, height = chart.height, ctx = chart.ctx;
-                        ctx.restore();
-                        var fontSize = (height / 110).toFixed(2);
-                        ctx.font = "600 " + fontSize + "em Inter";
-                        ctx.textBaseline = "middle";
-                        ctx.fillStyle = "#FFFFFF";
-                
-                        var text = total.toString(),
-                            textX = Math.round((width - ctx.measureText(text).width) / 2) - 40,
-                            textY = height / 2 - 10;
-                
-                        ctx.fillText(text, textX, textY);
-                        
-                        ctx.font = "400 " + (fontSize * 0.4).toFixed(2) + "em Inter";
-                        ctx.fillStyle = "#9CA3AF";
-                        var text2 = "Orders";
-                        var text2X = Math.round((width - ctx.measureText(text2).width) / 2) - 40;
-                        ctx.fillText(text2, text2X, textY + 25);
-                        ctx.save();
-                    }
-                }]
-            });
-        }
     }
 
     // ── PRODUCTS ──

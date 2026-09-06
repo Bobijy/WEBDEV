@@ -90,32 +90,30 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<!-- CHARTS GRID -->
-<div class="charts-grid">
-    <!-- Main Line Chart -->
-    <div class="chart-card" style="grid-column: span 2;">
-        <div class="chart-header">
-            <div class="chart-title">Sales Overview</div>
-            <div class="chart-actions">
-                <select id="salesChartRange">
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                    <option value="year">This Year</option>
-                </select>
-            </div>
-        </div>
-        <div class="chart-body">
-            <canvas id="salesLineChart"></canvas>
+<!-- REVENUE STATS GRID -->
+<div class="revenue-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 30px;">
+    <div class="stat-card" style="padding: 20px;">
+        <div class="stat-info">
+            <div class="stat-subtext" style="margin-bottom: 5px;">Today's Revenue</div>
+            <h3 id="revToday" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
         </div>
     </div>
-
-    <!-- Doughnut Chart -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div class="chart-title">Order Status</div>
+    <div class="stat-card" style="padding: 20px;">
+        <div class="stat-info">
+            <div class="stat-subtext" style="margin-bottom: 5px;">Monthly Revenue</div>
+            <h3 id="revMonth" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
         </div>
-        <div class="chart-body" style="display:flex; align-items:center; justify-content:center;">
-            <canvas id="orderStatusChart"></canvas>
+    </div>
+    <div class="stat-card" style="padding: 20px;">
+        <div class="stat-info">
+            <div class="stat-subtext" style="margin-bottom: 5px;">Yearly Revenue</div>
+            <h3 id="revYear" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
+        </div>
+    </div>
+    <div class="stat-card" style="padding: 20px;">
+        <div class="stat-info">
+            <div class="stat-subtext" style="margin-bottom: 5px;">Avg Order Value</div>
+            <h3 id="revAvg" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
         </div>
     </div>
 </div>
@@ -136,12 +134,13 @@ require_once __DIR__ . '/includes/header.php';
                         <th>Customer</th>
                         <th>Date</th>
                         <th>Status</th>
+                        <th>Payment Method</th>
                         <th>Total</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
