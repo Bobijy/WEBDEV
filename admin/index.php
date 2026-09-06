@@ -90,34 +90,6 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<!-- REVENUE STATS GRID -->
-<div class="revenue-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 30px;">
-    <div class="stat-card" style="padding: 20px;">
-        <div class="stat-info">
-            <div class="stat-subtext" style="margin-bottom: 5px;">Today's Revenue</div>
-            <h3 id="revToday" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
-        </div>
-    </div>
-    <div class="stat-card" style="padding: 20px;">
-        <div class="stat-info">
-            <div class="stat-subtext" style="margin-bottom: 5px;">Monthly Revenue</div>
-            <h3 id="revMonth" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
-        </div>
-    </div>
-    <div class="stat-card" style="padding: 20px;">
-        <div class="stat-info">
-            <div class="stat-subtext" style="margin-bottom: 5px;">Yearly Revenue</div>
-            <h3 id="revYear" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
-        </div>
-    </div>
-    <div class="stat-card" style="padding: 20px;">
-        <div class="stat-info">
-            <div class="stat-subtext" style="margin-bottom: 5px;">Avg Order Value</div>
-            <h3 id="revAvg" style="font-size: 1.5rem; margin: 0; color: #F5F5F5;">$0.00</h3>
-        </div>
-    </div>
-</div>
-
 <!-- TABLES & LISTS GRID -->
 <div class="tables-grid">
     <!-- Recent Orders -->
@@ -146,7 +118,7 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <!-- Best Selling Products -->
+        <!-- Best Selling Products -->
     <div class="admin-table-container">
         <div class="table-header">
             <div class="table-title">Best Selling Products</div>

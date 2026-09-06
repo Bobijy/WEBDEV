@@ -14,7 +14,6 @@ unset($_SESSION['msg'], $_SESSION['error']);
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Product Catalog</h3>
-    <a href="product_form.php" class="btn">Add Product</a>
 </div>
 
 <?php if ($msg): ?>
@@ -42,7 +41,7 @@ unset($_SESSION['msg'], $_SESSION['error']);
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="productsTableBody">
             <?php if (count($products) > 0): ?>
                 <?php foreach ($products as $p): ?>
                     <tr>
@@ -58,7 +57,7 @@ unset($_SESSION['msg'], $_SESSION['error']);
                         </td>
                         <td>
                             <div style="display:flex; gap: 5px;">
-                                <a href="product_form.php?id=<?= $p['id'] ?>" class="btn" style="padding: 4px 8px; font-size: 12px;">Edit</a>
+                                <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editProduct(<?= $p['id'] ?>)">Edit</button>
                                 <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
@@ -78,7 +77,90 @@ unset($_SESSION['msg'], $_SESSION['error']);
     </table>
 </div>
 
+
+
+
+<!-- AJAX Edit Product Modal -->
+<div class="modal-overlay" id="editProductModalOverlay"></div>
+<div class="admin-modal" id="editProductModal" style="width: 100%; max-width: 600px;">
+    <div class="modal-header">
+        <div class="modal-title">Edit Product</div>
+        <button class="modal-close" id="closeEditProductModal">&times;</button>
+    </div>
+    <div class="modal-body">
+        <form id="editProductForm" enctype="multipart/form-data">
+            <!-- CSRF Token -->
+            <input type="hidden" name="csrf_token" value="<?= CSRF::generate() ?>">
+            <input type="hidden" name="action" value="edit_product">
+            <input type="hidden" name="id" id="editProductId">
+
+            <div id="editModalFormError" style="display:none; background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #f5c6cb; font-size: 13px;"></div>
+
+            <div class="form-group">
+                <label>Product Name <span style="color:red;">*</span></label>
+                <input type="text" name="name" id="editProductName" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" id="editProductDesc" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div style="display:flex; gap:15px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Category <span style="color:red;">*</span></label>
+                    <select name="category" id="editProductCat" class="form-control" required>
+                        <option value="Pour Homme">Pour Homme</option>
+                        <option value="Pour Femme">Pour Femme</option>
+                        <option value="Unisex">Unisex</option>
+                        <option value="Uncategorized">Uncategorized</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Brand</label>
+                    <input type="text" name="brand" id="editProductBrand" class="form-control" placeholder="e.g. Maison Ungod">
+                </div>
+            </div>
+
+            <div style="display:flex; gap:15px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Price (₱) <span style="color:red;">*</span></label>
+                    <input type="number" step="0.01" name="price" id="editProductPrice" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Stock Quantity <span style="color:red;">*</span></label>
+                    <input type="number" name="stock" id="editProductStock" class="form-control" required min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Status <span style="color:red;">*</span></label>
+                <select name="status" id="editProductStatus" class="form-control" required>
+                    <option value="Active">Active</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Hidden">Hidden</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Current Image</label>
+                <div style="margin-bottom: 10px;">
+                    <img id="editProductImgPreview" src="" alt="Product Image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: none;">
+                </div>
+                <label>Replace Image <small>(optional, Max 5MB)</small></label>
+                <input type="file" name="image" id="editProductImageInput" class="form-control" accept="image/jpeg, image/png, image/webp, image/gif">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button type="submit" class="btn" style="flex:1;" id="saveEditProductBtn">Update Product</button>
+                <button type="button" class="btn btn-outline" style="flex:1;" id="cancelEditProductBtn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+    let productsList = <?= json_encode($products) ?>;
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pageTitle').textContent = 'Manage Products';
     });

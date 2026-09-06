@@ -135,18 +135,6 @@
             }
         }
 
-        // Revenue Stats Widget
-        if (data.revenue_stats) {
-            const revCard = document.getElementById('revToday');
-            if(revCard) revCard.textContent = `$${parseFloat(data.revenue_stats.today).toFixed(2)}`;
-            const revMonth = document.getElementById('revMonth');
-            if(revMonth) revMonth.textContent = `$${parseFloat(data.revenue_stats.month).toFixed(2)}`;
-            const revYear = document.getElementById('revYear');
-            if(revYear) revYear.textContent = `$${parseFloat(data.revenue_stats.year).toFixed(2)}`;
-            const revAvg = document.getElementById('revAvg');
-            if(revAvg) revAvg.textContent = `$${parseFloat(data.revenue_stats.avg).toFixed(2)}`;
-        }
-
         // Notifications
         if (data.notifications) {
             const notifBadge = document.getElementById('notifBadge');
@@ -181,106 +169,141 @@
     }
 
     // ── PRODUCTS ──
-    let productsList = [];
+    const editProductModal = document.getElementById('editProductModal');
+    const editProductModalOverlay = document.getElementById('editProductModalOverlay');
+    const editProductForm = document.getElementById('editProductForm');
+    const editModalFormError = document.getElementById('editModalFormError');
+
+    function closeEditProductModal() {
+        if (editProductModal) editProductModal.classList.remove('open');
+        if (editProductModalOverlay) editProductModalOverlay.classList.remove('open');
+        if (editProductForm) editProductForm.reset();
+        if (editModalFormError) editModalFormError.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    if (document.getElementById('closeEditProductModal')) {
+        document.getElementById('closeEditProductModal').addEventListener('click', closeEditProductModal);
+    }
+    
+    if (document.getElementById('cancelEditProductBtn')) {
+        document.getElementById('cancelEditProductBtn').addEventListener('click', closeEditProductModal);
+    }
+
+    window.editProduct = function(id) {
+        if (typeof productsList === 'undefined') return;
+        const p = productsList.find(x => x.id == id);
+        if(!p) return;
+
+        document.getElementById('editProductId').value = p.id;
+        document.getElementById('editProductName').value = p.name;
+        document.getElementById('editProductDesc').value = p.description || '';
+        document.getElementById('editProductCat').value = p.category;
+        document.getElementById('editProductBrand').value = p.brand || '';
+        document.getElementById('editProductPrice').value = p.price;
+        document.getElementById('editProductStock').value = p.stock;
+        document.getElementById('editProductStatus').value = p.status;
+
+        const imgPreview = document.getElementById('editProductImgPreview');
+        if (p.image) {
+            imgPreview.src = '../' + p.image;
+            imgPreview.style.display = 'block';
+        } else {
+            imgPreview.style.display = 'none';
+        }
+
+        editProductModal.classList.add('open');
+        editProductModalOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveEditProductBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Updating...';
+            btn.disabled = true;
+            editModalFormError.style.display = 'none';
+
+            const formData = new FormData(editProductForm);
+
+            try {
+                const response = await fetch('../api/admin.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeEditProductModal();
+                    showToast('Product updated successfully!');
+                    fetchProducts();
+                } else {
+                    let errHtml = '<strong>Error:</strong><br>';
+                    if (data.errors) {
+                        for (let field in data.errors) {
+                            errHtml += `- ${data.errors[field]}<br>`;
+                        }
+                    } else {
+                        errHtml += data.message || 'An unknown error occurred.';
+                    }
+                    editModalFormError.innerHTML = errHtml;
+                    editModalFormError.style.display = 'block';
+                }
+            } catch (err) {
+                editModalFormError.innerHTML = '<strong>Connection Error:</strong> Could not connect to server.';
+                editModalFormError.style.display = 'block';
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+
     window.fetchProducts = async function() {
         const data = await apiCall('get_products');
         if (!data || !data.success) return;
-        productsList = data.products;
-
-        const tbody = document.querySelector('#productsTable tbody');
-        if (productsList.length === 0) {
+        
+        productsList = data.products; // Update global array
+        const tbody = document.getElementById('productsTableBody');
+        if (!tbody) return;
+        
+        if (data.products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No products found.</td></tr>';
         } else {
             let html = '';
-            productsList.forEach(p => {
+            data.products.forEach(p => {
+                const statusColor = p.status === 'Active' ? '#e2f5ec' : '#f0f0f0';
+                const textColor = p.status === 'Active' ? '#1b8b54' : '#666';
+                const imgTag = p.image ? `<img src="../${p.image}" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">` : '';
                 html += `
                     <tr>
-                        <td><img src="../${p.image}" alt=""></td>
+                        <td>${imgTag}</td>
                         <td>${p.name}</td>
                         <td>${p.category}</td>
                         <td>$${parseFloat(p.price).toFixed(2)}</td>
                         <td>${p.stock}</td>
-                        <td><span class="badge ${badgeColor(p.status)}">${p.status}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick="editProduct(${p.id})">Edit</button>
-                            <button class="btn btn-sm btn-outline" style="color:#e74c3c; border-color:#e74c3c;" onclick="deleteProduct(${p.id})">Delete</button>
+                            <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: ${statusColor}; color: ${textColor};">
+                                ${p.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap: 5px;">
+                                <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editProduct(${p.id})">Edit</button>
+                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="${p.id}">
+                                    <input type="hidden" name="csrf_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                                    <button type="submit" class="btn" style="padding: 4px 8px; font-size: 12px; background-color: #dc3545;">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 `;
             });
             tbody.innerHTML = html;
-        }
-    }
-
-    // Product Modal Logic
-    const prodModal = document.getElementById('productModal');
-    const prodOverlay = document.getElementById('productModalOverlay');
-    const prodForm = document.getElementById('productForm');
-    
-    if (document.getElementById('openAddProductModal')) {
-        document.getElementById('openAddProductModal').addEventListener('click', () => {
-            prodForm.reset();
-            document.getElementById('prodId').value = '';
-            document.getElementById('productModalTitle').textContent = 'Add Product';
-            prodModal.classList.add('open');
-            prodOverlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        });
-    }
-    
-    function closeProductModal() {
-        prodModal.classList.remove('open');
-        prodOverlay.classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    if (document.getElementById('closeProductModal')) {
-        document.getElementById('closeProductModal').addEventListener('click', closeProductModal);
-    }
-
-
-    window.editProduct = function(id) {
-        const p = productsList.find(x => x.id == id);
-        if(!p) return;
-        
-        document.getElementById('prodId').value = p.id;
-        document.getElementById('prodName').value = p.name;
-        document.getElementById('prodDesc').value = p.description;
-        document.getElementById('prodPrice').value = p.price;
-        document.getElementById('prodStock').value = p.stock;
-        document.getElementById('prodCategory').value = p.category;
-        document.getElementById('prodStatus').value = p.status;
-        
-        document.getElementById('productModalTitle').textContent = 'Edit Product';
-        prodModal.classList.add('open');
-        prodOverlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-
-    if (prodForm) {
-        prodForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(prodForm);
-            const action = formData.get('id') ? 'update_product' : 'add_product';
-            const data = await apiCall(action, 'POST', formData);
-            if (data && data.success) {
-                prodModal.classList.remove('open');
-                prodOverlay.classList.remove('open');
-                fetchProducts();
-            } else {
-                alert(data ? data.message : 'Error saving product');
-            }
-        });
-    }
-
-    window.deleteProduct = async function(id) {
-        if(confirm('Are you sure you want to delete this product?')) {
-            const data = await apiCall('delete_product', 'DELETE', { id });
-            if (data && data.success) {
-                fetchProducts();
-            } else {
-                alert(data ? data.message : 'Error deleting product');
-            }
         }
     }
 
@@ -357,7 +380,24 @@
         });
     }
 
-    // ── USERS ──
+    // ── TOAST NOTIFICATIONS ──
+    function showToast(message, type = 'success') {
+        let toast = document.getElementById('adminToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'adminToast';
+            document.body.appendChild(toast);
+        }
+        toast.className = 'admin-toast ' + type;
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // ── UTILS ──
     let usersList = [];
     window.fetchUsers = async function() {
         const data = await apiCall('get_users');
@@ -406,9 +446,10 @@
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (prodModal && prodModal.classList.contains('open')) {
-                if (typeof closeProductModal === 'function') closeProductModal();
+            if (editProductModal && editProductModal.classList.contains('open')) {
+                closeEditProductModal();
             }
+
             if (orderModal && orderModal.classList.contains('open')) {
                 if (typeof closeOrderModal === 'function') closeOrderModal();
             }
