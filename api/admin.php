@@ -382,18 +382,41 @@ switch ($action) {
         }
 
         try {
+            // Get current order status
+            $currentOrder = db_fetch($pdo, 'SELECT status FROM orders WHERE id = :id', [':id' => $id]);
+            if (!$currentOrder) {
+                json_response(false, 'Order not found.');
+            }
+
+            $pdo->beginTransaction();
+
             $affected = db_execute(
                 $pdo,
                 'UPDATE orders SET status = :status WHERE id = :id',
                 [':status' => $status, ':id' => $id]
             );
-            if ($affected === 0) {
-                json_response(false, 'Order not found.');
+
+            // Deduct stock if it was not Approved and now is Approved
+            if ($currentOrder['status'] !== 'Approved' && $status === 'Approved') {
+                $items = db_fetch_all($pdo, 'SELECT product_id, quantity FROM order_items WHERE order_id = :id', [':id' => $id]);
+                $stmtStock = $pdo->prepare('UPDATE products SET stock = GREATEST(stock - :qty, 0) WHERE id = :id');
+                foreach ($items as $item) {
+                    $stmtStock->execute([
+                        ':qty' => (int) $item['quantity'],
+                        ':id'  => (int) $item['product_id'],
+                    ]);
+                }
             }
+
+            $pdo->commit();
         } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             error_log('[Maison Ungod] Update order status failed: ' . $e->getMessage());
             json_response(false, 'Failed to update order status. Please try again.');
         }
+
 
         json_response(true, 'Status updated to ' . $status . '.');
         break;

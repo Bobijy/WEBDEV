@@ -138,11 +138,6 @@ try {
         INSERT INTO order_items (order_id, product_id, quantity, price)
         VALUES (:order_id, :product_id, :quantity, :price)
     ');
-    $stmtStock = $pdo->prepare('
-        UPDATE products
-        SET    stock = GREATEST(stock - :qty, 0)
-        WHERE  id = :id
-    ');
 
     foreach ($items as $item) {
         $stmtItem->execute([
@@ -150,11 +145,6 @@ try {
             ':product_id'=> (int) $item['product_id'],
             ':quantity'  => (int) $item['quantity'],
             ':price'     => (float) $item['price'],
-        ]);
-
-        $stmtStock->execute([
-            ':qty' => (int) $item['quantity'],
-            ':id'  => (int) $item['product_id'],
         ]);
     }
 
