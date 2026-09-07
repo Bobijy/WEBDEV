@@ -220,7 +220,10 @@ $socials = [
                         <?php if(empty($user['phone'])): ?>
                             <button type="button" class="text-link" onclick="openChangeFieldModal('phone', '')">Add</button>
                         <?php else: ?>
-                            <span class="form-text" style="color: var(--text-light);">**********<?= htmlspecialchars(substr($user['phone'], -2)) ?></span>
+                            <span class="form-text" style="color: var(--text-light); display: inline-flex; align-items: center;">
+                                <span style="transform: translateY(-1px); letter-spacing: 2px; margin-right: 2px;">**********</span>
+                                <span><?= htmlspecialchars(substr($user['phone'], -2)) ?></span>
+                            </span>
                             <button type="button" class="text-link" onclick="openChangeFieldModal('phone', '<?= htmlspecialchars($user['phone']) ?>')">Change</button>
                         <?php endif; ?>
                     </div>

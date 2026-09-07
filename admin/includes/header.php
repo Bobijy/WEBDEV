@@ -29,7 +29,7 @@ $admin_name = $_SESSION['first_name'] ?? 'Admin';
     <!-- SIDEBAR -->
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-brand">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <img src="../assets/logo/logo.png" width="28" height="28" alt="Logo" style="object-fit: contain;">
             <div>
                 Maison Ungod
                 <span class="sidebar-brand-subtitle">Admin Panel</span>
@@ -84,28 +84,10 @@ $admin_name = $_SESSION['first_name'] ?? 'Admin';
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="top-nav-title" id="pageTitle">Admin Panel</div>
-                <div class="top-nav-subtitle" id="pageSubtitle">Here's what's happening with your store today.</div>
             </div>
             
-            <div class="top-nav-right" style="position:relative;">
-                <div class="search-bar" style="position:relative;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" id="globalSearchInput" placeholder="Search anything...">
-                    <div id="searchResults" class="search-results-dropdown" style="display:none;"></div>
-                </div>
-                <div style="position:relative;">
-                    <button class="icon-btn" id="notifBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        <span class="notification-badge" id="notifBadge" style="display:none;">0</span>
-                    </button>
-                    <div id="notifDropdown" class="notif-dropdown" style="display:none;">
-                        <div class="notif-header">Notifications</div>
-                        <div id="notificationList" class="notif-list">
-                            <div style="padding: 1rem; text-align: center; color: var(--text-muted);">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-                <img src="../assets/user-placeholder.jpg" alt="Avatar" class="nav-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=18181F&color=7C3AED'">
+            <div class="top-nav-right" style="position:relative; display: flex; align-items: center; gap: 24px;">
+                <!-- Links removed as per user request -->
             </div>
         </nav>
 

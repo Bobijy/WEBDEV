@@ -392,8 +392,7 @@
             const formData = new FormData(orderForm);
             const data = await apiCall('update_order_status', 'POST', formData);
             if (data && data.success) {
-                orderModal.classList.remove('open');
-                orderOverlay.classList.remove('open');
+                closeOrderModal();
                 fetchOrders();
             } else {
                 alert(data ? data.message : 'Error updating order');
