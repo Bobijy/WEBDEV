@@ -190,7 +190,7 @@ switch ($action) {
 
             // Orders grouped by status
             $orderRows = db_fetch_all($pdo, 'SELECT status, COUNT(*) AS c FROM orders GROUP BY status');
-            $orderCounts = ['Pending' => 0, 'Approved' => 0, 'Completed' => 0];
+            $orderCounts = ['Pending' => 0, 'Approved' => 0, 'Processing' => 0, 'Shipped' => 0, 'Completed' => 0, 'Cancelled' => 0];
             foreach ($orderRows as $row) {
                 if (array_key_exists($row['status'], $orderCounts)) {
                     $orderCounts[$row['status']] = (int) $row['c'];
@@ -202,7 +202,11 @@ switch ($action) {
 
             // 10 most recent orders
             $recentOrders = db_fetch_all($pdo, '
-                SELECT o.id, o.total_amount, o.status, o.created_at, o.payment_method, u.full_name
+                SELECT o.id, o.total_amount, o.status, o.created_at, o.payment_method, u.full_name, o.shipping_address, u.email,
+                       (SELECT GROUP_CONCAT(CONCAT(p.name, " (x", oi.quantity, ")") SEPARATOR ", ") 
+                        FROM order_items oi 
+                        JOIN products p ON oi.product_id = p.id 
+                        WHERE oi.order_id = o.id) AS products_list
                 FROM   orders o
                 JOIN   users u ON o.user_id = u.id
                 ORDER BY o.created_at DESC
@@ -213,7 +217,7 @@ switch ($action) {
             $salesData = db_fetch_all($pdo, "
                 SELECT DATE(created_at) as date, SUM(total_amount) as total
                 FROM orders
-                WHERE status != 'Cancelled' AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                WHERE status NOT IN ('Cancelled', 'Pending') AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
                 GROUP BY DATE(created_at)
                 ORDER BY date ASC
             ");
@@ -224,7 +228,7 @@ switch ($action) {
                 FROM order_items oi
                 JOIN products p ON oi.product_id = p.id
                 JOIN orders o ON oi.order_id = o.id
-                WHERE o.status != 'Cancelled'
+                WHERE o.status NOT IN ('Cancelled', 'Pending')
                 GROUP BY p.id
                 ORDER BY total_sold DESC
                 LIMIT 5
@@ -257,6 +261,8 @@ switch ($action) {
                     'total_stock' => (int) $productRow['s'],
                     'pending_orders' => $orderCounts['Pending'],
                     'approved_orders' => $orderCounts['Approved'],
+                    'processing_orders' => $orderCounts['Processing'],
+                    'shipped_orders' => $orderCounts['Shipped'],
                     'completed_orders' => $orderCounts['Completed'],
                     'total_customers' => (int) $customerRow['c'],
                     'all_order_counts' => $orderCounts // raw counts for the doughnut chart
@@ -330,12 +336,26 @@ switch ($action) {
 
     // ─── GET ALL ORDERS ───
     case 'get_orders':
-        $orders = db_fetch_all($pdo, '
-            SELECT o.*, u.full_name AS customer_name, u.email
+        $statusFilter = $_GET['status'] ?? '';
+        $sql = '
+            SELECT o.*, u.full_name AS customer_name, u.email,
+                   (SELECT GROUP_CONCAT(CONCAT(p.name, " (x", oi.quantity, ")") SEPARATOR ", ") 
+                    FROM order_items oi 
+                    JOIN products p ON oi.product_id = p.id 
+                    WHERE oi.order_id = o.id) AS products_list
             FROM   orders o
             JOIN   users u ON o.user_id = u.id
-            ORDER BY o.created_at DESC
-        ');
+        ';
+        $params = [];
+        
+        if ($statusFilter && in_array($statusFilter, ALLOWED_ORDER_STATUSES)) {
+            $sql .= ' WHERE o.status = :status ';
+            $params[':status'] = $statusFilter;
+        }
+        
+        $sql .= ' ORDER BY o.created_at DESC';
+        
+        $orders = db_fetch_all($pdo, $sql, $params);
         json_response(true, '', ['orders' => $orders]);
         break;
 

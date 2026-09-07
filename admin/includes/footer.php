@@ -4,6 +4,6 @@
 </div> <!-- End app-wrapper -->
 <?php endif; ?>
 
-    <script src="js/admin.js?v=4"></script>
+    <script src="js/admin.js?v=11"></script>
 </body>
 </html>

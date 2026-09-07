@@ -1,7 +1,18 @@
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
-<div style="margin-bottom: 20px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Order Management</h3>
+    <div>
+        <select id="orderStatusFilter" class="form-control" style="width:200px;">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
 </div>
 
 <div class="admin-table-container">
@@ -10,6 +21,8 @@
             <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
+                <th>Address</th>
+                <th>Products</th>
                 <th>Date</th>
                 <th>Total</th>
                 <th>Status</th>
@@ -17,7 +30,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+            <tr><td colspan="8" style="text-align:center;">Loading...</td></tr>
         </tbody>
     </table>
 </div>
@@ -53,6 +66,19 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pageTitle').textContent = 'Manage Orders';
+        
+        const filter = document.getElementById('orderStatusFilter');
+        if (filter) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            if (status) {
+                filter.value = status;
+            }
+            filter.addEventListener('change', () => {
+                fetchOrders();
+            });
+        }
+
         fetchOrders();
     });
 </script>

@@ -1,15 +1,12 @@
-// ═══════════════════════════════════════════════════════
 // Maison Ungod — Premium Animation Engine
 // Advanced scroll reveals, parallax, cursor effects,
 // 3D tilt, magnetic links, slider upgrades
-// ═══════════════════════════════════════════════════════
 
 (function () {
     'use strict';
 
-    // ───────────────────────────────────
-    // 1. NAVBAR — Scroll Effect
-    // ───────────────────────────────────
+    // NAVBAR — Scroll Effect
+
     const navbar = document.getElementById('navbar');
     if (navbar) {
         window.addEventListener('scroll', () => {
@@ -17,12 +14,12 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 2. HAMBURGER TOGGLE
-    // ───────────────────────────────────
+
+    // HAMBURGER TOGGLE
+
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
-    
+
     if (hamburger && navLinks) {
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -62,9 +59,9 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 3. SCROLL PROGRESS BAR
-    // ───────────────────────────────────
+
+    // SCROLL PROGRESS BAR
+
     const scrollProgress = document.querySelector('.scroll-progress');
     if (scrollProgress) {
         window.addEventListener('scroll', () => {
@@ -75,9 +72,8 @@
         }, { passive: true });
     }
 
-    // ───────────────────────────────────
-    // 4. SCROLL-TO-TOP BUTTON
-    // ───────────────────────────────────
+    // SCROLL-TO-TOP BUTTON
+
     const scrollTopBtn = document.querySelector('.scroll-to-top');
     if (scrollTopBtn) {
         window.addEventListener('scroll', () => {
@@ -89,9 +85,8 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 5. ADVANCED SCROLL REVEAL
-    // ───────────────────────────────────
+    // ADVANCED SCROLL REVEAL
+
     const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur, .section-divider, .story-bar');
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -137,9 +132,8 @@
     cardStyle.textContent = '.coll-card.visible { opacity: 1 !important; transform: translateY(0) scale(1) !important; }';
     document.head.appendChild(cardStyle);
 
-    // ───────────────────────────────────
-    // 6. PARALLAX ENGINE
-    // ───────────────────────────────────
+    // PARALLAX ENGINE
+
     const parallaxElements = document.querySelectorAll('[data-parallax]');
 
     function updateParallax() {
@@ -171,9 +165,9 @@
         }, { passive: true });
     }
 
-    // ───────────────────────────────────
-    // 7. MOUSE-FOLLOW GLOW (Hero)
-    // ───────────────────────────────────
+
+    // MOUSE-FOLLOW GLOW (Hero)
+
     const heroSection = document.getElementById('hero');
     const mouseGlow = document.querySelector('.mouse-glow');
 
@@ -194,12 +188,12 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 8. CUSTOM CURSOR (Removed)
 
-    // ───────────────────────────────────
-    // 9. MAGNETIC NAV LINKS
-    // ───────────────────────────────────
+    // CUSTOM CURSOR (Removed)
+
+
+    // MAGNETIC NAV LINKS
+
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     if (!isTouchDevice) {
@@ -217,9 +211,8 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 10. 3D TILT CARDS
-    // ───────────────────────────────────
+    // 3D TILT CARDS
+
     if (!isTouchDevice) {
         const tiltCards = document.querySelectorAll('.coll-card, .cat-card');
 
@@ -240,9 +233,9 @@
         });
     }
 
-    // ───────────────────────────────────
-    // 11. BUTTON RIPPLE EFFECT
-    // ───────────────────────────────────
+
+    // BUTTON RIPPLE EFFECT
+
     const rippleButtons = document.querySelectorAll('.btn-shop, .account-submit, .cart-checkout-btn');
 
     rippleButtons.forEach(btn => {
@@ -265,9 +258,8 @@
         });
     });
 
-    // ───────────────────────────────────
-    // 12. ELASTIC BAG BOUNCE
-    // ───────────────────────────────────
+    // ELASTIC BAG BOUNCE
+
     document.addEventListener('click', (e) => {
         const bagBtn = e.target.closest('.coll-card__bag, .shop-card__bag');
         if (bagBtn) {
@@ -279,31 +271,29 @@
         }
     });
 
-    // ───────────────────────────────────
-    // 13. SHIMMER EFFECT ON IMAGES
-    // ───────────────────────────────────
+    // SHIMMER EFFECT ON IMAGES
+
     const shimmerTargets = document.querySelectorAll('.coll-card__img-wrap, .cat-card, .shop-card__img-wrap, .feat-img');
     shimmerTargets.forEach(el => {
         el.classList.add('shimmer-wrap');
     });
 
-    // ───────────────────────────────────
-    // 14. COLLECTIONS SLIDER — Enhanced
-    // ───────────────────────────────────
+    // COLLECTIONS SLIDER — Enhanced
+
     const collTrack = document.getElementById('collTrack');
     if (collTrack) {
         const collPrev = document.getElementById('collPrev');
         const collNext = document.getElementById('collNext');
         const sliderProgressBar = document.querySelector('.slider-progress__bar');
         const progressContainer = document.querySelector('.slider-progress');
-        
+
         let autoPlayInterval = null;
         let isHovered = false;
 
         function checkScrollable() {
             // Check if there is actual content to scroll
             const isScrollable = Math.ceil(collTrack.scrollWidth) > Math.ceil(collTrack.clientWidth);
-            
+
             if (!isScrollable) {
                 if (collPrev) collPrev.style.display = 'none';
                 if (collNext) collNext.style.display = 'none';
@@ -331,13 +321,13 @@
 
         if (collPrev) {
             collPrev.addEventListener('click', () => {
-                if(checkScrollable()) collTrack.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+                if (checkScrollable()) collTrack.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
             });
         }
 
         if (collNext) {
             collNext.addEventListener('click', () => {
-                if(checkScrollable()) collTrack.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+                if (checkScrollable()) collTrack.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
             });
         }
 
@@ -412,7 +402,7 @@
 
         // Initialize state
         checkScrollable();
-        
+
         // Use a short delay before autoplay to ensure styles are calculated
         setTimeout(() => {
             startAutoPlay();
@@ -421,16 +411,15 @@
         // Re-evaluate on window resize
         window.addEventListener('resize', () => {
             checkScrollable();
-            if(!checkScrollable() && autoPlayInterval) {
+            if (!checkScrollable() && autoPlayInterval) {
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
             }
         });
     }
 
-    // ───────────────────────────────────
-    // 15. CART BADGE PULSE ON UPDATE
-    // ───────────────────────────────────
+    // CART BADGE PULSE ON UPDATE
+
     const cartBadge = document.getElementById('cartBadge');
     if (cartBadge) {
         const badgeObserver = new MutationObserver(() => {
@@ -446,21 +435,20 @@
 
 })();
 
-// ───────────────────────────────────
 // GLOBAL HELPERS: CSRF & Field Errors
-// ───────────────────────────────────
+
 window.MaisonUngod = window.MaisonUngod || {};
 
-window.MaisonUngod.getCSRFToken = function() {
+window.MaisonUngod.getCSRFToken = function () {
     const meta = document.querySelector('meta[name="csrf-token"]');
     return meta ? meta.content : '';
 };
 
-window.MaisonUngod.displayFieldErrors = function(form, errors) {
+window.MaisonUngod.displayFieldErrors = function (form, errors) {
     // Clear old errors
     form.querySelectorAll('.field-error').forEach(el => el.remove());
     form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
-    
+
     if (!errors) return;
 
     for (const [field, msg] of Object.entries(errors)) {
@@ -479,7 +467,7 @@ window.MaisonUngod.displayFieldErrors = function(form, errors) {
     }
 };
 
-window.MaisonUngod.clearFieldErrors = function(form) {
+window.MaisonUngod.clearFieldErrors = function (form) {
     form.querySelectorAll('.field-error').forEach(el => el.remove());
     form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
 };

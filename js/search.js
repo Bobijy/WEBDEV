@@ -19,10 +19,10 @@
 
     // ── Product catalog (all available products) ──
     const products = [
-        { name: 'Fragrance 1', price: '$145.00', image: 'assets/images/collection-1.png', link: 'shop.php' },
-        { name: 'Fragrance 2', price: '$145.00', image: 'assets/images/collection-2.png', link: 'shop.php' },
-        { name: 'Fragrance 3', price: '$145.00', image: 'assets/images/collection-3.png', link: 'shop.php' },
-        { name: 'Fragrance 4', price: '$165.00', image: 'assets/images/collection-4.png', link: 'shop.php' },
+        { name: 'Fragrance 1', price: '₱145.00', image: 'assets/images/collection-1.png', link: 'shop.php' },
+        { name: 'Fragrance 2', price: '₱145.00', image: 'assets/images/collection-2.png', link: 'shop.php' },
+        { name: 'Fragrance 3', price: '₱145.00', image: 'assets/images/collection-3.png', link: 'shop.php' },
+        { name: 'Fragrance 4', price: '₱165.00', image: 'assets/images/collection-4.png', link: 'shop.php' },
     ];
 
     // ── Pages catalog ──

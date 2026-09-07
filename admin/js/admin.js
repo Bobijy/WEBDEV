@@ -71,29 +71,33 @@
         const data = await apiCall('dashboard_stats');
         if (!data || !data.success) return;
 
-        document.getElementById('statProducts').textContent = data.stats.total_products;
-        document.getElementById('statStock').textContent = data.stats.total_stock;
-        document.getElementById('statPending').textContent = data.stats.pending_orders;
-        document.getElementById('statApproved').textContent = data.stats.approved_orders;
-        document.getElementById('statCompleted').textContent = data.stats.completed_orders;
-        document.getElementById('statCustomers').textContent = data.stats.total_customers;
+        if(document.getElementById('statProducts')) document.getElementById('statProducts').textContent = data.stats.total_products;
+        if(document.getElementById('statStock')) document.getElementById('statStock').textContent = data.stats.total_stock;
+        if(document.getElementById('statPending')) document.getElementById('statPending').textContent = data.stats.pending_orders;
+        if(document.getElementById('statApproved')) document.getElementById('statApproved').textContent = data.stats.approved_orders;
+        if(document.getElementById('statProcessing')) document.getElementById('statProcessing').textContent = data.stats.processing_orders;
+        if(document.getElementById('statShipped')) document.getElementById('statShipped').textContent = data.stats.shipped_orders;
+        if(document.getElementById('statCompleted')) document.getElementById('statCompleted').textContent = data.stats.completed_orders;
+        if(document.getElementById('statCustomers')) document.getElementById('statCustomers').textContent = data.stats.total_customers;
 
         const tbody = document.querySelector('#recentOrdersTable tbody');
         if (data.recent_orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No recent orders.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No recent orders.</td></tr>';
         } else {
             let html = '';
             data.recent_orders.forEach(o => {
                 html += `
                     <tr>
                         <td style="color:var(--text-muted);">#${String(o.id).padStart(5, '0')}</td>
-                        <td>${o.full_name}</td>
+                        <td>${o.full_name}<br><small style="color:#8A8A8A">${o.email || ''}</small></td>
+                        <td style="max-width: 120px; white-space: normal; word-wrap: break-word; line-height: 1.4;"><small>${o.shipping_address || 'N/A'}</small></td>
+                        <td style="max-width: 150px; white-space: normal; word-wrap: break-word; line-height: 1.4;"><small>${o.products_list || 'N/A'}</small></td>
                         <td style="color:var(--text-muted);">${formatDate(o.created_at)}</td>
                         <td><span class="badge ${badgeColor(o.status)}">${o.status}</span></td>
                         <td style="color:var(--text-muted);">${o.payment_method || 'N/A'}</td>
-                        <td style="font-weight:500;">$${parseFloat(o.total_amount).toFixed(2)}</td>
+                        <td style="font-weight:500;">₱${parseFloat(o.total_amount).toFixed(2)}</td>
                         <td>
-                            <button class="action-btn" title="View Options" onclick="window.location.href='orders.php?id=${o.id}'">
+                            <button class="action-btn" title="View Options" onclick="window.location.href='orders.php?status=${o.status}'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
                             </button>
                         </td>
@@ -127,7 +131,7 @@
                                     <div class="bs-progress" style="width: ${percent}%;"></div>
                                 </div>
                             </div>
-                            <div class="bs-price">$${parseFloat(p.price).toFixed(2)}</div>
+                            <div class="bs-price">₱${parseFloat(p.price).toFixed(2)}</div>
                         </div>
                     `;
                 });
@@ -282,7 +286,7 @@
                         <td>${imgTag}</td>
                         <td>${p.name}</td>
                         <td>${p.category}</td>
-                        <td>$${parseFloat(p.price).toFixed(2)}</td>
+                        <td>₱${parseFloat(p.price).toFixed(2)}</td>
                         <td>${p.stock}</td>
                         <td>
                             <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: ${statusColor}; color: ${textColor};">
@@ -310,13 +314,28 @@
     // ── ORDERS ──
     let ordersList = [];
     window.fetchOrders = async function() {
-        const data = await apiCall('get_orders');
+        let statusQuery = '';
+        
+        const filterDropdown = document.getElementById('orderStatusFilter');
+        if (filterDropdown) {
+            statusQuery = filterDropdown.value;
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            statusQuery = urlParams.get('status') || '';
+        }
+
+        let action = 'get_orders';
+        if (statusQuery) {
+            action += '&status=' + encodeURIComponent(statusQuery);
+        }
+
+        const data = await apiCall(action);
         if (!data || !data.success) return;
         ordersList = data.orders;
 
         const tbody = document.querySelector('#ordersTable tbody');
         if (ordersList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No orders found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No orders found.</td></tr>';
         } else {
             let html = '';
             ordersList.forEach(o => {
@@ -324,8 +343,10 @@
                     <tr>
                         <td>#${String(o.id).padStart(5, '0')}</td>
                         <td>${o.customer_name}<br><small style="color:#8A8A8A">${o.email}</small></td>
+                        <td style="max-width: 120px; white-space: normal; word-wrap: break-word; line-height: 1.4;"><small>${o.shipping_address || 'N/A'}</small></td>
+                        <td style="max-width: 150px; white-space: normal; word-wrap: break-word; line-height: 1.4;"><small>${o.products_list || 'N/A'}</small></td>
                         <td>${formatDate(o.created_at)}</td>
-                        <td>$${parseFloat(o.total_amount).toFixed(2)}</td>
+                        <td>₱${parseFloat(o.total_amount).toFixed(2)}</td>
                         <td><span class="badge ${badgeColor(o.status)}">${o.status}</span></td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="editOrder(${o.id})">Update Status</button>

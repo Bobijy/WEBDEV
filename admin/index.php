@@ -13,10 +13,6 @@ require_once __DIR__ . '/includes/header.php';
             <p id="statProducts">0</p>
             <div class="stat-subtext">All Products</div>
         </div>
-        <!-- SVG Mini Chart -->
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,20 Q10,30 20,15 T40,25 T60,10 T80,20 T100,5" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 
     <div class="stat-card">
@@ -28,12 +24,9 @@ require_once __DIR__ . '/includes/header.php';
             <p id="statStock">0</p>
             <div class="stat-subtext">In Inventory</div>
         </div>
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,15 Q15,5 30,20 T60,10 T80,25 T100,10" fill="none" stroke="var(--accent-hover)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" onclick="window.location.href='orders.php?status=Pending'" style="cursor: pointer;">
         <div class="stat-icon purple">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
@@ -42,37 +35,46 @@ require_once __DIR__ . '/includes/header.php';
             <p id="statPending">0</p>
             <div class="stat-subtext">Awaiting Action</div>
         </div>
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,25 Q20,20 30,28 T50,15 T70,25 T100,5" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" onclick="window.location.href='orders.php?status=Approved'" style="cursor: pointer;">
         <div class="stat-icon green">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div class="stat-info">
             <h4>Approved Orders</h4>
             <p id="statApproved">0</p>
-            <div class="stat-subtext">This Month</div>
         </div>
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,20 Q10,10 25,20 T50,5 T75,15 T100,0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" onclick="window.location.href='orders.php?status=Processing'" style="cursor: pointer;">
+        <div class="stat-icon blue">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+        </div>
+        <div class="stat-info">
+            <h4>Processing Orders</h4>
+            <p id="statProcessing">0</p>
+        </div>
+    </div>
+
+    <div class="stat-card" onclick="window.location.href='orders.php?status=Shipped'" style="cursor: pointer;">
+        <div class="stat-icon purple">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        </div>
+        <div class="stat-info">
+            <h4>Shipped Orders</h4>
+            <p id="statShipped">0</p>
+        </div>
+    </div>
+
+    <div class="stat-card" onclick="window.location.href='orders.php?status=Completed'" style="cursor: pointer;">
         <div class="stat-icon blue">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
         </div>
         <div class="stat-info">
             <h4>Completed Orders</h4>
             <p id="statCompleted">0</p>
-            <div class="stat-subtext">This Month</div>
         </div>
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,25 Q15,25 30,15 T50,20 T75,5 T100,10" fill="none" stroke="var(--accent-hover)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 
     <div class="stat-card">
@@ -84,9 +86,6 @@ require_once __DIR__ . '/includes/header.php';
             <p id="statCustomers">0</p>
             <div class="stat-subtext">Registered Users</div>
         </div>
-        <svg class="mini-chart" viewBox="0 0 100 30" preserveAspectRatio="none">
-            <path d="M0,20 Q10,30 20,15 T40,25 T60,10 T80,20 T100,5" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
     </div>
 </div>
 
@@ -104,6 +103,8 @@ require_once __DIR__ . '/includes/header.php';
                     <tr>
                         <th>Order ID</th>
                         <th>Customer</th>
+                        <th>Address</th>
+                        <th>Products</th>
                         <th>Date</th>
                         <th>Status</th>
                         <th>Payment Method</th>
@@ -112,7 +113,7 @@ require_once __DIR__ . '/includes/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+                    <tr><td colspan="9" style="text-align:center;">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
