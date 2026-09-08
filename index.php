@@ -29,14 +29,14 @@ $categories = [
         'title' => 'Pour Homme',
         'subtitle' => 'Fragrance For Him',
         'image' => 'assets/images/pour-homme.png',
-        'price' => '₱145.00',
+        'price' => '₱599.00',
         'link' => 'shop.php',
     ],
     [
         'title' => 'Pour Femme',
         'subtitle' => 'Fragrance For Her',
         'image' => 'assets/images/pour-femme.png',
-        'price' => '₱145.00',
+        'price' => '₱599.00',
         'link' => 'shop.php',
     ],
 ];
@@ -102,7 +102,7 @@ $socials = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Luxury Fragrances</title>
-    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/style.css?v=12">
     <link rel="stylesheet" href="css/animations.css?v=2">
 </head>
 
@@ -144,8 +144,32 @@ $socials = [
             <!-- Bottom Row: Centered Nav Links -->
             <div class="nav-bottom" id="navLinks">
                 <?php foreach ($navLinks as $link): ?>
-                    <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="' . $link['id'] . '"' : '' ?>     <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
+                    <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="' . $link['id'] . '"' : '' ?>
+                        <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
                 <?php endforeach; ?>
+
+                <!-- Mobile Only Actions (Search, Account, Cart) -->
+                <div class="mobile-nav-actions">
+                    <a href="#" class="mobile-nav-action" id="mobileSearchToggle" aria-label="Search"
+                        onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;">
+                        <?= $icons['search'] ?>
+                        <span>Search</span>
+                    </a>
+                    <a href="#" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account"
+                        onclick="const at = document.getElementById('accountToggle'); if (at) at.click(); return false;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <span>Account</span>
+                    </a>
+                    <a href="#" class="mobile-nav-action" id="mobileCartToggle" aria-label="Cart"
+                        onclick="const ct = document.getElementById('cartToggle'); if (ct) ct.click(); return false;">
+                        <?= $icons['bag'] ?>
+                        <span>Bag</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -290,7 +314,7 @@ $socials = [
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?>">
                     <div class="footer-social">
                         <?php foreach ($socials as $s): ?>
-                            <a href="<?= $s['url'] ?>" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
+                            <a href="javascript:void(0)" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -298,26 +322,26 @@ $socials = [
                 <div class="footer-col">
                     <h4>Menu</h4>
                     <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="index.php#collections">Collections</a></li>
-                        <li><a href="index.php#story">Our Story</a></li>
+                        <li><a href="javascript:void(0)">Home</a></li>
+                        <li><a href="javascript:void(0)">Collections</a></li>
+                        <li><a href="javascript:void(0)">Our Story</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4>Legalities</h4>
                     <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="javascript:void(0)">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)">Terms of Service</a></li>
+                        <li><a href="javascript:void(0)">Cookie Policy</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <ul>
-                        <li><a href="#">Phone: (0912) 0858</a></li>
-                        <li><a href="mailto:bobjoshuaungod26@gmail.com">Email: bobjoshuaungod26@gmail.com</a></li>
+                        <li><a href="javascript:void(0)">Phone: (0912) 0858</a></li>
+                        <li><a href="javascript:void(0)">Email: bobjoshuaungod26@gmail.com</a></li>
                     </ul>
                 </div>
             </div>
@@ -369,28 +393,49 @@ $socials = [
         </div>
         <div class="cart-panel__footer" id="cartFooter">
             <div class="cart-total-row">
-                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Subtotal</span>
-                <span id="cartSubtotal" style="font-size: 0.95rem; color: #F5F5F5; font-family: var(--font-body);">₱0.00</span>
+                <span
+                    style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Subtotal</span>
+                <span id="cartSubtotal"
+                    style="font-size: 0.95rem; color: #F5F5F5; font-family: var(--font-body);">₱0.00</span>
             </div>
             <div class="cart-total-row" style="margin-bottom: 20px;">
-                <span style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Shipping</span>
-                <span style="font-size: 0.8rem; color: #C2C2C2; font-family: var(--font-body);">Calculated at checkout</span>
+                <span
+                    style="color:#C2C2C2; font-size: 0.85rem; text-transform: none; letter-spacing: 0;">Shipping</span>
+                <span style="font-size: 0.8rem; color: #C2C2C2; font-family: var(--font-body);">Calculated at
+                    checkout</span>
             </div>
-            <div class="cart-total-box" style="background: rgba(113, 65, 107, 0.05); border: 1px solid rgba(113, 65, 107, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px;">
-                <span style="display:block; font-size: 0.75rem; letter-spacing: 3px; color: #8A8A8A; text-transform: uppercase; margin-bottom: 8px;">TOTAL</span>
-                <div id="cartTotal" style="font-size: 1.8rem; color: var(--accent); font-family: var(--font-heading);">₱0.00</div>
+            <div class="cart-total-box"
+                style="background: rgba(113, 65, 107, 0.05); border: 1px solid rgba(113, 65, 107, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px;">
+                <span
+                    style="display:block; font-size: 0.75rem; letter-spacing: 3px; color: #8A8A8A; text-transform: uppercase; margin-bottom: 8px;">TOTAL</span>
+                <div id="cartTotal" style="font-size: 1.8rem; color: var(--accent); font-family: var(--font-heading);">
+                    ₱0.00</div>
             </div>
             <div style="text-align: center; color: #8A8A8A; font-size: 0.75rem; margin-bottom: 15px;">
-                <svg style="vertical-align: middle; margin-right: 4px; margin-top:-2px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <svg style="vertical-align: middle; margin-right: 4px; margin-top:-2px;"
+                    xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
                 Secure checkout • 100% Authentic
             </div>
-            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout" style="display:flex; justify-content:center; align-items:center; gap: 8px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <a href="checkout.php" class="cart-checkout-btn" id="cartCheckout"
+                style="display:flex; justify-content:center; align-items:center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
                 CHECK OUT
             </a>
             <div style="text-align: center; margin-top: 20px;">
-                <a href="#" onclick="document.getElementById('cartClose').click(); return false;" style="color: #999; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <a href="#" onclick="document.getElementById('cartClose').click(); return false;"
+                    style="color: #999; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
                     Continue Shopping
                 </a>
             </div>
@@ -500,7 +545,7 @@ $socials = [
     <!-- Page Transition Overlay -->
     <!-- (injected by transitions.js) -->
 
-    <script src="js/main.js?v=5"></script>
+    <script src="js/main.js?v=6"></script>
     <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/account.js?v=3"></script>

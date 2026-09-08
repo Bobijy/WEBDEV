@@ -35,14 +35,24 @@
         });
 
         // Close mobile nav on link click and update active link
-        const allNavLinks = navLinks.querySelectorAll('a');
-        allNavLinks.forEach(link => {
+        const pageNavLinks = navLinks.querySelectorAll('a:not(.mobile-nav-action)');
+        pageNavLinks.forEach(link => {
             link.addEventListener('click', () => {
                 if (navLinks.classList.contains('active')) {
                     toggleMenu();
                 }
-                allNavLinks.forEach(l => l.classList.remove('active'));
+                pageNavLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
+            });
+        });
+
+        // Close mobile nav when clicking mobile action buttons
+        const mobileActionLinks = navLinks.querySelectorAll('.mobile-nav-action');
+        mobileActionLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    toggleMenu();
+                }
             });
         });
 
@@ -490,3 +500,13 @@ window.MaisonUngod.clearFieldErrors = function (form) {
     form.querySelectorAll('.field-error').forEach(el => el.remove());
     form.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
 };
+
+// Make footer links non-clickable while preserving hover effects
+document.addEventListener('click', (e) => {
+    const footerLink = e.target.closest('.site-footer a');
+    if (footerLink) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+

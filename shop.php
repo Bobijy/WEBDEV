@@ -63,7 +63,7 @@ $socials = [
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Shop</title>
 
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/style.css?v=12">
     <link rel="stylesheet" href="css/animations.css?v=2">
 
     <link rel="stylesheet" href="css/pages/shop.css?v=1">
@@ -108,6 +108,26 @@ $socials = [
                 <?php foreach ($navLinks as $link): ?>
                     <a href="<?= $link['href'] ?>" <?= isset($link['id']) ? 'id="'.$link['id'].'"' : '' ?> <?= $link['active'] ? ' class="active"' : '' ?>><?= $link['label'] ?></a>
                 <?php endforeach; ?>
+
+                <!-- Mobile Only Actions (Search, Account, Cart) -->
+                <div class="mobile-nav-actions">
+                    <a href="#" class="mobile-nav-action" id="mobileSearchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;">
+                        <?= $icons['search'] ?>
+                        <span>Search</span>
+                    </a>
+                    <a href="#" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account" onclick="const at = document.getElementById('accountToggle'); if (at) at.click(); return false;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <span>Account</span>
+                    </a>
+                    <a href="#" class="mobile-nav-action" id="mobileCartToggle" aria-label="Cart" onclick="const ct = document.getElementById('cartToggle'); if (ct) ct.click(); return false;">
+                        <?= $icons['bag'] ?>
+                        <span>Bag</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -171,7 +191,7 @@ $socials = [
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?>">
                     <div class="footer-social">
                         <?php foreach ($socials as $s): ?>
-                            <a href="<?= $s['url'] ?>" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
+                            <a href="javascript:void(0)" aria-label="<?= $s['icon'] ?>"><?= $icons[$s['icon']] ?></a>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -179,26 +199,26 @@ $socials = [
                 <div class="footer-col">
                     <h4>Menu</h4>
                     <ul>
-                        <li><a href="index.php">Home</a></li>
-                        <li><a href="index.php#collections">Collections</a></li>
-                        <li><a href="index.php#story">Our Story</a></li>
+                        <li><a href="javascript:void(0)">Home</a></li>
+                        <li><a href="javascript:void(0)">Collections</a></li>
+                        <li><a href="javascript:void(0)">Our Story</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4>Legalities</h4>
                     <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="javascript:void(0)">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)">Terms of Service</a></li>
+                        <li><a href="javascript:void(0)">Cookie Policy</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <ul>
-                        <li><a href="#">Phone: (0912) 0858</a></li>
-                        <li><a href="mailto:bobjoshuaungod26@gmail.com">Email: bobjoshuaungod26@gmail.com</a></li>
+                        <li><a href="javascript:void(0)">Phone: (0912) 0858</a></li>
+                        <li><a href="javascript:void(0)">Email: bobjoshuaungod26@gmail.com</a></li>
                     </ul>
                 </div>
             </div>
@@ -373,7 +393,7 @@ $socials = [
         </svg>
     </button>
 
-    <script src="js/main.js?v=5"></script>
+    <script src="js/main.js?v=6"></script>
     <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/account.js?v=3"></script>

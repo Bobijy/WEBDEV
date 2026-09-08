@@ -161,6 +161,7 @@ $site = ['name' => 'Maison Ungod'];
                 <div class="floating-input">
                     <select id="region" name="region">
                         <option value="Metro Manila">Metro Manila</option>
+                        <option value="Visayas">Visayas</option>
                         <option value="Cebu">Cebu</option>
                         <option value="Davao">Davao</option>
                     </select>
