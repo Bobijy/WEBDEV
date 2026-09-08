@@ -65,7 +65,7 @@ $socials = [
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Shop</title>
 
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=8">
+    <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="stylesheet" href="css/animations.css?v=2">
 
     <link rel="stylesheet" href="css/pages/shop.css?v=1">
@@ -102,6 +102,9 @@ $socials = [
                         </svg>
                     </a>
                     <a href="#" class="nav-icon" id="cartToggle" aria-label="Cart"><?= $icons['bag'] ?></a>
+                    <button class="hamburger" id="hamburger" aria-label="Menu">
+                        <span></span><span></span><span></span>
+                    </button>
                 </div>
             </div>
             <!-- Bottom Row: Centered Nav Links -->
@@ -111,10 +114,6 @@ $socials = [
                 <?php endforeach; ?>
             </div>
         </div>
-
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-            <span></span><span></span><span></span>
-        </button>
     </nav>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -390,7 +389,7 @@ $socials = [
         </svg>
     </button>
 
-    <script src="js/main.js?v=4"></script>
+    <script src="js/main.js?v=5"></script>
     <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
     <script src="js/account.js?v=3"></script>

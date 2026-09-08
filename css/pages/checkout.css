@@ -95,7 +95,11 @@ h2:first-of-type { margin-top: 0; }
 }
 
 /* Forms */
-.form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.form-row { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+
+@media (min-width: 769px) {
+    .form-row { flex-direction: row; }
+}
 .form-col { flex: 1; }
 .form-col-2 { flex: 2; }
 

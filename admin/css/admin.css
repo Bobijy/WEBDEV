@@ -59,6 +59,11 @@ body {
     left: 0;
     z-index: 100;
     transition: transform 0.3s ease;
+    transform: translateX(-100%);
+}
+
+.admin-sidebar.open {
+    transform: translateX(0);
 }
 
 .sidebar-brand {
@@ -189,8 +194,7 @@ body {
 /* ── MAIN CONTENT ── */
 .admin-main {
     flex: 1;
-    margin-left: 260px;
-    /* offset for fixed sidebar */
+    margin-left: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -199,7 +203,7 @@ body {
 /* ── TOP NAV ── */
 .top-nav {
     height: 80px;
-    padding: 0 40px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -239,6 +243,13 @@ body {
 .search-bar {
     position: relative;
     width: 280px;
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .search-bar {
+        display: block;
+    }
 }
 
 .search-bar svg {
@@ -430,7 +441,7 @@ body {
 }
 
 .mobile-menu-btn {
-    display: none;
+    display: block;
     background: transparent;
     border: none;
     color: var(--text-main);
@@ -439,7 +450,7 @@ body {
 
 /* ── ADMIN CONTENT ── */
 .admin-content {
-    padding: 40px;
+    padding: 20px;
     flex: 1;
 }
 
@@ -558,7 +569,7 @@ body {
 /* ── CHARTS SECTION ── */
 .charts-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 24px;
     margin-bottom: 40px;
 }
@@ -641,7 +652,7 @@ body {
 /* ── TABLES SECTION ── */
 .tables-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr;
     gap: 24px;
 }
 
@@ -649,7 +660,8 @@ body {
     background: var(--bg-panel);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table-header {
@@ -941,40 +953,33 @@ body {
 }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 1024px) {
-
-    .charts-grid,
+@media (min-width: 1025px) {
+    .charts-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
     .tables-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 2fr 1fr;
     }
 }
 
-@media (max-width: 768px) {
+@media (min-width: 769px) {
     .admin-sidebar {
-        transform: translateX(-100%);
-    }
-
-    .admin-sidebar.open {
         transform: translateX(0);
     }
 
     .admin-main {
-        margin-left: 0;
+        margin-left: 260px;
     }
 
     .mobile-menu-btn {
-        display: block;
+        display: none;
     }
 
     .admin-content {
-        padding: 20px;
+        padding: 40px;
     }
 
     .top-nav {
-        padding: 0 20px;
-    }
-
-    .search-bar {
-        display: none;
+        padding: 0 40px;
     }
 }

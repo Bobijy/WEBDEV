@@ -12,9 +12,10 @@
 }
 
 .shop-page .shop-container {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 40px;
+    padding: 0 var(--space-md);
 }
 
 /* ── Heading ── */
@@ -25,7 +26,7 @@
 
 .shop-page .shop-heading h1 {
     font-family: 'Bodoni MT', 'Bodoni Moda', 'Didot', Georgia, serif;
-    font-size: 2.6rem;
+    font-size: var(--fs-xl);
     font-weight: 400;
     font-style: italic;
     color: #71416B;
@@ -130,32 +131,12 @@
 /* ── Product Grid ── */
 .shop-page .product-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px 50px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
 }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
+@media (min-width: 769px) {
     .shop-page .product-grid {
-        grid-template-columns: 1fr;
-        gap: 36px;
-    }
-
-    .shop-page {
-        padding-top: 140px;
-    }
-
-    .shop-page .shop-heading h1 {
-        font-size: 2.2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .shop-page .shop-container {
-        padding: 0 18px;
-    }
-
-    .shop-page .shop-heading h1 {
-        font-size: 1.8rem;
+        gap: 40px 50px;
     }
 }

@@ -160,14 +160,14 @@ body {
 /* Layout Grid */
 .order-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr;
     gap: 24px;
     align-items: start;
 }
 
-@media (max-width: 850px) {
+@media (min-width: 851px) {
     .order-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 340px;
     }
 }
 
