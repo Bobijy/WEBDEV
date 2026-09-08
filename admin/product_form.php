@@ -1,4 +1,6 @@
 <?php
+// Admin product form: handles creating and editing product records
+
 require_once __DIR__ . '/../database/db.php';
 require_once __DIR__ . '/../database/helpers.php';
 require_once __DIR__ . '/includes/header.php';

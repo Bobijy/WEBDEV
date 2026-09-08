@@ -1,4 +1,6 @@
 <?php
+// Admin login page: authenticates store administrators
+
 require_once __DIR__ . '/includes/header.php';
 
 // Redirect to dashboard if already logged in as admin

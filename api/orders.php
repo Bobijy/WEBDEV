@@ -1,4 +1,6 @@
 <?php
+// Orders API: handles customer order actions like cancellation
+
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../database/db.php';

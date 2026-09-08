@@ -1,11 +1,5 @@
 <?php
-/**
- * Maison Ungod — Cart API
- *
- * Actions : fetch, add, update, remove
- * Driver  : PDO with named parameters
- * Security: session guard + input validation on all mutable actions
- */
+// Cart API: handles fetch, add, update, and remove actions
 
 session_start();
 header('Content-Type: application/json');
@@ -13,7 +7,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../database/db.php';
 require_once __DIR__ . '/../database/helpers.php';
 
-// Require a valid session — cart actions are never public
+// Cart actions require a logged-in user
 require_auth();
 
 $userId = (int) $_SESSION['user_id'];
@@ -23,15 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
-// ── Cart Retrieval / Creation ─────────────────────────────────────────────────
-/**
- * Return the cart ID for the given user.
- * Creates a new cart record if one does not exist.
- *
- * @param  PDO $pdo
- * @param  int $userId
- * @return int Cart ID
- */
+
+// Get the user's cart ID, or create one if it does not exist
 function get_or_create_cart(PDO $pdo, int $userId): int {
     $cart = db_fetch($pdo, 'SELECT id FROM carts WHERE user_id = :uid', [':uid' => $userId]);
 
@@ -39,19 +26,17 @@ function get_or_create_cart(PDO $pdo, int $userId): int {
         return (int) $cart['id'];
     }
 
-    // No cart yet — create one
+    // No cart yet — create a new one
     db_execute($pdo, 'INSERT INTO carts (user_id) VALUES (:uid)', [':uid' => $userId]);
     return (int) $pdo->lastInsertId();
 }
 
 $cartId = get_or_create_cart($pdo, $userId);
 
-// ── Action Router ─────────────────────────────────────────────────────────────
+// Handle cart actions
 switch ($action) {
 
-    // ═══════════════════════
-    // FETCH — return all items in the cart
-    // ═══════════════════════
+    // Return all items in the user's cart
     case 'fetch':
         $items = db_fetch_all($pdo, '
             SELECT ci.id        AS item_id,
@@ -64,30 +49,27 @@ switch ($action) {
             WHERE  ci.cart_id = :cart_id
         ', [':cart_id' => $cartId]);
 
-        // Compute total server-side — never trust the client's total
+        // Calculate total price server-side
         $total = array_reduce($items, fn($carry, $row) => $carry + ($row['price'] * $row['quantity']), 0.0);
 
         json_response(true, '', ['items' => $items, 'total' => $total]);
         break;
 
-    // ═══════════════════════
-    // ADD — add a product to the cart (or increase quantity)
-    // ═══════════════════════
+    // Add a product to the cart (or increment quantity if already added)
     case 'add':
         $productId = (int) ($_POST['product_id'] ?? 0);
         $qty       = (int) ($_POST['quantity']   ?? 1);
 
-        // Validate product ID
+        // Validate product ID and quantity
         if (!validate_id($productId)) {
             json_response(false, 'Invalid product.');
         }
 
-        // Validate quantity (must be at least 1)
         if (!validate_quantity($qty)) {
             json_response(false, 'Quantity must be at least 1.');
         }
 
-        // Verify the product actually exists and is Active
+        // Check if the product exists and is active
         $product = db_fetch(
             $pdo,
             'SELECT id FROM products WHERE id = :id AND status = :status',
@@ -97,7 +79,7 @@ switch ($action) {
             json_response(false, 'Product not found or unavailable.');
         }
 
-        // Insert or increment quantity if already in cart
+        // Check if item is already in the cart
         $existing = db_fetch(
             $pdo,
             'SELECT id, quantity FROM cart_items WHERE cart_id = :cart_id AND product_id = :product_id',
@@ -125,21 +107,18 @@ switch ($action) {
         json_response(true, 'Item added to cart.');
         break;
 
-    // ═══════════════════════
-    // UPDATE — change quantity of a cart item
-    // ═══════════════════════
+    // Update item quantity
     case 'update':
         $itemId = (int) ($_POST['item_id']  ?? 0);
         $qty    = (int) ($_POST['quantity'] ?? 0);
 
-        // Validate item ID
         if (!validate_id($itemId)) {
             json_response(false, 'Invalid cart item.');
         }
 
         try {
             if ($qty <= 0) {
-                // Quantity zero or below — remove the item entirely
+                // If quantity is 0 or less, remove the item
                 db_execute($pdo,
                     'DELETE FROM cart_items WHERE id = :id AND cart_id = :cart_id',
                     [':id' => $itemId, ':cart_id' => $cartId]
@@ -158,19 +137,16 @@ switch ($action) {
         json_response(true, 'Cart updated.');
         break;
 
-    // ═══════════════════════
-    // REMOVE — delete a cart item
-    // ═══════════════════════
+    // Remove an item from the cart
     case 'remove':
         $itemId = (int) ($_POST['item_id'] ?? 0);
 
-        // Validate item ID
         if (!validate_id($itemId)) {
             json_response(false, 'Invalid cart item.');
         }
 
         try {
-            // cart_id guard ensures users can only remove their own items
+            // Only remove if the item belongs to the user's cart
             db_execute($pdo,
                 'DELETE FROM cart_items WHERE id = :id AND cart_id = :cart_id',
                 [':id' => $itemId, ':cart_id' => $cartId]
@@ -183,10 +159,8 @@ switch ($action) {
         json_response(true, 'Item removed from cart.');
         break;
 
-    // ═══════════════════════
-    // DEFAULT
-    // ═══════════════════════
     default:
         json_response(false, 'Invalid action.');
         break;
 }
+

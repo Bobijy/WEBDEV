@@ -49,11 +49,11 @@ $addresses = db_fetch_all($pdo, '
 $site = [
     'name' => 'Maison Ungod',
     'tagline' => 'Find Your Signature Scent',
-    'description' => 'Shop the exclusive Maison Ungod fragrance collection Ã¢â‚¬â€ luxury perfumes crafted with rare ingredients.',
+    'description' => 'Shop the exclusive Maison Ungod fragrance collection — luxury perfumes crafted with rare ingredients.',
     'year' => date('Y'),
 ];
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Navigation Links Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// Navigation Links
 $navLinks = [
     ['label' => 'Home', 'href' => 'index.php#hero', 'active' => false],
     ['label' => 'Shop', 'href' => 'shop.php', 'active' => false],
@@ -62,15 +62,16 @@ $navLinks = [
     ['label' => 'Contact', 'href' => '#', 'id' => 'contactToggle', 'active' => false],
 ];
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SVG Icons Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// SVG Icons
 $icons = [
     'instagram' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
     'facebook' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
     'x' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16zM4 20l6.768 -6.768M13.232 10.768L20 4"/></svg>',
     'search' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-    'bag' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+    'bag' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 00 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
 ];
 
+// Social Links
 $socials = [
     ['icon' => 'instagram', 'url' => '#'],
     ['icon' => 'facebook', 'url' => '#'],
@@ -88,7 +89,7 @@ $socials = [
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="stylesheet" href="css/animations.css?v=2">
     
     <link rel="stylesheet" href="css/pages/account.css?v=8">
@@ -103,17 +104,15 @@ $socials = [
 </head>
 <body>
 
-    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-     NAVBAR
-     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- Navigation Bar -->
     <nav class="navbar" id="navbar">
         <div class="container">
-            <!-- Top Row: Logo | Brand | Icons -->
+            <!-- Top Row: Logo | Centered Brand | Icons -->
             <div class="nav-top">
-                <a href="index.php" class="nav-logo">
+                <a href="index.php" class="nav-logo" aria-label="<?= $site['name'] ?>">
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
                 </a>
-                <span class="nav-brand">&mdash;<?= strtoupper($site['name']) ?>&mdash;</span>
+                <span class="nav-brand">&mdash;&nbsp;<?= strtoupper($site['name']) ?>&nbsp;&mdash;</span>
                 <div class="nav-icons">
                     <a href="#" class="nav-icon" id="searchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
                     <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
@@ -388,7 +387,7 @@ $socials = [
                                         </p>
                                         <p>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                            <?= htmlspecialchars($addr['address_line']) ?>
+                                            <?= htmlspecialchars($addr['address_line']) ?><?= !empty($addr['postal_code']) ? ', ' . htmlspecialchars($addr['postal_code']) : '' ?>
                                         </p>
                                     </div>
                                 </div>
@@ -399,12 +398,10 @@ $socials = [
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         Edit
                                     </button>
-                                    <?php if (!$addr['is_default']): ?>
-                                        <button class="text-link delete-btn" onclick="deleteAddress(<?= $addr['id'] ?>)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                            Delete
-                                        </button>
-                                    <?php endif; ?>
+                                    <button class="text-link delete-btn" onclick="deleteAddress(<?= $addr['id'] ?>)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        Delete
+                                    </button>
                                 </div>
                                 <?php if (!$addr['is_default']): ?>
                                     <button class="btn-outline" onclick="setDefaultAddress(<?= $addr['id'] ?>)">Set as Default</button>
@@ -434,7 +431,6 @@ $socials = [
         <h2 id="changeFieldModalTitle">Change</h2>
         <form id="changeFieldForm">
             <input type="hidden" name="action" value="update_profile">
-            <!-- We also need to send empty values for other fields to prevent the API from falling back to old ones... Wait, the API only falls back if the field is NOT in POST. So we only send the field we want to update! Wait, if we send ONLY email, the API falls back to the database for name, phone, etc. Yes! That's exactly what we want. -->
             
             <div class="edit-msg" id="changeFieldMsg"></div>
             
@@ -464,11 +460,6 @@ $socials = [
                 <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(113,65,107,0.4); display: flex; justify-content: center; align-items: center; color: var(--brand-light); box-shadow: 0 0 15px rgba(113,65,107,0.3);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm4 10.723V19h-2v-1.277a1.993 1.993 0 0 1 .567-3.677A2.001 2.001 0 0 1 14 16a1.99 1.99 0 0 1-1 1.723z"/></svg>
                 </div>
-                <!-- Small decorative dots -->
-                <div style="position: absolute; top: 0px; left: 30%; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
-                <div style="position: absolute; bottom: 8px; left: -2px; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
-                <div style="position: absolute; bottom: 4px; right: 8px; width: 5px; height: 5px; background: var(--brand-light); border-radius: 50%;"></div>
-                <div style="position: absolute; top: 20px; right: -2px; width: 3px; height: 3px; background: var(--brand-light); border-radius: 50%;"></div>
             </div>
         </div>
 
@@ -552,12 +543,10 @@ $socials = [
                 if(/[0-9]/.test(val)) score++;
                 if(/[^A-Za-z0-9]/.test(val)) score++;
                 
-                // Color mapping
                 const colors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', 'var(--brand-light)', 'var(--brand-light)'];
                 const labels = ['None', 'Weak', 'Fair', 'Good', 'Strong', 'Strong'];
                 const labelColors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', '#4CAF50', '#4CAF50'];
                 
-                // update bars
                 bars.forEach((bar, idx) => {
                     bar.style.background = idx < score ? colors[score] : '#2E2E2E';
                 });
@@ -592,6 +581,10 @@ $socials = [
             <div class="form-group">
                 <label for="addr_line">Address</label>
                 <textarea id="addr_line" name="address_line" rows="3" required style="width: 100%; background: transparent; border: 1px solid var(--border-light); color: var(--text-main); padding: 10px 16px; border-radius: 4px; font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="addr_postal_code">Postal Code</label>
+                <input type="text" id="addr_postal_code" name="postal_code" placeholder="e.g. 1000">
             </div>
             <div class="form-group">
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
@@ -632,9 +625,7 @@ $socials = [
 
     </div> <!-- Close account-page-wrapper -->
 
-    <!-- â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
-     FOOTER
-     â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â•  -->
+    <!-- Footer -->
     <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-top">
@@ -680,9 +671,7 @@ $socials = [
         </div>
     </footer>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SEARCH OVERLAY
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Search Modal -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal">
             <div class="search-modal__header">
@@ -703,9 +692,7 @@ $socials = [
         </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     CART MODAL
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Shopping Bag Drawer -->
     <div class="cart-overlay" id="cartOverlay"></div>
     <aside class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">

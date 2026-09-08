@@ -1,12 +1,9 @@
-// Maison Ungod — Premium Animation Engine
-// Advanced scroll reveals, parallax, cursor effects,
-// 3D tilt, magnetic links, slider upgrades
+// Main script: animations, scroll reveals, navbar effects, and slider interactions
 
 (function () {
     'use strict';
 
-    // NAVBAR — Scroll Effect
-
+    // Navbar scroll effect
     const navbar = document.getElementById('navbar');
     if (navbar) {
         window.addEventListener('scroll', () => {
@@ -14,9 +11,7 @@
         });
     }
 
-
-    // HAMBURGER TOGGLE
-
+    // Hamburger menu toggle
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
 
@@ -39,7 +34,7 @@
             }
         });
 
-        // Close mobile nav on link click + transfer active highlight
+        // Close mobile nav on link click and update active link
         const allNavLinks = navLinks.querySelectorAll('a');
         allNavLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -64,7 +59,7 @@
 
     const allNavLinks = navLinks ? navLinks.querySelectorAll('a') : [];
 
-    // ── Scroll Spy — only on pages with hash-based nav links ──
+    // Scroll spy for pages with hash-based nav links
     const sections = document.querySelectorAll('section[id]');
     const hasHashLinks = [...allNavLinks].some(link => link.getAttribute('href').startsWith('#'));
 
@@ -126,7 +121,7 @@
 
     revealElements.forEach(el => revealObserver.observe(el));
 
-    // ── Collection Card Wave Entrance ──
+    // Staggered entrance for collection cards
     const collCards = document.querySelectorAll('.coll-card');
     const cardWaveObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -355,7 +350,7 @@
             });
         }
 
-        // ── Auto-play with pause on hover ──
+        // Auto-play slider with pause on hover
         function startAutoPlay() {
             if (!checkScrollable()) return;
             if (autoPlayInterval) clearInterval(autoPlayInterval);

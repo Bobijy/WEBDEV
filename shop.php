@@ -2,11 +2,10 @@
 session_start();
 require_once __DIR__ . '/database/helpers.php';
 /**
- * Maison Ungod &mdash; Shop Page
- * Reproduces the reference design with maximum visual fidelity
+ * Maison Ungod — Shop Page
  */
 
-// â”€â”€â”€ Site Configuration â”€â”€â”€
+// Site Configuration
 $site = [
     'name' => 'Maison Ungod',
     'tagline' => 'Find Your Signature Scent',
@@ -14,7 +13,7 @@ $site = [
     'year' => date('Y'),
 ];
 
-// â”€â”€â”€ Navigation Links â”€â”€â”€
+// Navigation Links
 $navLinks = [
     ['label' => 'Home', 'href' => 'index.php#hero', 'active' => false],
     ['label' => 'Shop', 'href' => 'shop.php', 'active' => true],
@@ -23,8 +22,7 @@ $navLinks = [
     ['label' => 'Contact', 'href' => '#', 'id' => 'contactToggle', 'active' => false],
 ];
 
-// â”€â”€â”€ Products (from DB) â”€â”€â”€
-// Only Active products are shown to customers; Draft products are hidden.
+// Active Products from Database
 require_once __DIR__ . '/database/db.php';
 require_once __DIR__ . '/database/helpers.php';
 
@@ -39,7 +37,7 @@ foreach ($rows as $row) {
     ];
 }
 
-// â”€â”€â”€ SVG Icons â”€â”€â”€
+// SVG Icons
 $icons = [
     'instagram' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
     'facebook' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
@@ -65,7 +63,7 @@ $socials = [
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Shop</title>
 
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="stylesheet" href="css/animations.css?v=2">
 
     <link rel="stylesheet" href="css/pages/shop.css?v=1">
@@ -81,17 +79,15 @@ $socials = [
     <!-- Custom Cursor -->
 
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     NAVBAR
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Navigation Bar -->
     <nav class="navbar" id="navbar">
         <div class="container">
-            <!-- Top Row: Logo | Brand | Icons -->
+            <!-- Top Row: Logo | Centered Brand | Icons -->
             <div class="nav-top">
-                <a href="index.php" class="nav-logo">
+                <a href="index.php" class="nav-logo" aria-label="<?= $site['name'] ?>">
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
                 </a>
-                <span class="nav-brand">&mdash;<?= strtoupper($site['name']) ?>&mdash;</span>
+                <span class="nav-brand">&mdash;&nbsp;<?= strtoupper($site['name']) ?>&nbsp;&mdash;</span>
                 <div class="nav-icons">
                     <a href="#" class="nav-icon" id="searchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
                     <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
@@ -116,9 +112,7 @@ $socials = [
         </div>
     </nav>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SHOP &mdash; OUR PRODUCTS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Products Catalog Section -->
     <section class="shop-page" id="shop">
         <div class="shop-container">
 
@@ -169,9 +163,7 @@ $socials = [
         </div>
     </section>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     FOOTER
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Footer -->
     <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-top">
@@ -217,9 +209,7 @@ $socials = [
         </div>
     </footer>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SEARCH OVERLAY
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Search Modal -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal">
             <div class="search-modal__header">
@@ -240,9 +230,7 @@ $socials = [
         </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     CART MODAL (Slide-out or Centered)
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Shopping Bag Drawer -->
     <div class="cart-overlay" id="cartOverlay"></div>
     <aside class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
@@ -289,9 +277,7 @@ $socials = [
         </div>
     </aside>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     ACCOUNT MODAL
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Account Modal (Sign In / Register) -->
     <div class="account-overlay" id="accountOverlay"></div>
     <div class="account-modal" id="accountModal">
         <button class="account-modal__close" id="accountClose" aria-label="Close account">
@@ -379,9 +365,7 @@ $socials = [
         </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SCRIPTS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Page Scripts -->
     <!-- Scroll-to-Top Button -->
     <button class="scroll-to-top" aria-label="Scroll to top">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

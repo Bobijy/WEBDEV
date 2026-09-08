@@ -1,7 +1,5 @@
-/**
- * shop-sort.js — Shop Page Sort Dropdown
- * Handles the sort toggle and product card reordering on shop.php
- */
+// Shop sort script: handles sorting products by price or name on shop.php
+
 (function () {
     const sortWrapper  = document.getElementById('sortWrapper');
     const sortToggle   = document.getElementById('sortToggle');
@@ -10,49 +8,48 @@
 
     if (!sortWrapper || !productGrid) return;
 
-    // ── Toggle dropdown ──
+    // Toggle dropdown open and closed
     sortToggle.addEventListener('click', () => {
         sortWrapper.classList.toggle('open');
     });
 
-    // ── Close when clicking outside ──
+    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!sortWrapper.contains(e.target)) {
             sortWrapper.classList.remove('open');
         }
     });
 
-    // ── Parse price from card ──
+    // Extract price number from product card element
     function getPrice(card) {
         const priceEl = card.querySelector('.cat-price');
         return parseFloat(priceEl.textContent.replace(/[^0-9.]/g, '')) || 0;
     }
 
-    // ── Get name from card ──
+    // Extract product name from product card element
     function getName(card) {
         const nameEl = card.querySelector('.cat-title');
         return nameEl.textContent.trim();
     }
 
-    // ── Save original order ──
+    // Preserve initial catalog order
     const originalOrder = [...productGrid.querySelectorAll('.cat-card')];
 
-    // ── Sort handler ──
+    // Handle sort selection
     sortDropdown.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', () => {
             const sortType = btn.dataset.sort;
 
-            // Update active state
+            // Highlight selected sort option
             sortDropdown.querySelectorAll('button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
             // Close dropdown
             sortWrapper.classList.remove('open');
 
-            // Get current cards
+            // Sort product cards
             let cards = [...productGrid.querySelectorAll('.cat-card')];
 
-            // Sort
             switch (sortType) {
                 case 'price-asc':
                     cards.sort((a, b) => getPrice(a) - getPrice(b));
@@ -70,8 +67,9 @@
                     cards = [...originalOrder];
             }
 
-            // Rearrange DOM
+            // Re-append cards in sorted order
             cards.forEach(card => productGrid.appendChild(card));
         });
     });
 })();
+

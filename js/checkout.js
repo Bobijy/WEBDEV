@@ -1,31 +1,20 @@
-/**
- * checkout.js — Checkout Page Logic
- * Handles payment method toggle and checkout form AJAX submission.
- */
+// Checkout page script: handles address selection, payment method toggle, and order submission
 
-/**
- * Toggle the active payment option and show the corresponding panel.
- * Called via onclick attribute on each payment radio input.
- *
- * @param {HTMLInputElement} radio   The radio input that was selected
- * @param {string}           panelId The ID of the panel to reveal
- */
+// Switch active payment option and show corresponding details
 function togglePayment(radio, panelId) {
     // Reset all option labels
     document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active'));
     // Hide all panels
     document.querySelectorAll('.payment-panel').forEach(el => el.classList.remove('active'));
 
-    // Activate selected option + panel
+    // Activate selected option and panel
     radio.closest('.payment-option').classList.add('active');
     document.getElementById(panelId).classList.add('active');
 }
 
-/**
- * Toggle between saved addresses and the new address form.
- */
+// Switch between saved addresses and new address input form
 function toggleAddressMode(isNew, radioEl) {
-    // Highlight the selected option container
+    // Highlight selected address option
     if (radioEl) {
         document.querySelectorAll('.saved-addresses .payment-option').forEach(el => el.classList.remove('active'));
         radioEl.closest('.payment-option').classList.add('active');
@@ -43,7 +32,7 @@ function toggleAddressMode(isNew, radioEl) {
     }
 }
 
-// ── Checkout Form Submit ──────────────────────────────────────────────────────
+// Handle checkout form submission
 document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 

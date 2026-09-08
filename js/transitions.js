@@ -1,24 +1,21 @@
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// Maison Ungod â€” Page Transition System
-// Smooth branded transitions between pages
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Page Transitions: smooth page transitions and scroll position restoration
 
 (function () {
     'use strict';
     return; // Disabled by user request
 
-    // â”€â”€ Create transition overlay element â”€â”€
+    // Create transition overlay element
     const overlay = document.createElement('div');
     overlay.className = 'page-transition';
     overlay.innerHTML = '<div class="page-transition__bar"></div>';
     document.body.appendChild(overlay);
 
-    // â”€â”€ Save scroll position before leaving â”€â”€
+    // Save scroll position before leaving
     function saveScrollPosition() {
         sessionStorage.setItem('mu_scroll_' + window.location.pathname, window.scrollY);
     }
 
-    // â”€â”€ Restore scroll position on load â”€â”€
+    // Restore scroll position on load
     function restoreScrollPosition() {
         const saved = sessionStorage.getItem('mu_scroll_' + window.location.pathname);
         if (saved && !window.location.hash) {
@@ -29,7 +26,7 @@
         }
     }
 
-    // â”€â”€ Intercept internal link clicks â”€â”€
+    // Intercept internal link clicks
     document.addEventListener('click', function (e) {
         const link = e.target.closest('a[href]');
         if (!link) return;
@@ -72,7 +69,7 @@
         }, 400);
     });
 
-    // â”€â”€ Fade-in on page load â”€â”€
+    // Fade in on page load
     window.addEventListener('pageshow', function (e) {
         // Handle back/forward cache
         if (e.persisted) {
@@ -82,7 +79,7 @@
         restoreScrollPosition();
     });
 
-    // On initial load, make sure overlay is hidden
+    // Ensure overlay is hidden on initial load
     window.addEventListener('DOMContentLoaded', function () {
         // Small delay to ensure page has rendered
         setTimeout(() => {
@@ -90,4 +87,3 @@
         }, 100);
     });
 })();
-

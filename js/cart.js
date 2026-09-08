@@ -1,7 +1,9 @@
+// Cart slide-over panel: handles bag preview, quantity adjustments, and adding items
+
 (function () {
     'use strict';
 
-    // ── DOM References ──
+    // DOM elements
     const cartOverlay = document.getElementById('cartOverlay');
     const cartPanel = document.getElementById('cartPanel');
     const cartClose = document.getElementById('cartClose');
@@ -13,7 +15,7 @@
     const cartCheckoutBtn = document.getElementById('cartCheckout');
     const cartBadge = document.getElementById('cartBadge');
 
-    // ── Open / Close ──
+    // Open and close slide-over cart panel
     function openCart() {
         if (!cartPanel) return;
         cartPanel.classList.add('open');
@@ -45,7 +47,7 @@
         }
     });
 
-    // ── Fetch Cart via API ──
+    // Fetch cart contents from API
     async function fetchCart() {
         try {
             const res = await fetch('api/cart.php?action=fetch');
@@ -68,7 +70,7 @@
         }
     }
 
-    // ── Render Cart UI ──
+    // Render cart items in the slide-over panel
     function renderCart(items, total) {
         if (items.length === 0) {
             cartEmptyP.textContent = 'Your bag is empty.';
@@ -140,7 +142,7 @@
         });
     }
 
-    // ── Custom Confirm Modal ──
+    // Confirmation modal for item removal
     function showCartConfirmModal(message) {
         return new Promise((resolve) => {
             let overlay = document.getElementById('cartCustomConfirmOverlay');
@@ -238,7 +240,7 @@
         }
     }
 
-    // ── Update Item API ──
+    // Update item quantity or remove via API
     async function updateCartItem(id, qty) {
         const formData = new FormData();
         formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
@@ -258,7 +260,7 @@
         }
     }
 
-    // ── Handle Add to Bag Buttons globally ──
+    // Add to bag button click handler
     const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
     addToCartBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {

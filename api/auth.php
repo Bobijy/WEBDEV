@@ -17,6 +17,7 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 switch ($action) {
 
+    // User Registration
     case 'register':
         $name            = sanitize_raw($_POST['name']             ?? '');
         $email           = sanitize_raw($_POST['email']            ?? '');
@@ -71,6 +72,7 @@ switch ($action) {
         ]);
         break;
 
+    // User Login
     case 'login':
         $email    = sanitize_raw($_POST['email']    ?? '');
         $password = $_POST['password']               ?? '';
@@ -110,6 +112,7 @@ switch ($action) {
         ]);
         break;
 
+    // User Logout
     case 'logout':
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
@@ -120,6 +123,7 @@ switch ($action) {
         json_response(true, 'Logged out successfully.');
         break;
 
+    // Check Login Status & Fetch Account Info
     case 'status':
         if (!isset($_SESSION['user_id'])) {
             json_response(false, '', ['loggedIn' => false]);
@@ -127,7 +131,7 @@ switch ($action) {
         $userId = (int) $_SESSION['user_id'];
         $user = db_fetch($pdo, 'SELECT id, full_name, email, phone, address, role FROM users WHERE id = :id', [':id' => $userId]);
         
-        // Use order_items joined, since order_number is not in the db bootstrap schema it's added during checkout
+        // Fetch recent orders
         $orders = db_fetch_all($pdo, 'SELECT id, total_amount, status, created_at FROM orders WHERE user_id = :id ORDER BY created_at DESC', [':id' => $userId]);
         
         echo json_encode([
@@ -137,6 +141,7 @@ switch ($action) {
         ]);
         break;
 
+    // Update Profile Information
     case 'update_profile':
         require_auth();
         $userId = (int) $_SESSION['user_id'];
@@ -207,6 +212,7 @@ switch ($action) {
         json_response(true, 'Profile updated successfully.');
         break;
 
+    // Change Password
     case 'change_password':
         require_auth();
 

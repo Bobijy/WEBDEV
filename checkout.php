@@ -48,7 +48,7 @@ if (empty($items)) {
 $shipping = 50.00;
 $tax_rate = 0.12; // 12%
 $taxes = $total * $tax_rate;
-$grand_total = $total + $shipping; // Tax is typically included in total based on screenshot "Including P106.61 in taxes"
+$grand_total = $total + $shipping; // Total including shipping
 
 $site = ['name' => 'Maison Ungod'];
 ?>
@@ -100,7 +100,7 @@ $site = ['name' => 'Maison Ungod'];
                                 <div>
                                     <strong style="font-size:0.85rem;"><?= htmlspecialchars($addr['full_name']) ?></strong><br>
                                     <span style="font-size:0.8rem; color:var(--text-light);"><?= htmlspecialchars($addr['phone']) ?></span><br>
-                                    <span style="font-size:0.8rem; color:var(--text-light);"><?= htmlspecialchars($addr['address_line']) ?></span>
+                                    <span style="font-size:0.8rem; color:var(--text-light);"><?= htmlspecialchars($addr['address_line']) ?><?= !empty($addr['postal_code']) ? ', ' . htmlspecialchars($addr['postal_code']) : '' ?></span>
                                 </div>
                             </div>
                         </label>
@@ -182,7 +182,7 @@ $site = ['name' => 'Maison Ungod'];
             <p style="color: var(--text-light); font-size: 0.8rem; margin-bottom: 16px;">All transactions are secure and encrypted.</p>
             
             <div class="payment-box">
-                <!-- Option 1 -->
+                <!-- Card Payment -->
                 <label class="payment-option active" id="label-cc">
                     <div class="payment-label-wrap">
                         <input type="radio" name="payment_method" value="Card" checked onclick="togglePayment(this, 'panel-cc')">
@@ -215,7 +215,7 @@ $site = ['name' => 'Maison Ungod'];
                 </div>
                 
 
-                <!-- Option 3 -->
+                <!-- Cash On Delivery -->
                 <label class="payment-option" id="label-cod">
                     <div class="payment-label-wrap">
                         <input type="radio" name="payment_method" value="Cash On Delivery" onclick="togglePayment(this, 'panel-cod')">
@@ -227,7 +227,7 @@ $site = ['name' => 'Maison Ungod'];
                 </div>
             </div>
 
-            <!-- We generate the aggregate hidden address field to satisfy the legacy API -->
+            <!-- Complete delivery address for order submission -->
             <input type="hidden" name="address" id="finalAddress">
             
             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">

@@ -1,7 +1,9 @@
+// Contact modal script: handles open/close and contact form submission
+
 (function () {
     'use strict';
 
-    // ── DOM References ──
+    // DOM elements
     const contactOverlay = document.getElementById('contactOverlay');
     const contactModal = document.getElementById('contactModal');
     const contactClose = document.getElementById('contactClose');
@@ -11,7 +13,7 @@
     const contactMsg = document.getElementById('contactMsg');
     const contactSubmit = document.getElementById('contactSubmit');
 
-    // ── Open / Close ──
+    // Open and close contact modal
     function openContact() {
         if (!contactModal) return;
         contactModal.classList.add('open');
@@ -42,7 +44,7 @@
         }
     });
 
-    // ── Form Submission ──
+    // Handle contact form submission
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -68,3 +70,4 @@
         });
     }
 })();
+

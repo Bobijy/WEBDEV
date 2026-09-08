@@ -1,7 +1,9 @@
+// Account modal script: handles modal toggle, sign-in, and registration via API
+
 (function () {
     'use strict';
 
-    // ── DOM References ──
+    // DOM elements
     const accountOverlay = document.getElementById('accountOverlay');
     const accountModal = document.getElementById('accountModal');
     const accountClose = document.getElementById('accountClose');
@@ -26,7 +28,7 @@
     const fAddress = document.getElementById('updateAddress');
     const fMsg = document.getElementById('updateMsg');
 
-    // ── Modal Toggle Logic ──
+    // Open and close account modal
     async function openAccount() {
         if (!accountModal) return;
         
@@ -73,7 +75,7 @@
         }
     });
 
-    // ── Forms Switcher ──
+    // Switch between sign-in and registration forms
     if (showRegisterBtn) {
         showRegisterBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -97,9 +99,7 @@
         });
     }
 
-
-
-    // ── Login AJAX ──
+    // Handle sign-in form submission
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -139,7 +139,7 @@
         });
     }
 
-    // ── Register AJAX ──
+    // Handle registration form submission
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -179,13 +179,11 @@
         });
     }
 
-
-
-    // ── Check URL for Login Param ──
+    // Check for login query parameter in URL (e.g. ?login=1)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('login') === '1') {
         openAccount();
-        // Remove param from URL without reloading
+        // Remove parameter from URL without reloading
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 

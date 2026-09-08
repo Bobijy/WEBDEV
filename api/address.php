@@ -1,4 +1,6 @@
 <?php
+// Address API: manages user delivery addresses (add, edit, delete, set default)
+
 session_start();
 header('Content-Type: application/json');
 
@@ -25,6 +27,7 @@ switch ($action) {
         $full_name    = sanitize_raw($_POST['full_name'] ?? '');
         $phone        = sanitize_raw($_POST['phone'] ?? '');
         $address_line = sanitize_raw($_POST['address_line'] ?? '');
+        $postal_code  = sanitize_raw($_POST['postal_code'] ?? '');
         $is_default   = isset($_POST['is_default']) ? 1 : 0;
 
         if ($full_name === '' || $phone === '' || $address_line === '') {
@@ -40,12 +43,14 @@ switch ($action) {
                 $is_default = 1;
             }
 
+            $display_addr = $address_line . ($postal_code !== '' ? ', ' . $postal_code : '');
+
             // If setting as default, clear others
             if ($is_default) {
                 db_execute($pdo, 'UPDATE user_addresses SET is_default = 0 WHERE user_id = :uid', [':uid' => $user_id]);
                 // Sync to users table
                 db_execute($pdo, 'UPDATE users SET address = :addr, phone = :phone WHERE id = :uid', [
-                    ':addr'  => $address_line,
+                    ':addr'  => $display_addr,
                     ':phone' => $phone,
                     ':uid'   => $user_id
                 ]);
@@ -53,28 +58,30 @@ switch ($action) {
 
             if ($action === 'add') {
                 db_execute($pdo, 
-                    'INSERT INTO user_addresses (user_id, label, full_name, phone, address_line, is_default) VALUES (:uid, :label, :name, :phone, :addr, :def)',
+                    'INSERT INTO user_addresses (user_id, label, full_name, phone, address_line, postal_code, is_default) VALUES (:uid, :label, :name, :phone, :addr, :postal, :def)',
                     [
-                        ':uid'   => $user_id,
-                        ':label' => $label,
-                        ':name'  => $full_name,
-                        ':phone' => $phone,
-                        ':addr'  => $address_line,
-                        ':def'   => $is_default
+                        ':uid'    => $user_id,
+                        ':label'  => $label,
+                        ':name'   => $full_name,
+                        ':phone'  => $phone,
+                        ':addr'   => $address_line,
+                        ':postal' => $postal_code !== '' ? $postal_code : null,
+                        ':def'    => $is_default
                     ]
                 );
             } else {
                 // Ensure the address belongs to the user
                 db_execute($pdo,
-                    'UPDATE user_addresses SET label = :label, full_name = :name, phone = :phone, address_line = :addr, is_default = :def WHERE id = :id AND user_id = :uid',
+                    'UPDATE user_addresses SET label = :label, full_name = :name, phone = :phone, address_line = :addr, postal_code = :postal, is_default = :def WHERE id = :id AND user_id = :uid',
                     [
-                        ':label' => $label,
-                        ':name'  => $full_name,
-                        ':phone' => $phone,
-                        ':addr'  => $address_line,
-                        ':def'   => $is_default,
-                        ':id'    => $id,
-                        ':uid'   => $user_id
+                        ':label'  => $label,
+                        ':name'   => $full_name,
+                        ':phone'  => $phone,
+                        ':addr'   => $address_line,
+                        ':postal' => $postal_code !== '' ? $postal_code : null,
+                        ':def'    => $is_default,
+                        ':id'     => $id,
+                        ':uid'    => $user_id
                     ]
                 );
             }
@@ -97,11 +104,12 @@ switch ($action) {
                 
                 // If default was deleted, make the newest one default
                 if ($addr['is_default']) {
-                    $next = db_fetch($pdo, 'SELECT id, address_line, phone FROM user_addresses WHERE user_id = :uid ORDER BY id DESC LIMIT 1', [':uid' => $user_id]);
+                    $next = db_fetch($pdo, 'SELECT id, address_line, postal_code, phone FROM user_addresses WHERE user_id = :uid ORDER BY id DESC LIMIT 1', [':uid' => $user_id]);
                     if ($next) {
                         db_execute($pdo, 'UPDATE user_addresses SET is_default = 1 WHERE id = :id', [':id' => $next['id']]);
+                        $next_addr = $next['address_line'] . (!empty($next['postal_code']) ? ', ' . $next['postal_code'] : '');
                         db_execute($pdo, 'UPDATE users SET address = :addr, phone = :phone WHERE id = :uid', [
-                            ':addr'  => $next['address_line'],
+                            ':addr'  => $next_addr,
                             ':phone' => $next['phone'],
                             ':uid'   => $user_id
                         ]);
@@ -128,8 +136,9 @@ switch ($action) {
                 db_execute($pdo, 'UPDATE user_addresses SET is_default = 0 WHERE user_id = :uid', [':uid' => $user_id]);
                 db_execute($pdo, 'UPDATE user_addresses SET is_default = 1 WHERE id = :id', [':id' => $id]);
                 
+                $full_addr = $addr['address_line'] . (!empty($addr['postal_code']) ? ', ' . $addr['postal_code'] : '');
                 db_execute($pdo, 'UPDATE users SET address = :addr, phone = :phone WHERE id = :uid', [
-                    ':addr'  => $addr['address_line'],
+                    ':addr'  => $full_addr,
                     ':phone' => $addr['phone'],
                     ':uid'   => $user_id
                 ]);

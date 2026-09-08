@@ -1,9 +1,6 @@
-/**
- * admin-login.js — Admin Login Page Logic
- * Handles password visibility toggle and login AJAX on admin/login.php.
- */
+// Admin login script: handles password toggle and login submission on admin/login.php
 
-// ── Password Show/Hide Toggle ─────────────────────────────────────────────────
+// Show or hide password toggle
 document.getElementById('togglePassword').addEventListener('click', function () {
     const input = document.getElementById('adminPassword');
     if (input.type === 'password') {
@@ -15,7 +12,7 @@ document.getElementById('togglePassword').addEventListener('click', function () 
     }
 });
 
-// ── Login Form Submit ─────────────────────────────────────────────────────────
+// Handle admin login submission
 document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 

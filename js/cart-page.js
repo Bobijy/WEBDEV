@@ -1,19 +1,9 @@
-/**
- * cart-page.js — Cart Page Interaction
- * Handles quantity update and item removal on cart.php.
- * Calls api/cart.php and reloads the page to reflect changes.
- */
+// Cart page script: handles quantity changes and item removal on cart.php
 
-/**
- * Send a cart update or remove request to the API.
- *
- * @param {string|number} id     The cart item ID
- * @param {string|number} qty    The new quantity (ignored for 'remove')
- * @param {string}        action 'update' or 'remove'
- */
+// Update item quantity or remove item via API
 async function updateCart(id, qty, action) {
     const formData = new FormData();
-        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
+    formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
     formData.append('action', action);
     formData.append('item_id', id);
     if (action === 'update') formData.append('quantity', qty);
@@ -26,14 +16,14 @@ async function updateCart(id, qty, action) {
     }
 }
 
-// ── Quantity Buttons ──────────────────────────────────────────────────────────
+// Quantity adjust buttons (+ / -)
 document.querySelectorAll('.qty-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         updateCart(btn.dataset.id, btn.dataset.qty, 'update');
     });
 });
 
-// ── Remove Buttons ────────────────────────────────────────────────────────────
+// Remove item buttons
 document.querySelectorAll('.cart-item-remove').forEach(btn => {
     btn.addEventListener('click', () => {
         if (confirm('Remove item from cart?')) {
@@ -41,3 +31,4 @@ document.querySelectorAll('.cart-item-remove').forEach(btn => {
         }
     });
 });
+

@@ -1,4 +1,5 @@
- __DIR__ . '/database/helpers.php';
+<?php
+require_once __DIR__ . '/database/helpers.php';
 session_start();
 if (isset($_SESSION['user_id'])) {
     header("Location: account.php");

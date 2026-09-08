@@ -1,27 +1,17 @@
-/**
- * account-page.js — Account Dashboard Logic
- * Handles tab switching, profile edit modal, and profile update AJAX.
- * Loaded only by account.php.
- */
+// Account dashboard script: tab switching, profile editing, address book, and order management
 
-// ── Tab Switcher ─────────────────────────────────────────────────────────────
-/**
- * Switch between the Profile and Orders tabs.
- * Called from onclick="" attributes on the sidebar nav items.
- *
- * @param {string} tabId  'profile' or 'orders'
- */
+// Switch between Profile, Orders, and Addresses tabs
 function switchTab(tabId) {
-    // Update Nav
+    // Update nav link
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     document.getElementById('nav-' + tabId).classList.add('active');
 
-    // Update Content
+    // Update tab content
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + tabId).classList.add('active');
 }
 
-// ── Check URL hash on load to auto-switch tabs ────────────────────────────────
+// Auto-switch tab if URL hash is present (e.g. #orders, #addresses)
 window.addEventListener('DOMContentLoaded', () => {
     const hash = window.location.hash;
     if (hash === '#orders') {
@@ -31,7 +21,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ── Logout ───────────────────────────────────────────────────────────────────
+// Logout handler
 const logoutBtn = document.getElementById('logoutBtnNav') || document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
@@ -41,7 +31,7 @@ if (logoutBtn) {
     });
 }
 
-// ── Profile Update Form Submit ────────────────────────────────────────────────
+// Profile update form submission
 const inlineProfileForm = document.getElementById('inlineProfileForm');
 const editMsg           = document.getElementById('editMsg');
 const inlineModalSubmit = document.getElementById('inlineModalSubmit');
@@ -88,7 +78,7 @@ if (inlineProfileForm) {
     });
 }
 
-// ── Addresses Logic ────────────────────────────────────────────────────────
+// Delivery addresses management
 const addressModalOverlay = document.getElementById('addressModalOverlay');
 const addressForm = document.getElementById('addressForm');
 const addrMsg = document.getElementById('addrMsg');
@@ -103,6 +93,7 @@ function openAddressModal(addr = null) {
         document.getElementById('addr_full_name').value = addr.full_name;
         document.getElementById('addr_phone').value = addr.phone;
         document.getElementById('addr_line').value = addr.address_line;
+        document.getElementById('addr_postal_code').value = addr.postal_code || '';
         document.getElementById('addr_is_default').checked = addr.is_default == 1;
         document.getElementById('addr_is_default').disabled = addr.is_default == 1; // prevent unchecking if already default
     } else {
@@ -110,6 +101,7 @@ function openAddressModal(addr = null) {
         document.getElementById('addr_action').value = 'add';
         addressForm.reset();
         document.getElementById('addr_id').value = '';
+        document.getElementById('addr_postal_code').value = '';
         document.getElementById('addr_is_default').disabled = false;
     }
     
@@ -204,7 +196,7 @@ async function setDefaultAddress(id) {
     }
 }
 
-// ── Change Field Logic (Email / Phone) ──────────────────────────────────────
+// Update email or phone number
 const changeFieldModalOverlay = document.getElementById('changeFieldModalOverlay');
 const changeFieldForm = document.getElementById('changeFieldForm');
 const changeFieldMsg = document.getElementById('changeFieldMsg');
@@ -275,7 +267,7 @@ if (changeFieldForm) {
     });
 }
 
-// ── Change Password Logic ───────────────────────────────────────────────────
+// Change account password
 const passwordModalOverlay = document.getElementById('passwordModalOverlay');
 const passwordForm = document.getElementById('passwordForm');
 const passwordMsg = document.getElementById('passwordMsg');
@@ -345,7 +337,7 @@ if (passwordForm) {
     });
 }
 
-// ── Cancel Order Logic ──────────────────────────────────────────────────────
+// Cancel pending order
 const cancelOrderModalOverlay = document.getElementById('cancelOrderModalOverlay');
 const cancelOrderMsg = document.getElementById('cancelOrderMsg');
 const confirmCancelOrderBtn = document.getElementById('confirmCancelOrderBtn');

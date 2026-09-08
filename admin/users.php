@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/includes/header.php'; ?>
+<?php
+// Admin users page: lists registered users and allows role management
+require_once __DIR__ . '/includes/header.php'; ?>
 
 <div style="margin-bottom: 20px;">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Registered Users</h3>

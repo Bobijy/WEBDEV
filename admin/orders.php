@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/includes/header.php'; ?>
+<?php
+// Admin orders page: lists customer orders and provides status update modal
+require_once __DIR__ . '/includes/header.php'; ?>
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Order Management</h3>

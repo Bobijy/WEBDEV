@@ -2,19 +2,19 @@
 session_start();
 require_once __DIR__ . '/database/helpers.php';
 /**
- * Maison Ungod &mdash; Luxury Perfume House
- * Pure PHP Landing Page
+ * Maison Ungod — Luxury Perfume House
+ * Landing Page
  */
 
-// â”€â”€â”€ Site Configuration â”€â”€â”€
+// Site Configuration
 $site = [
     'name' => 'Maison Ungod',
     'tagline' => 'Find Your Signature Scent',
-    'description' => 'Maison Ungod &mdash; Luxury fragrance house crafting exquisite perfumes with rare ingredients and masterful craftsmanship.',
+    'description' => 'Maison Ungod — Luxury fragrance house crafting exquisite perfumes with rare ingredients and masterful craftsmanship.',
     'year' => date('Y'),
 ];
 
-// â”€â”€â”€ Navigation Links â”€â”€â”€
+// Navigation Links
 $navLinks = [
     ['label' => 'Home', 'href' => '#hero', 'active' => true],
     ['label' => 'Shop', 'href' => 'shop.php', 'active' => false],
@@ -23,7 +23,7 @@ $navLinks = [
     ['label' => 'Contact', 'href' => '#', 'id' => 'contactToggle', 'active' => false],
 ];
 
-// â”€â”€â”€ Product Categories â”€â”€â”€
+// Product Categories
 $categories = [
     [
         'title' => 'Pour Homme',
@@ -41,8 +41,7 @@ $categories = [
     ],
 ];
 
-// â”€â”€â”€ Collections (from DB) â”€â”€â”€
-// Only Active products are shown to homepage visitors.
+// Active Collections from Database
 require_once __DIR__ . '/database/db.php';
 require_once __DIR__ . '/database/helpers.php';
 
@@ -57,13 +56,12 @@ foreach ($rows as $row) {
     ];
 }
 
-// Ensure the slider has enough items to actually slide (overflow the container)
-// If there are 3 or fewer products, duplicate them to create an infinite scroll effect
+// Duplicate items if 3 or fewer to keep infinite slider smooth
 if (count($collections) > 0 && count($collections) <= 3) {
     $collections = array_merge($collections, $collections, $collections);
 }
 
-// â”€â”€â”€ Features â”€â”€â”€
+// Brand Features
 $features = [
     [
         'title' => 'Rare Ingredients',
@@ -79,7 +77,7 @@ $features = [
     ],
 ];
 
-// â”€â”€â”€ SVG Icons â”€â”€â”€
+// SVG Icons
 $icons = [
     'instagram' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>',
     'facebook' => '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
@@ -88,6 +86,7 @@ $icons = [
     'bag' => '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
 ];
 
+// Social Links
 $socials = [
     ['icon' => 'instagram', 'url' => '#'],
     ['icon' => 'facebook', 'url' => '#'],
@@ -103,7 +102,7 @@ $socials = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Luxury Fragrances</title>
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <link rel="stylesheet" href="css/animations.css?v=2">
 </head>
 
@@ -117,17 +116,15 @@ $socials = [
     <!-- Custom Cursor (desktop only) -->
 
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     NAVBAR
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Navigation Bar -->
     <nav class="navbar" id="navbar">
         <div class="container">
-            <!-- Top Row: Logo | Brand | Icons -->
+            <!-- Top Row: Logo | Centered Brand | Icons -->
             <div class="nav-top">
-                <a href="index.php" class="nav-logo">
+                <a href="index.php" class="nav-logo" aria-label="<?= $site['name'] ?>">
                     <img src="assets/logo/logo.png" alt="<?= $site['name'] ?> Logo">
                 </a>
-                <span class="nav-brand">&mdash;<?= strtoupper($site['name']) ?>&mdash;</span>
+                <span class="nav-brand">&mdash;&nbsp;<?= strtoupper($site['name']) ?>&nbsp;&mdash;</span>
                 <div class="nav-icons">
                     <a href="#" class="nav-icon" id="searchToggle" aria-label="Search"
                         onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
@@ -153,9 +150,7 @@ $socials = [
         </div>
     </nav>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     HERO
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Hero Section -->
     <section class="hero" id="hero">
         <!-- Ambient Floating Particles -->
         <div class="ambient-particles">
@@ -179,9 +174,7 @@ $socials = [
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     CATEGORIES &mdash; Pour Homme / Pour Femme
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Fragrance Categories -->
     <section class="categories" id="categories">
         <div class="container categories-grid">
             <?php foreach ($categories as $i => $cat): ?>
@@ -199,9 +192,7 @@ $socials = [
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     THE COLLECTIONS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Featured Collections -->
     <section class="collections" id="collections">
         <div class="container">
             <div class="section-title reveal">
@@ -249,9 +240,7 @@ $socials = [
         </div>
     </section>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     THE STORY OF THE MAISON
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Brand Story -->
     <section class="story" id="story">
         <div class="container story-grid">
             <div class="story-img-wrap reveal">
@@ -276,9 +265,7 @@ $socials = [
     <!-- Section Divider -->
     <div class="section-divider reveal"></div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     FEATURES
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Features & Craftsmanship -->
     <section class="features" id="features">
         <div class="container">
             <?php foreach ($features as $feat): ?>
@@ -295,9 +282,7 @@ $socials = [
         </div>
     </section>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     FOOTER
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Footer -->
     <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-top">
@@ -343,9 +328,7 @@ $socials = [
         </div>
     </footer>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SEARCH OVERLAY
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Search Modal -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal">
             <div class="search-modal__header">
@@ -367,9 +350,7 @@ $socials = [
         </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     CART MODAL (Slide-out or Centered)
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Shopping Bag Drawer -->
     <div class="cart-overlay" id="cartOverlay"></div>
     <aside class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
@@ -416,9 +397,7 @@ $socials = [
         </div>
     </aside>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     ACCOUNT MODAL
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Account Modal (Sign In / Register) -->
     <div class="account-overlay" id="accountOverlay"></div>
     <div class="account-modal" id="accountModal">
         <button class="account-modal__close" id="accountClose" aria-label="Close account">
@@ -509,9 +488,7 @@ $socials = [
         </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     SCRIPTS
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- Page Scripts -->
     <!-- Scroll-to-Top Button -->
     <button class="scroll-to-top" aria-label="Scroll to top">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"

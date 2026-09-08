@@ -1,5 +1,10 @@
 <?php
+/**
+ * CSRF Protection Helper
+ * Generates and validates security tokens for forms and API requests.
+ */
 class CSRF {
+    // Generate or retrieve the current session token
     public static function generate(): string {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

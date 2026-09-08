@@ -1,11 +1,5 @@
 <?php
-/**
- * Maison Ungod — Admin API
- *
- * Protected endpoint for the Admin Dashboard.
- * Driver  : PDO with named parameters
- * Security: admin role guard + full product/order/user validation
- */
+// Admin API: handles admin management for products, orders, users, and dashboard stats
 
 session_start();
 header('Content-Type: application/json');
@@ -13,11 +7,10 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../database/db.php';
 require_once __DIR__ . '/../database/helpers.php';
 
-// Require admin role — will 403 and exit otherwise
+// Only admins can access this API
 require_admin();
 
-// ── Input Source ──
-// POST for form submissions, raw JSON body for PUT/DELETE from JS fetch()
+// Read input parameters from POST/GET or JSON request body
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -28,16 +21,16 @@ if ($method === 'PUT' || $method === 'DELETE') {
     $action = $input['action'] ?? $action;
 }
 
-// ── Allowed Whitelists ──
+// Allowed values for validation
 const ALLOWED_CATEGORIES = ['Pour Homme', 'Pour Femme', 'Unisex', 'Uncategorized'];
 const ALLOWED_STATUSES = ['Active', 'Draft'];
 const ALLOWED_ORDER_STATUSES = ['Pending', 'Approved', 'Processing', 'Shipped', 'Completed', 'Cancelled'];
 const ALLOWED_ROLES = ['admin', 'customer'];
 
-// ── Action Router ──
+// Handle admin actions
 switch ($action) {
 
-    // ─── PRODUCTS ───
+    // Fetch all products
     case 'get_products':
         try {
             $products = db_fetch_all($pdo, "SELECT * FROM products ORDER BY id DESC");
@@ -45,6 +38,97 @@ switch ($action) {
         } catch (PDOException $e) {
             error_log('[Maison Ungod] Failed to fetch products: ' . $e->getMessage());
             json_response(false, 'Failed to fetch products.');
+        }
+        break;
+
+    case 'add_product':
+        if ($method !== 'POST') {
+            json_response(false, 'Invalid method. Use POST for add_product.');
+        }
+
+        // Validate CSRF
+        if (!isset($_POST['csrf_token']) || !CSRF::verify($_POST['csrf_token'])) {
+            json_response(false, 'Invalid security token. Please refresh the page.');
+        }
+
+        $name = trim($_POST['name'] ?? '');
+        $category = trim($_POST['category'] ?? 'Uncategorized');
+        $brand = trim($_POST['brand'] ?? 'Maison Ungod');
+        $price = filter_input(INPUT_POST, 'price', FILTER_VALIDATE_FLOAT);
+        $stock = filter_input(INPUT_POST, 'stock', FILTER_VALIDATE_INT);
+        $status = trim($_POST['status'] ?? 'Active');
+        $description = trim($_POST['description'] ?? '');
+
+        $errors = [];
+        if (empty($name)) $errors['name'] = 'Product Name is required.';
+        if (!in_array($category, ALLOWED_CATEGORIES)) $errors['category'] = 'Invalid category selected.';
+        if ($price === false || $price < 0) $errors['price'] = 'Price must be a valid positive number.';
+        if ($stock === false || $stock < 0) $errors['stock'] = 'Stock must be a valid positive integer.';
+        if (!in_array($status, ALLOWED_STATUSES) && $status !== 'Hidden') $errors['status'] = 'Invalid status selected.';
+
+        // Image Handling
+        $imagePath = 'uploads/products/prod_6a9f9995d87df.png'; // default fallback image
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $tmpName = $_FILES['image']['tmp_name'];
+                $fileName = $_FILES['image']['name'];
+                $fileSize = $_FILES['image']['size'];
+                $fileType = mime_content_type($tmpName);
+
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                $maxSize = 5 * 1024 * 1024; // 5MB
+
+                if (!in_array($fileType, $allowedTypes)) {
+                    $errors['image'] = 'Invalid image format. Only JPG, PNG, WEBP, and GIF are allowed.';
+                }
+                if ($fileSize > $maxSize) {
+                    $errors['image'] = 'Image size exceeds the 5MB limit.';
+                }
+
+                if (empty($errors)) {
+                    $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+                    $newFileName = uniqid('prod_') . '.' . strtolower($ext);
+                    $uploadDir = __DIR__ . '/../uploads/products/';
+
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    $destination = $uploadDir . $newFileName;
+                    if (move_uploaded_file($tmpName, $destination)) {
+                        $imagePath = 'uploads/products/' . $newFileName;
+                    } else {
+                        $errors['image'] = 'Failed to upload image. Please try again.';
+                    }
+                }
+            } else {
+                $errors['image'] = 'Image upload error code: ' . $_FILES['image']['error'];
+            }
+        }
+
+        if (!empty($errors)) {
+            json_response(false, 'Validation failed.', ['errors' => $errors]);
+        }
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO products (name, description, category, brand, price, stock, status, image) VALUES (:name, :description, :category, :brand, :price, :stock, :status, :image)");
+            $stmt->execute([
+                ':name'        => $name,
+                ':description' => $description,
+                ':category'    => $category,
+                ':brand'       => $brand,
+                ':price'       => $price,
+                ':stock'       => $stock,
+                ':status'      => $status,
+                ':image'       => $imagePath,
+            ]);
+
+            $newId = $pdo->lastInsertId();
+            json_response(true, 'Product created successfully.', ['id' => $newId]);
+        } catch (PDOException $e) {
+            error_log('[Maison Ungod] Failed to create product: ' . $e->getMessage());
+            json_response(false, 'Database error while creating product.');
         }
         break;
 
@@ -182,7 +266,7 @@ switch ($action) {
         }
         break;
 
-    // ─── DASHBOARD STATS ──
+    // Dashboard statistics
     case 'dashboard_stats':
         try {
             // Products summary
@@ -277,7 +361,8 @@ switch ($action) {
             json_response(false, 'Failed to load dashboard stats.');
         }
         break;
-    // ─── SALES CHART ───
+
+    // Sales chart data
     case 'sales_chart':
         $range = $_GET['range'] ?? 'week';
         $interval = '6 DAY';
@@ -305,7 +390,7 @@ switch ($action) {
         }
         break;
 
-    // ─── GLOBAL SEARCH ────
+    // Global search across products, orders, and users
     case 'global_search':
         $q = sanitize_raw($_GET['q'] ?? '');
         if (strlen($q) < 2)
@@ -334,7 +419,7 @@ switch ($action) {
         }
         break;
 
-    // ─── GET ALL ORDERS ───
+    // Fetch all orders
     case 'get_orders':
         $statusFilter = $_GET['status'] ?? '';
         $sql = '
@@ -359,7 +444,7 @@ switch ($action) {
         json_response(true, '', ['orders' => $orders]);
         break;
 
-    // ─── GET SINGLE ORDER ───
+    // Fetch single order details
     case 'get_order':
         $id = (int) ($_GET['id'] ?? 0);
 
@@ -388,7 +473,7 @@ switch ($action) {
         json_response(true, '', ['order' => $order, 'items' => $items]);
         break;
 
-    // ─── UPDATE ORDER STATUS ───
+    // Update order status
     case 'update_order_status':
         $id = (int) ($input['id'] ?? $_POST['id'] ?? 0);
         $status = sanitize_raw($input['status'] ?? $_POST['status'] ?? '');
@@ -441,7 +526,7 @@ switch ($action) {
         json_response(true, 'Status updated to ' . $status . '.');
         break;
 
-    // ─── GET ALL USERS ───
+    // Fetch all users
     case 'get_users':
         $users = db_fetch_all(
             $pdo,
@@ -450,7 +535,7 @@ switch ($action) {
         json_response(true, '', ['users' => $users]);
         break;
 
-    // ─── UPDATE USER ROLE ───
+    // Update user role
     case 'update_user_role':
         $id = (int) ($input['id'] ?? $_POST['id'] ?? 0);
         $role = sanitize_raw($input['role'] ?? $_POST['role'] ?? '');
@@ -485,7 +570,6 @@ switch ($action) {
         json_response(true, 'User role updated to ' . $role . '.');
         break;
 
-    // ─── DEFAULT ─
     default:
         json_response(false, 'Invalid action.');
         break;

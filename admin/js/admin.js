@@ -1,7 +1,9 @@
+// Admin dashboard script: handles products, orders, user roles, and statistics
+
 (function () {
     'use strict';
 
-    // ── LOGOUT ──
+    // Logout handler
     const logoutBtn = document.getElementById('adminLogoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
@@ -11,7 +13,7 @@
         });
     }
 
-    // ── HELPERS ──
+    // Helper functions for API requests and formatting
     async function apiCall(action, method = 'GET', body = null) {
         const options = { method };
         if (body) {
@@ -47,7 +49,7 @@
         return 'badge-cancelled';
     }
 
-    // ── MOBILE MENU ──
+    // Mobile sidebar toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const adminSidebar = document.getElementById('adminSidebar');
     if (mobileMenuBtn && adminSidebar) {
@@ -66,7 +68,7 @@
         });
     }
 
-    // ── DASHBOARD ──
+    // Dashboard statistics and widgets
     window.fetchDashboardStats = async function() {
         const data = await apiCall('dashboard_stats');
         if (!data || !data.success) return;
@@ -172,7 +174,7 @@
 
     }
 
-    // ── PRODUCTS ──
+    // Product management
     const editProductModal = document.getElementById('editProductModal');
     const editProductModalOverlay = document.getElementById('editProductModalOverlay');
     const editProductForm = document.getElementById('editProductForm');
@@ -194,10 +196,49 @@
         document.getElementById('cancelEditProductBtn').addEventListener('click', closeEditProductModal);
     }
 
+    function openAddProductModal() {
+        if (!editProductModal) return;
+        if (editProductForm) editProductForm.reset();
+        if (editModalFormError) editModalFormError.style.display = 'none';
+
+        const modalTitle = document.getElementById('productModalTitle');
+        if (modalTitle) modalTitle.textContent = 'Add New Product';
+        const actionInput = document.getElementById('productFormAction');
+        if (actionInput) actionInput.value = 'add_product';
+        document.getElementById('editProductId').value = '';
+        document.getElementById('editProductStatus').value = 'Active';
+        document.getElementById('editProductCat').value = 'Uncategorized';
+        const saveBtn = document.getElementById('saveEditProductBtn');
+        if (saveBtn) saveBtn.textContent = 'Add Product';
+
+        const imgPreviewWrap = document.getElementById('editProductImgPreviewWrap');
+        if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
+        const imgLabel = document.getElementById('editProductImageLabel');
+        if (imgLabel) imgLabel.innerHTML = 'Product Image <small>(optional, Max 5MB)</small>';
+
+        editProductModal.classList.add('open');
+        editProductModalOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.openAddProductModal = openAddProductModal;
+    window.closeEditProductModal = closeEditProductModal;
+
+    if (document.getElementById('openAddProductBtn')) {
+        document.getElementById('openAddProductBtn').addEventListener('click', openAddProductModal);
+    }
+
     window.editProduct = function(id) {
         if (typeof productsList === 'undefined') return;
         const p = productsList.find(x => x.id == id);
         if(!p) return;
+
+        const modalTitle = document.getElementById('productModalTitle');
+        if (modalTitle) modalTitle.textContent = 'Edit Product';
+        const actionInput = document.getElementById('productFormAction');
+        if (actionInput) actionInput.value = 'edit_product';
+        const saveBtn = document.getElementById('saveEditProductBtn');
+        if (saveBtn) saveBtn.textContent = 'Update Product';
 
         document.getElementById('editProductId').value = p.id;
         document.getElementById('editProductName').value = p.name;
@@ -208,25 +249,33 @@
         document.getElementById('editProductStock').value = p.stock;
         document.getElementById('editProductStatus').value = p.status;
 
+        const imgPreviewWrap = document.getElementById('editProductImgPreviewWrap');
         const imgPreview = document.getElementById('editProductImgPreview');
         if (p.image) {
             imgPreview.src = '../' + p.image;
-            imgPreview.style.display = 'block';
+            if (imgPreviewWrap) imgPreviewWrap.style.display = 'block';
         } else {
-            imgPreview.style.display = 'none';
+            if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
         }
+
+        const imgLabel = document.getElementById('editProductImageLabel');
+        if (imgLabel) imgLabel.innerHTML = 'Replace Image <small>(optional, Max 5MB)</small>';
 
         editProductModal.classList.add('open');
         editProductModalOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
 
-    if (editProductForm) {
+    if (editProductForm && !editProductForm.dataset.bound) {
+        editProductForm.dataset.bound = "true";
         editProductForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveEditProductBtn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = 'Updating...';
+            const actionInput = document.getElementById('productFormAction');
+            const isAdd = actionInput && actionInput.value === 'add_product';
+
+            btn.innerHTML = isAdd ? 'Creating...' : 'Updating...';
             btn.disabled = true;
             editModalFormError.style.display = 'none';
 
@@ -241,7 +290,7 @@
                 
                 if (data.success) {
                     closeEditProductModal();
-                    showToast('Product updated successfully!');
+                    showToast(isAdd ? 'Product created successfully!' : 'Product updated successfully!');
                     fetchProducts();
                 } else {
                     let errHtml = '<strong>Error:</strong><br>';
@@ -311,7 +360,7 @@
         }
     }
 
-    // ── ORDERS ──
+    // Order management
     let ordersList = [];
     window.fetchOrders = async function() {
         let statusQuery = '';
@@ -400,7 +449,7 @@
         });
     }
 
-    // ── TOAST NOTIFICATIONS ──
+    // Toast notifications
     function showToast(message, type = 'success') {
         let toast = document.getElementById('adminToast');
         if (!toast) {
@@ -417,7 +466,9 @@
         }, 3000);
     }
 
-    // ── UTILS ──
+    window.showToast = showToast;
+
+    // User management
     let usersList = [];
     window.fetchUsers = async function() {
         const data = await apiCall('get_users');

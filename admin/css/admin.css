@@ -39,13 +39,13 @@ body {
     overflow-x: hidden;
 }
 
-/* ── LAYOUT SHELL ── */
+/* Layout Shell */
 .app-wrapper {
     display: flex;
     width: 100%;
 }
 
-/* ── SIDEBAR ── */
+/* Sidebar */
 .admin-sidebar {
     width: 260px;
     background: var(--bg-sidebar);
@@ -191,7 +191,7 @@ body {
     color: var(--text-muted);
 }
 
-/* ── MAIN CONTENT ── */
+/* Main Content */
 .admin-main {
     flex: 1;
     margin-left: 0;
@@ -200,7 +200,7 @@ body {
     min-height: 100vh;
 }
 
-/* ── TOP NAV ── */
+/* Top Nav */
 .top-nav {
     height: 80px;
     padding: 0 20px;
@@ -448,13 +448,13 @@ body {
     cursor: pointer;
 }
 
-/* ── ADMIN CONTENT ── */
+/* Admin Content */
 .admin-content {
     padding: 20px;
     flex: 1;
 }
 
-/* ── STATS GRID ── */
+/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -566,7 +566,7 @@ body {
     opacity: 0.7;
 }
 
-/* ── CHARTS SECTION ── */
+/* Charts Section */
 .charts-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -649,7 +649,7 @@ body {
     font-size: 0.75rem;
 }
 
-/* ── TABLES SECTION ── */
+/* Tables Section */
 .tables-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -812,7 +812,7 @@ body {
     font-size: 0.95rem;
 }
 
-/* ── BADGES ── */
+/* Badges */
 .badge {
     padding: 4px 10px;
     border-radius: 4px;
@@ -844,7 +844,7 @@ body {
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ── BUTTONS ── */
+/* Buttons */
 .btn {
     background: var(--accent);
     color: #fff;
@@ -885,7 +885,7 @@ body {
     border-color: var(--text-muted);
 }
 
-/* ── FORMS ── */
+/* Forms */
 .form-group {
     margin-bottom: 20px;
 }
@@ -915,10 +915,13 @@ body {
     box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
 }
 
-/* ── MODALS ── */
-.admin-modal-overlay {
+/* Modals */
+.admin-modal-overlay,
+.modal-overlay {
     position: fixed;
     inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -945,14 +948,53 @@ body {
     overflow-y: auto;
 }
 
-.admin-modal.open,
-.admin-modal-overlay.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, -50%) scale(1);
+.admin-modal.open {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate(-50%, -50%) scale(1) !important;
 }
 
-/* ── RESPONSIVE ── */
+.admin-modal-overlay.open,
+.modal-overlay.open {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: var(--accent);
+}
+
+/* Responsive */
 @media (min-width: 1025px) {
     .charts-grid {
         grid-template-columns: 2fr 1fr 1fr;

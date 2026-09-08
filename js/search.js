@@ -1,12 +1,9 @@
-// ═══════════════════════════════════════
-// Maison Ungod — Search System
-// Searches through products and pages
-// ═══════════════════════════════════════
+// Search overlay: search products and site pages
 
 (function () {
     'use strict';
 
-    // ── DOM References ──
+    // DOM elements
     const searchOverlay = document.getElementById('searchOverlay');
     const searchToggles = document.querySelectorAll('#searchToggle, .nav-icon[aria-label="Search"]');
     const searchClose = document.getElementById('searchClose');
@@ -15,9 +12,7 @@
 
     if (!searchOverlay || !searchInput) return;
 
-    // ... (rest of the vars)
-
-    // ── Product catalog (all available products) ──
+    // Available products for instant search
     const products = [
         { name: 'Fragrance 1', price: '₱145.00', image: 'assets/images/collection-1.png', link: 'shop.php' },
         { name: 'Fragrance 2', price: '₱145.00', image: 'assets/images/collection-2.png', link: 'shop.php' },
@@ -25,7 +20,7 @@
         { name: 'Fragrance 4', price: '₱165.00', image: 'assets/images/collection-4.png', link: 'shop.php' },
     ];
 
-    // ── Pages catalog ──
+    // Site pages
     const pages = [
         { name: 'Home', link: 'index.php' },
         { name: 'Shop — All Products', link: 'shop.php' },
@@ -34,9 +29,7 @@
         { name: 'Contact', link: 'index.php#contact' },
     ];
 
-    // ═══════════════════════
-    // Open / Close Search
-    // ═══════════════════════
+    // Open and close search modal
     function openSearch() {
         searchOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
@@ -74,9 +67,7 @@
         }
     });
 
-    // ═══════════════════════
     // Keyboard shortcut: Ctrl+K or Cmd+K
-    // ═══════════════════════
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
@@ -88,9 +79,7 @@
         }
     });
 
-    // ═══════════════════════
-    // Search Logic
-    // ═══════════════════════
+    // Filter and display search results
     function performSearch(query) {
         const q = query.toLowerCase().trim();
 
@@ -186,9 +175,7 @@
         });
     }
 
-    // ═══════════════════════
-    // Helpers
-    // ═══════════════════════
+    // Helper functions
     function escapeHTML(str) {
         const div = document.createElement('div');
         div.textContent = str;
@@ -200,7 +187,7 @@
         return text.replace(regex, '<span style="color:#71416B;font-weight:600;">$1</span>');
     }
 
-    // ── Live search on input ──
+    // Live search as user types (with small debounce)
     let debounceTimer;
     searchInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
@@ -209,7 +196,7 @@
         }, 150);
     });
 
-    // ── Search on Enter ──
+    // Immediate search on Enter
     searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();

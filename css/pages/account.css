@@ -1,7 +1,4 @@
-/* ============================================================
-   account.css — Account Dashboard Page Styles
-   Loaded only by account.php
-   ============================================================ */
+/* Account page styles */
 
 :root {
     --bg-main: #0b0b0b;
@@ -33,16 +30,15 @@ body {
 
 .account-layout {
     display: flex;
-    flex-direction: column;
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
     gap: 30px;
 }
 
-/* ── SIDEBAR ───────────────────────────────────────────────────────────── */
+/* Sidebar navigation */
 .sidebar {
-    width: 100%;
+    width: 280px;
     flex-shrink: 0;
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -128,7 +124,7 @@ body {
     color: var(--text-main);
 }
 
-/* ── MAIN CONTENT ──────────────────────────────────────────────────────── */
+/* Main content area */
 .main-content {
     flex: 1;
     background: var(--bg-card);
@@ -170,7 +166,7 @@ body {
     margin: 20px 0 30px 0;
 }
 
-/* ── FORM LAYOUT ───────────────────────────────────────────────────────── */
+/* Profile form styles */
 .profile-form {
     display: flex;
     flex-direction: column;
@@ -180,13 +176,11 @@ body {
 
 .form-row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    align-items: center;
 }
 
 .form-label {
-    width: 100%;
+    width: 140px;
     flex-shrink: 0;
     font-size: 0.85rem;
     color: var(--text-light);
@@ -357,7 +351,7 @@ body {
 .edit-msg.error { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.2); }
 .edit-msg.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
 
-/* ── ORDERS TAB ──────────────────────────────────────────────────────────── */
+/* Orders tab styles */
 .order-card {
     display: flex;
     align-items: center;
@@ -432,7 +426,7 @@ body {
     color: var(--bg-main);
 }
 
-/* ── ADDRESSES TAB ───────────────────────────────────────────────────────── */
+/* Addresses tab styles */
 .address-card {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -545,8 +539,11 @@ body {
     background: rgba(113, 65, 107, 0.05);
     color: var(--text-main);
 }
+.address-card-header .btn-icon:hover {
+    color: var(--text-main);
+}
 
-/* ── MODALS ────────────────────────────────────────────────────────────── */
+/* Profile edit modal */
 .edit-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -626,27 +623,27 @@ body {
 }
 
 /* Responsive */
-@media (min-width: 769px) {
+@media (max-width: 768px) {
     .account-layout {
-        flex-direction: row;
+        flex-direction: column;
     }
     
     .sidebar {
-        width: 280px;
+        width: 100%;
     }
     
     .form-row {
-        flex-direction: row;
-        align-items: center;
-        gap: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
     
     .form-label {
-        width: 140px;
+        width: 100%;
     }
 }
 
-/* ── CHANGE PASSWORD MODAL ─────────────────────────────────────────────── */
+/* Change password modal */
 .pw-form-group {
     margin-bottom: 20px;
 }

@@ -1,4 +1,6 @@
 <?php
+// Admin product actions: processes create, update, and delete form requests
+
 session_start();
 
 // Redirect to admin login if not logged in or not admin
@@ -45,7 +47,7 @@ if ($action === 'add' || $action === 'update') {
     }
 
     // Image handling
-    $imagePath = 'assets/images/default.png'; // default fallback
+    $imagePath = 'uploads/products/prod_6a9f9995d87df.png'; // default fallback
     
     // If it's an update, preserve the existing image first
     if ($is_update) {
@@ -67,7 +69,7 @@ if ($action === 'add' || $action === 'update') {
         } else {
             $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
             $filename = uniqid('prod_', true) . '.' . strtolower($ext);
-            $upload_dir = __DIR__ . '/../assets/images/';
+            $upload_dir = __DIR__ . '/../uploads/products/';
             
             // Create dir if not exists
             if (!is_dir($upload_dir)) {
@@ -77,7 +79,7 @@ if ($action === 'add' || $action === 'update') {
             $target_file = $upload_dir . $filename;
             
             if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-                $imagePath = 'assets/images/' . $filename;
+                $imagePath = 'uploads/products/' . $filename;
             } else {
                 $errors['image'] = 'Failed to save uploaded image.';
             }

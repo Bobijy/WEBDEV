@@ -1,9 +1,6 @@
-/* ============================================================
-   shop.css — Shop Page Scoped Styles
-   Loaded only by shop.php
-   ============================================================ */
+/* Shop page styles */
 
-/* ── Shop Section ── */
+/* Shop section layout */
 .shop-page {
     padding-top: 160px;
     padding-bottom: 80px;
@@ -12,13 +9,12 @@
 }
 
 .shop-page .shop-container {
-    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding: 0 40px;
 }
 
-/* ── Heading ── */
+/* Page heading */
 .shop-page .shop-heading {
     text-align: center;
     margin-bottom: 8px;
@@ -46,7 +42,7 @@
     opacity: 0.4;
 }
 
-/* ── Items count + Sort ── */
+/* Toolbar: count and sort */
 .shop-page .shop-toolbar {
     display: flex;
     justify-content: flex-end;
@@ -76,7 +72,7 @@
     color: #71416B;
 }
 
-/* ── Sort Dropdown ── */
+/* Sort dropdown */
 .sort-wrapper {
     position: relative;
 }
@@ -128,15 +124,35 @@
     color: #71416B;
 }
 
-/* ── Product Grid ── */
+/* Product grid */
 .shop-page .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-lg);
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 50px;
 }
 
-@media (min-width: 769px) {
+/* Responsive */
+@media (max-width: 768px) {
     .shop-page .product-grid {
-        gap: 40px 50px;
+        grid-template-columns: 1fr;
+        gap: 36px;
+    }
+
+    .shop-page {
+        padding-top: 140px;
+    }
+
+    .shop-page .shop-heading h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .shop-page .shop-container {
+        padding: 0 18px;
+    }
+
+    .shop-page .shop-heading h1 {
+        font-size: 1.8rem;
     }
 }

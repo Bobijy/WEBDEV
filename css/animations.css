@@ -1,12 +1,6 @@
-/* ═══════════════════════════════════════════════════════════════
-   Maison Ungod — Premium Animations
-   Zero-dependency, GPU-accelerated animation system
-   ═══════════════════════════════════════════════════════════════ */
+/* Animation system: scroll reveals, shimmer, and keyframes */
 
-/* ───────────────────────────────────
-   HERO H1 — Gradient Shimmer Text
-   (permanent decorative style, no load animation)
-   ─────────────────────────────────── */
+/* HERO H1 — Gradient Shimmer Text (permanent decorative style, no load animation) */
 .hero-content h1 {
     background: linear-gradient(90deg, #71416b 0%, #999 50%, #71416b 100%);
     background-size: 200% auto;
@@ -23,9 +17,7 @@
 }
 
 
-/* ───────────────────────────────────
-   4. FLOATING AMBIENT PARTICLES
-   ─────────────────────────────────── */
+/* 4. FLOATING AMBIENT PARTICLES */
 .ambient-particles {
     position: absolute;
     inset: 0;
@@ -60,14 +52,10 @@
     100% { transform: translateY(-20px) rotate(720deg); opacity: 0; }
 }
 
-/* ───────────────────────────────────
-   5. CUSTOM CURSOR
-   ─────────────────────────────────── */
+/* 5. CUSTOM CURSOR */
 
 
-/* ───────────────────────────────────
-   6. SCROLL PROGRESS BAR
-   ─────────────────────────────────── */
+/* 6. SCROLL PROGRESS BAR */
 .scroll-progress {
     position: fixed;
     top: 0;
@@ -86,9 +74,7 @@
     100% { background-position: 200% center; }
 }
 
-/* ───────────────────────────────────
-   7. SCROLL-TO-TOP BUTTON
-   ─────────────────────────────────── */
+/* 7. SCROLL-TO-TOP BUTTON */
 .scroll-to-top {
     position: fixed;
     bottom: 30px;
@@ -132,9 +118,7 @@
     transform: translateY(-2px);
 }
 
-/* ───────────────────────────────────
-   8. ADVANCED DIRECTIONAL REVEALS
-   ─────────────────────────────────── */
+/* 8. ADVANCED DIRECTIONAL REVEALS */
 /* Override the base .reveal with enhanced versions */
 .reveal-left {
     opacity: 0;
@@ -175,9 +159,7 @@
     filter: blur(0);
 }
 
-/* ───────────────────────────────────
-   9. SHIMMER SWEEP ON IMAGES
-   ─────────────────────────────────── */
+/* 9. SHIMMER SWEEP ON IMAGES */
 .shimmer-wrap {
     position: relative;
     overflow: hidden;
@@ -212,9 +194,7 @@
     100% { left: 200%; }
 }
 
-/* ───────────────────────────────────
-   10. 3D TILT CARD SYSTEM
-   ─────────────────────────────────── */
+/* 10. 3D TILT CARD SYSTEM */
 .tilt-card {
     transform-style: preserve-3d;
     perspective: 800px;
@@ -225,9 +205,7 @@
     transform: translateZ(0);
 }
 
-/* ───────────────────────────────────
-   11. BUTTON RIPPLE EFFECT
-   ─────────────────────────────────── */
+/* 11. BUTTON RIPPLE EFFECT */
 .ripple-btn {
     position: relative;
     overflow: hidden;
@@ -247,9 +225,7 @@
     100% { transform: scale(4); opacity: 0; }
 }
 
-/* ───────────────────────────────────
-   12. ELASTIC BOUNCE ON BAG BUTTONS
-   ─────────────────────────────────── */
+/* 12. ELASTIC BOUNCE ON BAG BUTTONS */
 @keyframes elasticBounce {
     0% { transform: scale(1); }
     20% { transform: scale(0.85); }
@@ -263,9 +239,7 @@
     animation: elasticBounce 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
 }
 
-/* ───────────────────────────────────
-   13. GRADIENT BORDER ON INPUTS
-   ─────────────────────────────────── */
+/* 13. GRADIENT BORDER ON INPUTS */
 .gradient-input-wrap {
     position: relative;
     border-radius: 6px;
@@ -294,9 +268,7 @@
     100% { background-position: 0% 50%; }
 }
 
-/* ───────────────────────────────────
-   14. MOUSE-FOLLOW GLOW
-   ─────────────────────────────────── */
+/* 14. MOUSE-FOLLOW GLOW */
 .mouse-glow {
     position: absolute;
     top: 0;
@@ -316,9 +288,7 @@
     opacity: 1;
 }
 
-/* ───────────────────────────────────
-   15. SECTION DIVIDER ANIMATIONS
-   ─────────────────────────────────── */
+/* 15. SECTION DIVIDER ANIMATIONS */
 .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
@@ -330,9 +300,7 @@
     transform: scaleX(1);
 }
 
-/* ───────────────────────────────────
-   16. STORY BAR GROWTH ANIMATION
-   ─────────────────────────────────── */
+/* 16. STORY BAR GROWTH ANIMATION */
 .story-bar-animated {
     width: 0;
     transition: width 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
@@ -342,9 +310,7 @@
     width: 50px;
 }
 
-/* ───────────────────────────────────
-   17. COLLECTION CARD WAVE ENTRANCE
-   ─────────────────────────────────── */
+/* 17. COLLECTION CARD WAVE ENTRANCE */
 .coll-card-wave {
     opacity: 0;
     transform: translateY(40px) scale(0.95);
@@ -357,9 +323,7 @@
     transform: translateY(0) scale(1);
 }
 
-/* ───────────────────────────────────
-   18. PAGE TRANSITION OVERLAY
-   ─────────────────────────────────── */
+/* 18. PAGE TRANSITION OVERLAY */
 .page-transition {
     position: fixed;
     inset: 0;
@@ -389,9 +353,7 @@
     transform: translateY(0);
 }
 
-/* ───────────────────────────────────
-   19. SLIDER AUTO-PLAY INDICATOR
-   ─────────────────────────────────── */
+/* 19. SLIDER AUTO-PLAY INDICATOR */
 .slider-progress {
     position: absolute;
     bottom: 0;
@@ -419,9 +381,7 @@
     width: 0%;
 }
 
-/* ───────────────────────────────────
-   20. PREFERS-REDUCED-MOTION
-   ─────────────────────────────────── */
+/* 20. PREFERS-REDUCED-MOTION */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
