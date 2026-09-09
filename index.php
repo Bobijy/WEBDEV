@@ -508,28 +508,24 @@ $socials = [
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
-        <div class="account-modal__inner">
-            <div class="auth-header">
+        <div class="account-modal__inner" style="text-align: center;">
+            <div class="auth-header" style="margin-bottom: 24px;">
                 <h2>Contact Us</h2>
-                <p>Send us a message and we will get back to you shortly.</p>
+                <p>Have questions or inquiries? Send us an email.</p>
             </div>
-            <form class="account-form" id="contactForm">
-                <div class="account-msg" id="contactMsg"></div>
-                <div class="account-field">
-                    <label for="contactName">Name</label>
-                    <input type="text" id="contactName" name="name" required>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid #2E2E2E; border-radius: 12px; padding: 24px 20px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: center; margin-bottom: 12px; color: #71416B;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                    </svg>
                 </div>
-                <div class="account-field">
-                    <label for="contactEmail">Email</label>
-                    <input type="email" id="contactEmail" name="email" required>
-                </div>
-                <div class="account-field">
-                    <label for="contactMessage">Message</label>
-                    <textarea id="contactMessage" name="message" required
-                        style="width: 100%; background: #171717; border: 1px solid #2E2E2E; color: #F5F5F5; padding: 12px; border-radius: 4px; font-family: var(--font-body); resize: vertical; min-height: 100px;"></textarea>
-                </div>
-                <button type="submit" class="account-submit" id="contactSubmit">Send Message</button>
-            </form>
+                <div style="color: #8A8A8A; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">Email Address</div>
+                <a href="mailto:bobjoshuaungod26@gmail.com" style="color: #F5F5F5; font-size: 1.05rem; font-weight: 500; text-decoration: none; word-break: break-all;">bobjoshuaungod26@gmail.com</a>
+            </div>
+            <a href="mailto:bobjoshuaungod26@gmail.com" class="account-submit" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                Send us an email
+            </a>
         </div>
     </div>
 
