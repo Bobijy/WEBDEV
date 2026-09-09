@@ -548,7 +548,7 @@ $socials = [
     <script src="js/main.js?v=6"></script>
     <script src="js/cart.js?v=5"></script>
     <script src="js/search.js?v=4"></script>
-    <script src="js/account.js?v=3"></script>
+    <script src="js/account.js?v=4"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
 

@@ -100,8 +100,11 @@ switch ($action) {
 
         $_SESSION['user_id']    = $user['id'];
         $_SESSION['user_name']  = $user['full_name'];
+        $_SESSION['first_name'] = explode(' ', trim($user['full_name']))[0];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role']  = $user['role'];
+
+        $redirect = ($user['role'] === 'admin') ? 'admin/index.php' : 'account.php';
 
         json_response(true, 'Welcome back, ' . htmlspecialchars($user['full_name'], ENT_QUOTES, 'UTF-8') . '!', [
             'user' => [
@@ -109,6 +112,7 @@ switch ($action) {
                 'email' => $user['email'],
                 'role'  => $user['role'],
             ],
+            'redirect' => $redirect,
         ]);
         break;
 

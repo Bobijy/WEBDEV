@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     }
 }
 $current_page = basename($_SERVER['PHP_SELF']);
-$admin_name = $_SESSION['first_name'] ?? 'Admin';
+$admin_name = $_SESSION['user_name'] ?? $_SESSION['first_name'] ?? 'Admin';
 ?>
 <!DOCTYPE html>
 <html lang="en">

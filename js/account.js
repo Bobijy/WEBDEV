@@ -37,7 +37,11 @@
             const data = await res.json();
             
             if (data.loggedIn) {
-                window.location.href = 'account.php';
+                if (data.user && data.user.role === 'admin') {
+                    window.location.href = 'admin/index.php';
+                } else {
+                    window.location.href = 'account.php';
+                }
             } else {
                 accountModal.classList.add('open');
                 accountOverlay.classList.add('open');
@@ -120,7 +124,13 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    window.location.href = 'account.php';
+                    if (data.user && data.user.role === 'admin') {
+                        window.location.href = 'admin/index.php';
+                    } else if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.href = 'account.php';
+                    }
                 } else {
                     msg.className = 'account-msg error';
                     msg.textContent = data.message;
