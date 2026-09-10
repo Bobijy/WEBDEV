@@ -56,7 +56,7 @@
             if (data.success) {
                 renderCart(data.items, data.total);
             } else {
-                if (data.message === 'Unauthorized') {
+                if (data.message && data.message.toLowerCase().includes('unauthorized')) {
                     cartEmptyP.textContent = 'Please sign in to view your bag.';
                     cartEmptyP.style.display = 'block';
                     cartItemsDiv.innerHTML = '';
@@ -144,100 +144,15 @@
 
     // Confirmation modal for item removal
     function showCartConfirmModal(message) {
-        return new Promise((resolve) => {
-            let overlay = document.getElementById('cartCustomConfirmOverlay');
-            let modal = document.getElementById('cartCustomConfirmModal');
-            
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'cartCustomConfirmOverlay';
-                overlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
-                    z-index: 999999; opacity: 0; pointer-events: none;
-                    transition: opacity 0.3s ease;
-                `;
-                document.body.appendChild(overlay);
-            }
-            
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = 'cartCustomConfirmModal';
-                modal.style.cssText = `
-                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%);
-                    background: var(--bg-card, #141414); border: 1px solid var(--border-color, rgba(255,255,255,0.05)); 
-                    border-radius: 8px; padding: 30px; width: 90%; max-width: 340px;
-                    z-index: 1000000; opacity: 0; pointer-events: none;
-                    transition: opacity 0.3s ease, transform 0.3s ease; text-align: center;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-                `;
-                modal.innerHTML = `
-                    <div style="margin-bottom: 20px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                        </svg>
-                    </div>
-                    <h3 style="margin-bottom: 10px; font-family: var(--font-heading, serif); font-size: 1.4rem; font-weight: 400; color: #fff;">Remove Item?</h3>
-                    <p id="cartCustomConfirmText" style="color: var(--text-secondary, #999); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5;"></p>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="cartCustomConfirmCancel" style="flex: 1; padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 4px; cursor: pointer; transition: background 0.2s;">Cancel</button>
-                        <button id="cartCustomConfirmOk" style="flex: 1; padding: 12px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 4px; cursor: pointer; transition: background 0.2s, color 0.2s;">Remove</button>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-                
-                // Add hover effects via JS since it's inline
-                const btnCancel = document.getElementById('cartCustomConfirmCancel');
-                const btnOk = document.getElementById('cartCustomConfirmOk');
-                
-                btnCancel.onmouseover = () => btnCancel.style.background = 'rgba(255,255,255,0.05)';
-                btnCancel.onmouseout = () => btnCancel.style.background = 'transparent';
-                
-                btnOk.onmouseover = () => { btnOk.style.background = '#ff4444'; btnOk.style.color = '#fff'; };
-                btnOk.onmouseout = () => { btnOk.style.background = 'transparent'; btnOk.style.color = '#ff4444'; };
-            }
-            
-            document.getElementById('cartCustomConfirmText').innerText = message;
-            
-            // Clean up old listeners
-            const oldCancel = document.getElementById('cartCustomConfirmCancel');
-            const oldOk = document.getElementById('cartCustomConfirmOk');
-            const newCancel = oldCancel.cloneNode(true);
-            const newOk = oldOk.cloneNode(true);
-            oldCancel.parentNode.replaceChild(newCancel, oldCancel);
-            oldOk.parentNode.replaceChild(newOk, oldOk);
-            
-            // Re-add hover effects to new nodes
-            newCancel.onmouseover = () => newCancel.style.background = 'rgba(255,255,255,0.05)';
-            newCancel.onmouseout = () => newCancel.style.background = 'transparent';
-            newOk.onmouseover = () => { newOk.style.background = '#ff4444'; newOk.style.color = '#fff'; };
-            newOk.onmouseout = () => { newOk.style.background = 'transparent'; newOk.style.color = '#ff4444'; };
-
-            newCancel.addEventListener('click', () => { hideCartConfirmModal(); resolve(false); });
-            newOk.addEventListener('click', () => { hideCartConfirmModal(); resolve(true); });
-            
-            // Show
-            overlay.style.pointerEvents = 'auto';
-            modal.style.pointerEvents = 'auto';
-            void overlay.offsetWidth; // force reflow
-            overlay.style.opacity = '1';
-            modal.style.opacity = '1';
-            modal.style.transform = 'translate(-50%, -50%)';
-        });
-    }
-
-    function hideCartConfirmModal() {
-        const overlay = document.getElementById('cartCustomConfirmOverlay');
-        const modal = document.getElementById('cartCustomConfirmModal');
-        if (overlay && modal) {
-            overlay.style.opacity = '0';
-            overlay.style.pointerEvents = 'none';
-            modal.style.opacity = '0';
-            modal.style.transform = 'translate(-50%, -45%)';
-            modal.style.pointerEvents = 'none';
+        if (window.MaisonUngod && typeof window.MaisonUngod.showConfirm === 'function') {
+            return window.MaisonUngod.showConfirm(message || 'Are you sure you want to remove this item?', 'Remove Item', {
+                icon: 'danger',
+                isDanger: true,
+                confirmText: 'Remove',
+                cancelText: 'Cancel'
+            });
         }
+        return Promise.resolve(confirm(message || 'Remove item?'));
     }
 
     // Update item quantity or remove via API
@@ -256,7 +171,7 @@
             await fetch('api/cart.php', { method: 'POST', body: formData });
             fetchCart(); // Refresh
         } catch (err) {
-            alert('Connection error');
+            window.MaisonUngod.showAlert('Connection error. Please try again.', 'Connection Error');
         }
     }
 
@@ -273,7 +188,7 @@
 
             try {
                 const formData = new FormData();
-        formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
+                formData.append('csrf_token', window.MaisonUngod.getCSRFToken());
                 formData.append('action', 'add');
                 formData.append('product_id', id);
 
@@ -292,16 +207,27 @@
                         btn.disabled = false;
                     }, 1000);
                 } else {
-                    if (data.message === 'Unauthorized') {
-                        // Open account login modal instead of redirecting
-                        if (document.getElementById('accountModal')) {
-                            document.getElementById('accountModal').classList.add('open');
-                            document.getElementById('accountOverlay').classList.add('open');
-                        } else {
-                            window.location.href = 'login.php';
-                        }
+                    if (data.message && data.message.toLowerCase().includes('unauthorized')) {
+                        window.MaisonUngod.showModal({
+                            title: 'Sign In Required',
+                            message: 'Unauthorized. Please log in to add items to your shopping bag.',
+                            icon: 'auth',
+                            confirmText: 'Sign In',
+                            cancelText: 'Continue Browsing',
+                            onConfirm: () => {
+                                if (window.MaisonUngod && typeof window.MaisonUngod.openAccount === 'function') {
+                                    window.MaisonUngod.openAccount();
+                                } else if (document.getElementById('accountModal')) {
+                                    document.getElementById('accountModal').classList.add('open');
+                                    document.getElementById('accountOverlay').classList.add('open');
+                                    document.body.style.overflow = 'hidden';
+                                } else {
+                                    window.location.href = 'index.php?login=1';
+                                }
+                            }
+                        });
                     } else {
-                        alert(data.message);
+                        window.MaisonUngod.showAlert(data.message || 'An error occurred.');
                     }
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;

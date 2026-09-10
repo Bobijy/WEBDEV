@@ -3,6 +3,200 @@
 (function () {
     'use strict';
 
+    // GLOBAL LUXURY MODAL SYSTEM (Message, Alert, Confirm)
+    window.MaisonUngod = window.MaisonUngod || {};
+
+    window.MaisonUngod.showModal = function (options) {
+        options = options || {};
+        return new Promise((resolve) => {
+            const title = options.title || 'Notice';
+            const message = options.message || '';
+            const iconType = options.icon || 'info';
+            const confirmText = options.confirmText || 'OK';
+            const cancelText = options.cancelText || null;
+            const isDanger = !!options.isDanger;
+
+            let overlay = document.getElementById('globalMessageOverlay');
+            let modal = document.getElementById('globalMessageModal');
+
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'globalMessageOverlay';
+                overlay.className = 'message-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'globalMessageModal';
+                modal.className = 'message-modal';
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                document.body.appendChild(modal);
+            }
+
+            let iconSvg = '';
+            let iconClass = 'message-modal__icon';
+            if (iconType === 'danger') {
+                iconClass += ' message-modal__icon--danger';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+            } else if (iconType === 'warning') {
+                iconClass += ' message-modal__icon--warning';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+            } else if (iconType === 'success') {
+                iconClass += ' message-modal__icon--success';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+            } else {
+                iconClass += ' message-modal__icon--info';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+            }
+
+            const confirmBtnClass = isDanger
+                ? 'message-modal__btn message-modal__btn--danger'
+                : 'message-modal__btn message-modal__btn--primary';
+
+            modal.innerHTML = `
+                <button class="message-modal__close" id="globalMessageClose" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="message-modal__inner">
+                    <div class="${iconClass}">
+                        ${iconSvg}
+                    </div>
+                    <h3 class="message-modal__title">${title}</h3>
+                    <p class="message-modal__text">${message}</p>
+                    <div class="message-modal__actions">
+                        ${cancelText ? `<button type="button" class="message-modal__btn message-modal__btn--secondary" id="globalMessageCancel">${cancelText}</button>` : ''}
+                        <button type="button" class="${confirmBtnClass}" id="globalMessageConfirm">${confirmText}</button>
+                    </div>
+                </div>
+            `;
+
+            const btnConfirm = modal.querySelector('#globalMessageConfirm');
+            const btnCancel = modal.querySelector('#globalMessageCancel');
+            const btnClose = modal.querySelector('#globalMessageClose');
+
+            let isClosed = false;
+            function cleanupAndClose() {
+                if (isClosed) return;
+                isClosed = true;
+                modal.classList.remove('open');
+                overlay.classList.remove('open');
+                document.removeEventListener('keydown', handleKeydown);
+                overlay.removeEventListener('click', handleOverlayClick);
+                document.body.style.overflow = '';
+            }
+
+            function handleConfirm() {
+                cleanupAndClose();
+                if (typeof options.onConfirm === 'function') {
+                    options.onConfirm();
+                }
+                resolve(true);
+            }
+
+            function handleCancel() {
+                cleanupAndClose();
+                if (typeof options.onCancel === 'function') {
+                    options.onCancel();
+                }
+                resolve(false);
+            }
+
+            function handleOverlayClick(e) {
+                if (e.target === overlay) {
+                    handleCancel();
+                }
+            }
+
+            function handleKeydown(e) {
+                if (e.key === 'Escape') {
+                    handleCancel();
+                } else if (e.key === 'Enter' && (!btnCancel || document.activeElement !== btnCancel)) {
+                    handleConfirm();
+                }
+            }
+
+            btnConfirm.addEventListener('click', handleConfirm);
+            if (btnCancel) btnCancel.addEventListener('click', handleCancel);
+            if (btnClose) btnClose.addEventListener('click', handleCancel);
+            overlay.addEventListener('click', handleOverlayClick);
+            document.addEventListener('keydown', handleKeydown);
+
+            // Open modal
+            document.body.style.overflow = 'hidden';
+            overlay.classList.add('open');
+            modal.classList.add('open');
+            setTimeout(() => btnConfirm.focus(), 50);
+        });
+    };
+
+    window.MaisonUngod.showConfirm = function (message, title, options) {
+        options = options || {};
+        return window.MaisonUngod.showModal({
+            title: title || 'Confirmation',
+            message: String(message || ''),
+            icon: options.icon || (options.isDanger ? 'danger' : 'warning'),
+            confirmText: options.confirmText || 'Confirm',
+            cancelText: options.cancelText || 'Cancel',
+            isDanger: !!options.isDanger
+        });
+    };
+
+    window.MaisonUngod.showAlert = function (message, title, icon) {
+        const msgStr = String(message || '');
+        let defaultIcon = icon;
+        if (!defaultIcon) {
+            const lower = msgStr.toLowerCase();
+            if (lower.includes('success') || (title && title.toLowerCase().includes('success'))) {
+                defaultIcon = 'success';
+            } else if (lower.includes('error') || lower.includes('failed') || (title && title.toLowerCase().includes('error'))) {
+                defaultIcon = 'danger';
+            } else if (lower.includes('warn')) {
+                defaultIcon = 'warning';
+            } else {
+                defaultIcon = 'info';
+            }
+        }
+        return window.MaisonUngod.showModal({
+            title: title || (defaultIcon === 'success' ? 'Success' : (defaultIcon === 'danger' ? 'Error' : 'Notice')),
+            message: msgStr,
+            icon: defaultIcon,
+            confirmText: 'OK',
+            cancelText: null
+        });
+    };
+
+    // Global delete confirmation handler for forms
+    window.confirmDelete = function(event, form, message) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        window.MaisonUngod.showConfirm(
+            message || 'Are you sure you want to delete this product?',
+            'Delete Product',
+            {
+                isDanger: true,
+                confirmText: 'Delete',
+                cancelText: 'Cancel'
+            }
+        ).then((confirmed) => {
+            if (confirmed && form) {
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        });
+        return false;
+    };
+
+    // Route native browser alert in admin to custom luxury modal
+    window.alert = function (msg) {
+        window.MaisonUngod.showAlert(msg);
+    };
+
     // Logout handler
     const logoutBtn = document.getElementById('adminLogoutBtn');
     if (logoutBtn) {
@@ -290,7 +484,7 @@
                 
                 if (data.success) {
                     closeEditProductModal();
-                    showToast(isAdd ? 'Product created successfully!' : 'Product updated successfully!');
+                    window.MaisonUngod.showAlert(isAdd ? 'Product created successfully!' : 'Product updated successfully!', 'Success', 'success');
                     fetchProducts();
                 } else {
                     let errHtml = '<strong>Error:</strong><br>';
@@ -345,7 +539,7 @@
                         <td>
                             <div style="display:flex; gap: 5px;">
                                 <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editProduct(${p.id})">Edit</button>
-                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirmDelete(event, this, 'Are you sure you want to delete this product?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="${p.id}">
                                     <input type="hidden" name="csrf_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
@@ -449,21 +643,13 @@
         });
     }
 
-    // Toast notifications
+    // Toast notifications - route to luxury modal
     function showToast(message, type = 'success') {
-        let toast = document.getElementById('adminToast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'adminToast';
-            document.body.appendChild(toast);
-        }
-        toast.className = 'admin-toast ' + type;
-        toast.textContent = message;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        const oldToast = document.getElementById('adminToast');
+        if (oldToast) oldToast.remove();
+
+        const title = type === 'success' ? 'Success' : (type === 'danger' || type === 'error' ? 'Error' : 'Notice');
+        window.MaisonUngod.showAlert(message, title, type === 'danger' ? 'danger' : type);
     }
 
     window.showToast = showToast;
@@ -502,12 +688,21 @@
     }
 
     window.updateUserRole = async function(id, role) {
-        if(confirm(`Are you sure you want to change user ${id} role to ${role}?`)) {
+        const confirmed = await window.MaisonUngod.showConfirm(
+            `Are you sure you want to change user #${id} role to ${role}?`,
+            'Change User Role',
+            {
+                confirmText: 'Change Role',
+                cancelText: 'Cancel',
+                isDanger: role === 'admin'
+            }
+        );
+        if(confirmed) {
             const data = await apiCall('update_user_role', 'POST', { id, role });
             if (data && data.success) {
                 fetchUsers();
             } else {
-                alert(data ? data.message : 'Error updating role');
+                window.MaisonUngod.showAlert(data ? data.message : 'Error updating role', 'Error');
                 fetchUsers(); // reset select
             }
         } else {

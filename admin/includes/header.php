@@ -21,7 +21,7 @@ $admin_name = $_SESSION['user_name'] ?? $_SESSION['first_name'] ?? 'Admin';
     <meta name="csrf-token" content="<?= CSRF::generate() ?>">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/admin.css?v=2">
+    <link rel="stylesheet" href="css/admin.css?v=<?= time() ?>">
 </head>
 <body>
 <?php if ($current_page !== 'login.php'): ?>

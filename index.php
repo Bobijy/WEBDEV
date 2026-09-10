@@ -102,7 +102,7 @@ $socials = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<?= htmlspecialchars($site['description']) ?>">
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Luxury Fragrances</title>
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/animations.css?v=2">
 </head>
 
@@ -456,6 +456,7 @@ $socials = [
         <div class="account-modal__inner">
             <div class="auth-header">
                 <h2>Sign In</h2>
+                <p class="auth-subtitle">Please enter your details to sign in.</p>
             </div>
 
             <form class="account-form" id="loginForm">
@@ -488,6 +489,11 @@ $socials = [
                 <div class="account-field">
                     <label for="registerPassword">Password</label>
                     <input type="password" id="registerPassword" name="password" placeholder="Min. 6 characters"
+                        required>
+                </div>
+                <div class="account-field">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" name="confirm_password" placeholder="Confirm your password"
                         required>
                 </div>
                 <button type="submit" class="account-submit" id="registerSubmit">Create Account</button>
@@ -541,10 +547,10 @@ $socials = [
     <!-- Page Transition Overlay -->
     <!-- (injected by transitions.js) -->
 
-    <script src="js/main.js?v=6"></script>
-    <script src="js/cart.js?v=5"></script>
+    <script src="js/main.js?v=7"></script>
+    <script src="js/cart.js?v=6"></script>
     <script src="js/search.js?v=4"></script>
-    <script src="js/account.js?v=4"></script>
+    <script src="js/account.js?v=7"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
 

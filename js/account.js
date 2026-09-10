@@ -47,7 +47,7 @@
                 accountOverlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
                 if (authHeader) authHeader.style.display = 'block';
-                if (loginForm) loginForm.style.display = 'block';
+                if (loginForm) loginForm.style.display = 'flex';
                 if (registerForm) registerForm.style.display = 'none';
                 if (profileView) profileView.style.display = 'none';
             }
@@ -62,6 +62,11 @@
         accountOverlay.classList.remove('open');
         document.body.style.overflow = '';
     }
+
+    // Expose helpers globally
+    window.MaisonUngod = window.MaisonUngod || {};
+    window.MaisonUngod.openAccount = openAccount;
+    window.MaisonUngod.closeAccount = closeAccount;
 
     accountToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
@@ -84,10 +89,12 @@
         showRegisterBtn.addEventListener('click', (e) => {
             e.preventDefault();
             loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
+            registerForm.style.display = 'flex';
             if (authHeader) {
                 const h2 = authHeader.querySelector('h2');
+                const p = authHeader.querySelector('.auth-subtitle');
                 if (h2) h2.textContent = 'Create Account';
+                if (p) p.textContent = 'Enter your details to create an account.';
             }
         });
     }
@@ -95,10 +102,12 @@
         showLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             registerForm.style.display = 'none';
-            loginForm.style.display = 'block';
+            loginForm.style.display = 'flex';
             if (authHeader) {
                 const h2 = authHeader.querySelector('h2');
+                const p = authHeader.querySelector('.auth-subtitle');
                 if (h2) h2.textContent = 'Sign In';
+                if (p) p.textContent = 'Please enter your details to sign in.';
             }
         });
     }
@@ -157,6 +166,15 @@
             const msg = document.getElementById('registerMsg');
             
             window.MaisonUngod.clearFieldErrors(registerForm);
+            
+            const pwd = document.getElementById('registerPassword').value;
+            const confirmPwd = document.getElementById('registerConfirmPassword').value;
+            if (pwd !== confirmPwd) {
+                msg.className = 'account-msg error';
+                msg.textContent = 'Passwords do not match.';
+                msg.style.display = 'block';
+                return;
+            }
             
             btn.disabled = true;
             btn.textContent = 'CREATING...';

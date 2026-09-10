@@ -63,7 +63,7 @@ $socials = [
     <title><?= htmlspecialchars($site['name']) ?> &mdash; Shop</title>
 
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/animations.css?v=2">
 
     <link rel="stylesheet" href="css/pages/shop.css?v=1">
@@ -390,10 +390,10 @@ $socials = [
         </svg>
     </button>
 
-    <script src="js/main.js?v=6"></script>
-    <script src="js/cart.js?v=5"></script>
+    <script src="js/main.js?v=7"></script>
+    <script src="js/cart.js?v=6"></script>
     <script src="js/search.js?v=4"></script>
-    <script src="js/account.js?v=4"></script>
+    <script src="js/account.js?v=6"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
 

@@ -156,7 +156,16 @@ if (addressForm) {
 }
 
 async function deleteAddress(id) {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+    if (window.MaisonUngod && typeof window.MaisonUngod.showConfirm === 'function') {
+        const confirmed = await window.MaisonUngod.showConfirm(
+            'Are you sure you want to delete this address?',
+            'Delete Address',
+            { isDanger: true, confirmText: 'Delete', cancelText: 'Cancel' }
+        );
+        if (!confirmed) return;
+    } else {
+        if (!confirm('Are you sure you want to delete this address?')) return;
+    }
     const formData = new FormData();
     formData.append('action', 'delete');
     formData.append('id', id);

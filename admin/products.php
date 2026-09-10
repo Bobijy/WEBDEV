@@ -23,15 +23,23 @@ unset($_SESSION['msg'], $_SESSION['error']);
 </div>
 
 <?php if ($msg): ?>
-    <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #c3e6cb;">
-        <?= htmlspecialchars($msg) ?>
-    </div>
+    <script>
+        window.addEventListener('load', function () {
+            if (window.MaisonUngod && typeof window.MaisonUngod.showAlert === 'function') {
+                window.MaisonUngod.showAlert(<?= json_encode($msg) ?>, 'Success', 'success');
+            }
+        });
+    </script>
 <?php endif; ?>
 
 <?php if ($error): ?>
-    <div style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #f5c6cb;">
-        <?= htmlspecialchars($error) ?>
-    </div>
+    <script>
+        window.addEventListener('load', function () {
+            if (window.MaisonUngod && typeof window.MaisonUngod.showAlert === 'function') {
+                window.MaisonUngod.showAlert(<?= json_encode($error) ?>, 'Error', 'danger');
+            }
+        });
+    </script>
 <?php endif; ?>
 
 <div class="admin-table-container">
@@ -64,7 +72,7 @@ unset($_SESSION['msg'], $_SESSION['error']);
                         <td>
                             <div style="display:flex; gap: 5px;">
                                 <button type="button" class="btn" style="padding: 4px 8px; font-size: 12px;" onclick="editProduct(<?= $p['id'] ?>)">Edit</button>
-                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                <form action="product_action.php" method="POST" style="display:inline;" onsubmit="return confirmDelete(event, this, 'Are you sure you want to delete this product?');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                     <input type="hidden" name="csrf_token" value="<?= CSRF::generate() ?>">
@@ -292,7 +300,13 @@ unset($_SESSION['msg'], $_SESSION['error']);
 
                     if (data.success) {
                         closeEditProductModal();
-                        // Reload page to refresh PHP-rendered table and counters
+                        if (window.MaisonUngod && typeof window.MaisonUngod.showAlert === 'function') {
+                            await window.MaisonUngod.showAlert(
+                                isAdd ? 'Product created successfully!' : 'Product updated successfully!',
+                                'Success',
+                                'success'
+                            );
+                        }
                         window.location.reload();
                     } else {
                         let errHtml = '<strong>Error:</strong><br>';

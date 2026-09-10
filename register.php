@@ -15,7 +15,7 @@ $site = ['name' => 'Maison Ungod'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $site['name'] ?> — Register</title>
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/animations.css?v=1">
     <link rel="stylesheet" href="css/pages/auth.css?v=1">
 </head>

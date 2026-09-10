@@ -12,7 +12,7 @@ async function updateCart(id, qty, action) {
         await fetch('api/cart.php', { method: 'POST', body: formData });
         window.location.reload(); // Refresh to show updated totals
     } catch (err) {
-        alert('Connection error. Please try again.');
+        window.MaisonUngod.showAlert('Connection error. Please try again.', 'Connection Error');
     }
 }
 
@@ -25,8 +25,14 @@ document.querySelectorAll('.qty-btn').forEach(btn => {
 
 // Remove item buttons
 document.querySelectorAll('.cart-item-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (confirm('Remove item from cart?')) {
+    btn.addEventListener('click', async () => {
+        const confirmed = await window.MaisonUngod.showConfirm('Are you sure you want to remove this item from your cart?', 'Remove Item', {
+            icon: 'danger',
+            isDanger: true,
+            confirmText: 'Remove',
+            cancelText: 'Cancel'
+        });
+        if (confirmed) {
             updateCart(btn.dataset.id, 0, 'remove');
         }
     });

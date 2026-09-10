@@ -39,7 +39,7 @@ switch ($action) {
         if ($password === '') $errors['password'] = 'Password is required.';
         elseif (!validate_password($password)) $errors['password'] = 'Password must be at least 6 characters.';
 
-        if ($confirmPassword !== '' && $password !== $confirmPassword) {
+        if ($password !== '' && $password !== $confirmPassword) {
             $errors['confirm_password'] = 'Passwords do not match.';
         }
 

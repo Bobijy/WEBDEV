@@ -89,7 +89,7 @@ $socials = [
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Shared styles for navbar + footer -->
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/animations.css?v=2">
     
     <link rel="stylesheet" href="css/pages/account.css?v=8">
