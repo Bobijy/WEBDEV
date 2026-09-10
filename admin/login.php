@@ -61,14 +61,14 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin') {
         if (csrfMeta) formData.append('csrf_token', csrfMeta.content);
 
         try {
-            const res = await fetch('../api/auth.php', { method: 'POST', body: formData });
+            const res = await fetch('../api/login.php', { method: 'POST', body: formData });
             const data = await res.json();
 
             if (data.success && data.user && data.user.role === 'admin') {
                 window.location.href = 'index.php';
             } else if (data.success) {
                 // Logged in successfully but not an admin
-                await fetch('../api/auth.php?action=logout'); // Log them out immediately
+                await fetch('../api/logout.php'); // Log them out immediately
                 msg.style.display = 'block';
                 msg.style.background = 'rgba(231, 76, 60, 0.2)';
                 msg.style.color = '#e74c3c';

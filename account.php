@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?login=1");
+    header("Location: login.php");
     exit;
 }
 
@@ -115,7 +115,7 @@ $socials = [
                 <span class="nav-brand">&mdash;&nbsp;<?= strtoupper($site['name']) ?>&nbsp;&mdash;</span>
                 <div class="nav-icons">
                     <a href="#" class="nav-icon" id="searchToggle" aria-label="Search" onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
-                    <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
+                    <a href="account.php" class="nav-icon" id="accountToggle" aria-label="Account">
                         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -140,7 +140,7 @@ $socials = [
                         <?= $icons['search'] ?>
                         <span>Search</span>
                     </a>
-                    <a href="#" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account" onclick="const at = document.getElementById('accountToggle'); if (at) at.click(); return false;">
+                    <a href="account.php" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

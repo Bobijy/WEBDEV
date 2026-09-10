@@ -26,14 +26,14 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
     formData.append('action', 'login');
 
     try {
-        const res  = await fetch('../api/auth.php', { method: 'POST', body: formData });
+        const res  = await fetch('../api/login.php', { method: 'POST', body: formData });
         const data = await res.json();
 
         if (data.success && data.user && data.user.role === 'admin') {
             window.location.href = 'index.php';
         } else if (data.success) {
             // Logged in but not an admin — log out immediately
-            await fetch('../api/auth.php?action=logout');
+            await fetch('../api/logout.php');
             msg.style.display = 'block';
             msg.style.background = 'rgba(231, 76, 60, 0.2)';
             msg.style.color = '#e74c3c';

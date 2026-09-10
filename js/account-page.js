@@ -26,8 +26,8 @@ const logoutBtn = document.getElementById('logoutBtnNav') || document.getElement
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        await fetch('api/auth.php?action=logout');
-        window.location.href = 'index.php?login=1';
+        await fetch('api/logout.php');
+        window.location.href = 'login.php';
     });
 }
 

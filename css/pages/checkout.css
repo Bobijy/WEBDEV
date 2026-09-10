@@ -155,6 +155,24 @@ h2:first-of-type { margin-top: 0; }
     font-weight: 500;
 }
 
+.floating-input input.has-error,
+.floating-input select.has-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15) !important;
+}
+
+.floating-input input.has-error + label {
+    color: #e74c3c !important;
+}
+
+.floating-input .field-error {
+    color: #e74c3c;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+    font-weight: 500;
+}
+
 /* Payment Selection Boxes */
 .payment-box {
     border: 1px solid var(--border);

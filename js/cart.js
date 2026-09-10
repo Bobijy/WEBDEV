@@ -215,15 +215,7 @@
                             confirmText: 'Sign In',
                             cancelText: 'Continue Browsing',
                             onConfirm: () => {
-                                if (window.MaisonUngod && typeof window.MaisonUngod.openAccount === 'function') {
-                                    window.MaisonUngod.openAccount();
-                                } else if (document.getElementById('accountModal')) {
-                                    document.getElementById('accountModal').classList.add('open');
-                                    document.getElementById('accountOverlay').classList.add('open');
-                                    document.body.style.overflow = 'hidden';
-                                } else {
-                                    window.location.href = 'index.php?login=1';
-                                }
+                                window.location.href = 'login.php';
                             }
                         });
                     } else {

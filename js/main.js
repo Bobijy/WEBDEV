@@ -655,15 +655,7 @@ window.MaisonUngod.showAlert = function (message, title) {
         cancelText: isAuth ? 'Continue Browsing' : null,
         onConfirm: () => {
             if (isAuth) {
-                if (typeof window.MaisonUngod.openAccount === 'function') {
-                    window.MaisonUngod.openAccount();
-                } else if (document.getElementById('accountModal')) {
-                    document.getElementById('accountModal').classList.add('open');
-                    document.getElementById('accountOverlay').classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    window.location.href = 'index.php?login=1';
-                }
+                window.location.href = 'login.php';
             }
         }
     });

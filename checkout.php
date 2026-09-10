@@ -60,7 +60,7 @@ $site = ['name' => 'Maison Ungod'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($site['name']) ?> — Checkout</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/pages/checkout.css?v=2">
+    <link rel="stylesheet" href="css/pages/checkout.css?v=3">
 
 </head>
 <body>
@@ -196,21 +196,21 @@ $site = ['name' => 'Maison Ungod'];
                 </label>
                 <div class="payment-panel active" id="panel-cc">
                     <div class="floating-input">
-                        <input type="text" placeholder=" " id="cc_number">
+                        <input type="text" placeholder=" " id="cc_number" name="card_number" inputmode="numeric" autocomplete="cc-number" maxlength="19">
                         <label for="cc_number">Card number</label>
                     </div>
                     <div class="form-row">
                         <div class="form-col floating-input">
-                            <input type="text" placeholder=" " id="cc_exp">
+                            <input type="text" placeholder=" " id="cc_exp" name="card_exp" inputmode="numeric" autocomplete="cc-exp" maxlength="7">
                             <label for="cc_exp">Expiration date (MM / YY)</label>
                         </div>
                         <div class="form-col floating-input">
-                            <input type="text" placeholder=" " id="cc_sec">
+                            <input type="text" placeholder=" " id="cc_sec" name="card_sec" inputmode="numeric" autocomplete="cc-csc" maxlength="4">
                             <label for="cc_sec">Security code</label>
                         </div>
                     </div>
                     <div class="floating-input" style="margin-bottom:0;">
-                        <input type="text" placeholder=" " id="cc_name">
+                        <input type="text" placeholder=" " id="cc_name" name="card_name" autocomplete="cc-name">
                         <label for="cc_name">Name on card</label>
                     </div>
                 </div>
@@ -288,6 +288,6 @@ $site = ['name' => 'Maison Ungod'];
 </div>
 
 <script src="js/main.js?v=3"></script>
-<script src="js/checkout.js?v=3"></script>
+<script src="js/checkout.js?v=5"></script>
 </body>
 </html>

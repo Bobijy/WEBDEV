@@ -1,7 +1,9 @@
 <?php
 // Checkout API: processes order placement, saves order items, and empties cart
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../database/db.php';
@@ -61,6 +63,52 @@ if (!validate_phone($phone)) {
 // Validate payment method
 if (!validate_in_list($paymentMethod, ALLOWED_PAYMENT_METHODS)) {
     json_response(false, 'Invalid payment method selected.');
+}
+
+if ($paymentMethod === 'Card') {
+    $cardNumber = preg_replace('/\D/', '', $_POST['card_number'] ?? '');
+    $cardExp    = trim($_POST['card_exp'] ?? '');
+    $cardSec    = trim($_POST['card_sec'] ?? '');
+    $cardName   = trim($_POST['card_name'] ?? '');
+
+    $cardErrors = [];
+
+    if ($cardNumber === '') {
+        $cardErrors['card_number'] = 'Card number is required.';
+    } elseif (strlen($cardNumber) < 15 || strlen($cardNumber) > 16) {
+        $cardErrors['card_number'] = 'Please enter a valid 15 or 16-digit card number.';
+    }
+
+    if ($cardExp === '') {
+        $cardErrors['card_exp'] = 'Expiration date is required.';
+    } elseif (!preg_match('/^(0[1-9]|1[0-2])\s*\/\s*(\d{2})$/', $cardExp, $m)) {
+        $cardErrors['card_exp'] = 'Please enter a valid expiration date (MM / YY).';
+    } else {
+        $expMonth  = (int) $m[1];
+        $expYear   = 2000 + (int) $m[2];
+        $currYear  = (int) date('Y');
+        $currMonth = (int) date('n');
+
+        if ($expYear < $currYear || ($expYear === $currYear && $expMonth < $currMonth)) {
+            $cardErrors['card_exp'] = 'Card has expired.';
+        }
+    }
+
+    if ($cardSec === '') {
+        $cardErrors['card_sec'] = 'Security code is required.';
+    } elseif (!preg_match('/^\d{3,4}$/', $cardSec)) {
+        $cardErrors['card_sec'] = 'Security code must be 3 or 4 digits.';
+    }
+
+    if ($cardName === '') {
+        $cardErrors['card_name'] = 'Name on card is required.';
+    } elseif (mb_strlen($cardName) < 2) {
+        $cardErrors['card_name'] = 'Please enter the full name on the card.';
+    }
+
+    if (!empty($cardErrors)) {
+        json_response(false, 'Please fill in all required card details.', ['errors' => $cardErrors]);
+    }
 }
 
 // Fetch the user's cart

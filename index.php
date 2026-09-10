@@ -14,6 +14,8 @@ $site = [
     'year' => date('Y'),
 ];
 
+$accountUrl = isset($_SESSION['user_id']) ? ($_SESSION['user_role'] === 'admin' ? 'admin/index.php' : 'account.php') : 'login.php';
+
 // Navigation Links
 $navLinks = [
     ['label' => 'Home', 'href' => '#hero', 'active' => true],
@@ -128,7 +130,7 @@ $socials = [
                 <div class="nav-icons">
                     <a href="#" class="nav-icon" id="searchToggle" aria-label="Search"
                         onclick="document.getElementById('searchOverlay').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(() => document.getElementById('searchInput').focus(), 100); return false;"><?= $icons['search'] ?></a>
-                    <a href="#" class="nav-icon" id="accountToggle" aria-label="Account">
+                    <a href="<?= $accountUrl ?>" class="nav-icon" id="accountToggle" aria-label="Account">
                         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -155,8 +157,7 @@ $socials = [
                         <?= $icons['search'] ?>
                         <span>Search</span>
                     </a>
-                    <a href="#" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account"
-                        onclick="const at = document.getElementById('accountToggle'); if (at) at.click(); return false;">
+                    <a href="<?= $accountUrl ?>" class="mobile-nav-action" id="mobileAccountToggle" aria-label="Account">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -442,68 +443,7 @@ $socials = [
         </div>
     </aside>
 
-    <!-- Account Modal (Sign In / Register) -->
-    <div class="account-overlay" id="accountOverlay"></div>
-    <div class="account-modal" id="accountModal">
-        <button class="account-modal__close" id="accountClose" aria-label="Close account">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-        </button>
 
-        <div class="account-modal__inner">
-            <div class="auth-header">
-                <h2>Sign In</h2>
-                <p class="auth-subtitle">Please enter your details to sign in.</p>
-            </div>
-
-            <form class="account-form" id="loginForm">
-                <div class="account-msg" id="loginMsg"></div>
-                <div class="account-field">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" name="email" placeholder="your@email.com" required>
-                </div>
-                <div class="account-field">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" name="password" placeholder="Enter your password"
-                        required>
-                </div>
-                <button type="submit" class="account-submit" id="loginSubmit">Sign In</button>
-                <div class="auth-links">
-                    Don't have an account? <a href="#" id="showRegister">Register</a>
-                </div>
-            </form>
-
-            <form class="account-form" id="registerForm" style="display:none;">
-                <div class="account-msg" id="registerMsg"></div>
-                <div class="account-field">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" name="name" placeholder="John Doe" required>
-                </div>
-                <div class="account-field">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" name="email" placeholder="your@email.com" required>
-                </div>
-                <div class="account-field">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" name="password" placeholder="Min. 6 characters"
-                        required>
-                </div>
-                <div class="account-field">
-                    <label for="registerConfirmPassword">Confirm Password</label>
-                    <input type="password" id="registerConfirmPassword" name="confirm_password" placeholder="Confirm your password"
-                        required>
-                </div>
-                <button type="submit" class="account-submit" id="registerSubmit">Create Account</button>
-                <div class="auth-links">
-                    Already have an account? <a href="#" id="showLogin">Sign In</a>
-                </div>
-            </form>
-
-        </div>
-    </div>
 
     <div class="contact-overlay" id="contactOverlay"></div>
     <div class="account-modal contact-modal" id="contactModal">
@@ -550,7 +490,7 @@ $socials = [
     <script src="js/main.js?v=7"></script>
     <script src="js/cart.js?v=6"></script>
     <script src="js/search.js?v=4"></script>
-    <script src="js/account.js?v=7"></script>
+    <script src="js/account.js?v=10"></script>
     <script src="js/contact.js?v=3"></script>
     <script src="js/transitions.js?v=4"></script>
 

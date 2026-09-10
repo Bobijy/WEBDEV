@@ -17,13 +17,13 @@ $site = ['name' => 'Maison Ungod'];
     <title><?= $site['name'] ?> — Register</title>
     <link rel="stylesheet" href="css/style.css?v=20">
     <link rel="stylesheet" href="css/animations.css?v=1">
-    <link rel="stylesheet" href="css/pages/auth.css?v=1">
+    <link rel="stylesheet" href="css/pages/auth.css?v=2">
 </head>
 <body>
     <div class="auth-page">
         <div class="auth-container">
             <div class="auth-header">
-                <a href="index.php">— <?= strtoupper($site['name']) ?> —</a>
+                <a href="index.php" class="brand-link">— <?= strtoupper($site['name']) ?> —</a>
                 <h1>Create Account</h1>
             </div>
             
@@ -50,6 +50,10 @@ $site = ['name' => 'Maison Ungod'];
             
             <div class="auth-links">
                 Already have an account? <a href="login.php">Sign In</a>
+            </div>
+
+            <div class="auth-back">
+                <a href="index.php">&larr; Back to Store</a>
             </div>
         </div>
     </div>
