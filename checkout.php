@@ -61,7 +61,7 @@ $site = ['name' => 'Maison Ungod'];
     <title><?= htmlspecialchars($site['name']) ?> — Checkout</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/pages/checkout.css?v=3">
-
+    <link rel="stylesheet" href="css/components/receipt-modal.css?v=1">
 </head>
 <body>
 
@@ -287,7 +287,116 @@ $site = ['name' => 'Maison Ungod'];
     </div>
 </div>
 
+<!-- Official E-Receipt Modal -->
+<div class="receipt-modal-overlay" id="receiptModalOverlay" aria-modal="true" role="dialog">
+    <div class="receipt-modal-container">
+        <div class="receipt-card">
+            <button type="button" class="receipt-close-btn" onclick="closeReceiptModal()" aria-label="Close receipt">&times;</button>
+            
+            <div class="receipt-header">
+                <div class="receipt-brand-logo"><?= htmlspecialchars($site['name']) ?></div>
+                <div class="receipt-brand-sub">Haute Parfumerie &middot; Official Payment Receipt</div>
+                <div class="receipt-title-wrap">
+                    <span class="receipt-badge-approved">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Card Payment Authorized &amp; Approved
+                    </span>
+                </div>
+            </div>
+
+            <div class="receipt-info-grid">
+                <div class="receipt-info-cell">
+                    <span class="receipt-info-label">Order Number</span>
+                    <span class="receipt-info-value" id="rcptOrderNumber">ORD-000000</span>
+                </div>
+                <div class="receipt-info-cell">
+                    <span class="receipt-info-label">Transaction Reference</span>
+                    <span class="receipt-info-value" id="rcptTxnId">TXN-000000</span>
+                </div>
+                <div class="receipt-info-cell">
+                    <span class="receipt-info-label">Date &amp; Time</span>
+                    <span class="receipt-info-value" id="rcptDate">Sep 10, 2026</span>
+                </div>
+                <div class="receipt-info-cell">
+                    <span class="receipt-info-label">Payment Method</span>
+                    <span class="receipt-info-value receipt-card-tag" id="rcptCardDetails">
+                        <span class="receipt-card-brand-badge" id="rcptBrandBadge">CARD</span>
+                        <span id="rcptCardMasked">•••• 0000</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="receipt-two-col">
+                <div class="receipt-col-block">
+                    <div class="receipt-col-title">Billed To (Cardholder)</div>
+                    <div class="receipt-col-text" id="rcptCardholder" style="font-weight:600;">Cardholder</div>
+                    <div class="receipt-col-text" id="rcptEmail" style="color:#6B7280; font-size:0.78rem;">email@example.com</div>
+                    <div class="receipt-col-text" id="rcptPhone" style="color:#6B7280; font-size:0.78rem;">0900-000-0000</div>
+                </div>
+                <div class="receipt-col-block">
+                    <div class="receipt-col-title">Delivery Address</div>
+                    <div class="receipt-col-text" id="rcptAddress">Shipping Address</div>
+                </div>
+            </div>
+
+            <div class="receipt-table-wrapper">
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-right">Price</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rcptItemsBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="receipt-totals-wrap">
+                <div class="receipt-totals-box">
+                    <div class="receipt-total-row">
+                        <span>Subtotal</span>
+                        <span id="rcptSubtotal">&#8369;0.00</span>
+                    </div>
+                    <div class="receipt-total-row">
+                        <span>Shipping Fee</span>
+                        <span id="rcptShipping">&#8369;50.00</span>
+                    </div>
+                    <div class="receipt-total-row">
+                        <span>Estimated VAT (12% incl.)</span>
+                        <span id="rcptTax">&#8369;0.00</span>
+                    </div>
+                    <div class="receipt-total-row grand-total">
+                        <span>Total Paid</span>
+                        <span class="val" id="rcptTotal">&#8369;0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-footer-wrap">
+                <p class="receipt-footer-text">
+                    Thank you for choosing <?= htmlspecialchars($site['name']) ?>. This document serves as your official electronic receipt and proof of card payment.
+                </p>
+                <div class="receipt-security-note">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    256-Bit Encrypted Electronic Transaction &middot; Verified &amp; Logged
+                </div>
+            </div>
+
+            <div class="receipt-actions" style="justify-content: center;">
+                <a href="#" id="rcptContinueBtn" class="btn-receipt-continue" onclick="closeReceiptModal(); return false;">
+                    <span>Continue to Orders</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="js/main.js?v=3"></script>
-<script src="js/checkout.js?v=5"></script>
+<script src="js/checkout.js?v=6"></script>
 </body>
 </html>

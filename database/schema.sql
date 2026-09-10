@@ -68,11 +68,18 @@ CREATE TABLE IF NOT EXISTS `cart_items` (
 -- Orders Table
 CREATE TABLE IF NOT EXISTS `orders` (
     `id`               INT AUTO_INCREMENT PRIMARY KEY,
+    `order_number`     VARCHAR(50)   DEFAULT NULL,
     `user_id`          INT           NOT NULL,
     `total_amount`     DECIMAL(10,2) NOT NULL,
     `shipping_address` TEXT          NOT NULL,
     `payment_method`   VARCHAR(50)   NOT NULL,
     `status`           VARCHAR(50)   DEFAULT 'Pending',
+    `discount_amount`  DECIMAL(10,2) DEFAULT 0.00,
+    `shipping_fee`     DECIMAL(10,2) DEFAULT 0.00,
+    `card_last4`       VARCHAR(4)    DEFAULT NULL,
+    `card_brand`       VARCHAR(20)   DEFAULT NULL,
+    `card_name`        VARCHAR(100)  DEFAULT NULL,
+    `transaction_id`   VARCHAR(50)   DEFAULT NULL,
     `created_at`       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -123,6 +123,7 @@ $cartId = (int) $cart['id'];
 $items = db_fetch_all($pdo, '
     SELECT ci.product_id,
            ci.quantity,
+           p.name,
            p.price,
            p.stock
     FROM   cart_items ci
@@ -144,6 +145,29 @@ $subtotal = array_reduce(
 $shippingFee = 50.00;
 $totalAmount = $subtotal + $shippingFee;
 
+// Prepare Card & Transaction metadata
+$cardLast4     = null;
+$cardBrand     = null;
+$cardHolder    = null;
+$transactionId = 'TXN-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+
+if ($paymentMethod === 'Card') {
+    $cardLast4 = substr($cardNumber, -4);
+    if (str_starts_with($cardNumber, '4')) {
+        $cardBrand = 'Visa';
+    } elseif (str_starts_with($cardNumber, '5') || str_starts_with($cardNumber, '2')) {
+        $cardBrand = 'Mastercard';
+    } elseif (str_starts_with($cardNumber, '3')) {
+        $cardBrand = 'American Express';
+    } else {
+        $cardBrand = 'Card';
+    }
+    $cardHolder = $cardName;
+}
+
+// Fetch user info for receipt
+$userInfo = db_fetch($pdo, 'SELECT email, full_name FROM users WHERE id = :id', [':id' => $userId]);
+
 // Create order transaction
 try {
     $pdo->beginTransaction();
@@ -158,8 +182,8 @@ try {
     $orderNumber = 'ORD-' . date('YmdHis') . '-' . strtoupper(substr(uniqid(), -4));
     
     $stmt = $pdo->prepare('
-        INSERT INTO orders (order_number, user_id, total_amount, shipping_fee, shipping_address, payment_method, status)
-        VALUES (:order_number, :user_id, :total_amount, :shipping_fee, :shipping_address, :payment_method, :status)
+        INSERT INTO orders (order_number, user_id, total_amount, shipping_fee, shipping_address, payment_method, status, card_last4, card_brand, card_name, transaction_id)
+        VALUES (:order_number, :user_id, :total_amount, :shipping_fee, :shipping_address, :payment_method, :status, :card_last4, :card_brand, :card_name, :transaction_id)
     ');
     $stmt->execute([
         ':order_number'     => $orderNumber,
@@ -169,6 +193,10 @@ try {
         ':shipping_address' => $address,
         ':payment_method'   => $paymentMethod,
         ':status'           => 'Pending',
+        ':card_last4'       => $cardLast4,
+        ':card_brand'       => $cardBrand,
+        ':card_name'        => $cardHolder,
+        ':transaction_id'   => $transactionId,
     ]);
     $orderId = (int) $pdo->lastInsertId();
 
@@ -178,6 +206,7 @@ try {
         VALUES (:order_id, :product_id, :quantity, :price)
     ');
 
+    $receiptItems = [];
     foreach ($items as $item) {
         $stmtItem->execute([
             ':order_id'  => $orderId,
@@ -185,6 +214,13 @@ try {
             ':quantity'  => (int) $item['quantity'],
             ':price'     => (float) $item['price'],
         ]);
+
+        $receiptItems[] = [
+            'name'     => $item['name'] ?? 'Perfume',
+            'quantity' => (int) $item['quantity'],
+            'price'    => (float) $item['price'],
+            'total'    => (float) $item['price'] * (int) $item['quantity']
+        ];
     }
 
     // 4. Empty the user's cart
@@ -195,7 +231,30 @@ try {
 
     $pdo->commit();
 
-    json_response(true, 'Order placed successfully!', ['order_id' => $orderId]);
+    $receiptData = [
+        'order_id'         => $orderId,
+        'order_number'     => $orderNumber,
+        'transaction_id'   => $transactionId,
+        'payment_method'   => $paymentMethod,
+        'card_brand'       => $cardBrand ?: 'Card',
+        'card_last4'       => $cardLast4 ?: '••••',
+        'card_name'        => $cardHolder ?: ($userInfo['full_name'] ?? 'Valued Customer'),
+        'date'             => date('M j, Y h:i A'),
+        'customer_name'    => $cardHolder ?: ($userInfo['full_name'] ?? 'Valued Customer'),
+        'customer_email'   => $userInfo['email'] ?? '',
+        'shipping_address' => $address,
+        'phone'            => $phone,
+        'items'            => $receiptItems,
+        'subtotal'         => $subtotal,
+        'shipping_fee'     => $shippingFee,
+        'tax_amount'       => $subtotal * 0.12,
+        'total_amount'     => $totalAmount,
+    ];
+
+    json_response(true, 'Order placed successfully!', [
+        'order_id' => $orderId,
+        'receipt'  => $receiptData
+    ]);
 
 } catch (PDOException $e) {
     $pdo->rollBack();

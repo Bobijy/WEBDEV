@@ -227,13 +227,16 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
         const data = await response.json();
 
         if (data.success) {
-            msg.className = 'alert success';
-            msg.textContent = 'Order placed successfully! Redirecting...';
-            msg.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Pay now';
+            msg.style.display = 'none';
 
-            setTimeout(() => {
-                window.location.href = 'account.php#orders';
-            }, 1500);
+            // Show the official E-Receipt modal before continuing to orders
+            if (data.receipt) {
+                showCardReceiptModal(data.receipt, data.order_id);
+            } else {
+                window.location.href = 'order.php?id=' + data.order_id;
+            }
         } else {
             msg.className = 'alert error';
             msg.textContent = data.message || 'An error occurred while processing checkout.';
@@ -255,3 +258,108 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
         btn.textContent = 'Pay now';
     }
 });
+
+// Show Card Payment Receipt Modal
+function showCardReceiptModal(receipt, orderId) {
+    const overlay = document.getElementById('receiptModalOverlay');
+    if (!overlay) {
+        window.location.href = 'order.php?id=' + orderId;
+        return;
+    }
+
+    window._activeReceiptOrderId = orderId;
+
+    const elOrderNumber = document.getElementById('rcptOrderNumber');
+    const elTxnId       = document.getElementById('rcptTxnId');
+    const elDate        = document.getElementById('rcptDate');
+    const brandBadge    = document.getElementById('rcptBrandBadge');
+    const elCardMasked  = document.getElementById('rcptCardMasked');
+    const elCardholder  = document.getElementById('rcptCardholder');
+    const elEmail       = document.getElementById('rcptEmail');
+    const elPhone       = document.getElementById('rcptPhone');
+    const elAddress     = document.getElementById('rcptAddress');
+    const tbody         = document.getElementById('rcptItemsBody');
+    const continueBtn   = document.getElementById('rcptContinueBtn') || document.getElementById('rcptViewOrderBtn');
+
+    if (elOrderNumber) elOrderNumber.textContent = receipt.order_number || ('ORD-' + orderId);
+    if (elTxnId)       elTxnId.textContent       = receipt.transaction_id || 'TXN-ONLINE';
+    if (elDate)        elDate.textContent        = receipt.date || new Date().toLocaleDateString();
+
+    const brandName = (receipt.card_brand || 'Card').toUpperCase();
+    if (brandBadge) {
+        brandBadge.textContent = brandName;
+        if (brandName.includes('MC') || brandName.includes('MASTER')) {
+            brandBadge.classList.add('mc');
+        } else {
+            brandBadge.classList.remove('mc');
+        }
+    }
+
+    if (elCardMasked) elCardMasked.textContent = (receipt.card_brand || 'Card') + ' ending in •••• ' + (receipt.card_last4 || '••••');
+    if (elCardholder) elCardholder.textContent = receipt.card_name || 'Cardholder';
+    if (elEmail)      elEmail.textContent      = receipt.customer_email || '';
+    if (elPhone)      elPhone.textContent      = receipt.phone || '';
+    if (elAddress)    elAddress.textContent    = receipt.shipping_address || '';
+
+    // Populate items
+    if (tbody) {
+        tbody.innerHTML = '';
+        if (Array.isArray(receipt.items)) {
+            receipt.items.forEach(it => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${escapeReceiptHtml(it.name)}</strong></td>
+                    <td class="text-center">${it.quantity}</td>
+                    <td class="text-right">&#8369;${formatReceiptCurrency(it.price)}</td>
+                    <td class="text-right" style="font-weight:600;">&#8369;${formatReceiptCurrency(it.total)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    }
+
+    const elSubtotal = document.getElementById('rcptSubtotal');
+    const elShipping = document.getElementById('rcptShipping');
+    const elTax      = document.getElementById('rcptTax');
+    const elTotal    = document.getElementById('rcptTotal');
+
+    if (elSubtotal) elSubtotal.innerHTML = '&#8369;' + formatReceiptCurrency(receipt.subtotal);
+    if (elShipping) elShipping.innerHTML = '&#8369;' + formatReceiptCurrency(receipt.shipping_fee);
+    if (elTax)      elTax.innerHTML      = '&#8369;' + formatReceiptCurrency(receipt.tax_amount);
+    if (elTotal)    elTotal.innerHTML    = '&#8369;' + formatReceiptCurrency(receipt.total_amount);
+
+    if (continueBtn) {
+        continueBtn.href = 'order.php?id=' + orderId;
+    }
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReceiptModal() {
+    const overlay = document.getElementById('receiptModalOverlay');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    const orderId = window._activeReceiptOrderId;
+    if (orderId) {
+        window.location.href = 'order.php?id=' + orderId;
+    } else {
+        window.location.href = 'account.php#orders';
+    }
+}
+
+function escapeReceiptHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function formatReceiptCurrency(val) {
+    return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+window.closeReceiptModal = closeReceiptModal;
