@@ -35,10 +35,8 @@ services:
 
 volumes:
   symfony-db-data:
-    external: true
     name: symfony-db-data
 
 networks:
   platform-network:
-    external: true
     name: platform-network

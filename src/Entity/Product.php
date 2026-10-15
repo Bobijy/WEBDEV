@@ -42,9 +42,9 @@ class Product
     #[Assert\PositiveOrZero]
     private ?int $stock = 0;
 
-    #[ORM\Column(length: 100, nullable: true, options: ['default' => 'Uncategorized'])]
-    #[Assert\Length(max: 100)]
-    private ?string $category = 'Uncategorized';
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     #[ORM\Column(length: 20, nullable: true, options: ['default' => 'Active'])]
     private ?string $status = 'Active';
@@ -128,12 +128,12 @@ class Product
         return $this;
     }
 
-    public function getCategory(): ?string
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(?string $category): static
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
         return $this;
