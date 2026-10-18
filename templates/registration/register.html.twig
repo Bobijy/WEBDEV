@@ -1,0 +1,64 @@
+{% extends 'auth_base.html.twig' %}
+
+{% block title %}Register &mdash; Maison Ungod{% endblock %}
+
+{% block body %}
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <a href="{{ path('app_home') }}">&mdash; MAISON UNGOD &mdash;</a>
+                <h1>Create Account</h1>
+            </div>
+
+            <form method="post" class="account-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('register') }}">
+                
+
+
+                <div class="account-field">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" maxlength="100" autocomplete="name" placeholder="John Doe" required>
+                </div>
+
+                <div class="account-field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" maxlength="255" autocomplete="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="account-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Min. 12 characters" minlength="12" maxlength="72" autocomplete="new-password" required>
+                </div>
+                
+                <div class="account-field">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
+                </div>
+
+                <button type="submit" class="account-submit">REGISTER</button>
+            </form>
+
+            <div class="auth-links">
+                Already have an account? <a href="{{ path('app_login') }}" style="color: #fff; font-weight: bold; text-decoration: none;">Sign In</a>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{{ path('app_home') }}" style="color: #666; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 1rem;">&larr;</span> Back to Store
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.account-form').addEventListener('submit', function(e) {
+            const pwd = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            
+            if (pwd !== confirm) {
+                e.preventDefault();
+                alert("Passwords do not match!");
+            }
+        });
+    </script>
+{% endblock %}
