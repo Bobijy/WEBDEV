@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+        <meta name="cart-token" content="{{ csrf_token('cart') }}">
+        <title>{% block title %}Maison Ungod{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=9">
+            <link rel="stylesheet" href="{{ asset('css/animations.css') }}?v=2">
+        {% endblock %}
+        <link rel="stylesheet" href="{{ asset('css/qa.css') }}">
+
+        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+        {% if frankenphp_hot_reload %}
+        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
+        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+        {% endif %}
+    </head>
+    <body>
+        {% include 'partials/_scroll_progress.html.twig' %}
+        {% include 'partials/_header.html.twig' %}
+        
+        {% include 'partials/_flash_messages.html.twig' %}
+
+        <a class="skip-link" href="#main-content">Skip to content</a>
+        <main id="main-content">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% include 'partials/_footer.html.twig' %}
+        {% include 'partials/_search_modal.html.twig' %}
+        {% include 'partials/_contact_modal.html.twig' %}
+        {% include 'partials/_cart_drawer.html.twig' %}
+    
+        {% include 'partials/_scroll_to_top.html.twig' %}
+
+        {% block javascripts %}
+            <script>
+                // Expose path variables to JS
+                window.routes = {
+                    cartAdd: "{{ path('api_cart_add', {id: 'ID_PLACEHOLDER'}) }}",
+                    cartRemove: "{{ path('api_cart_remove', {id: 'ID_PLACEHOLDER'}) }}",
+                    cartView: "{{ path('api_cart_view') }}"
+                };
+            </script>
+            <script src="{{ asset('js/main.js') }}?v=5"></script>
+            <script src="{{ asset('js/cart.js') }}?v=7"></script>
+            <script src="{{ asset('js/search.js') }}?v=4"></script>
+            <script src="{{ asset('js/account.js') }}?v=3"></script>
+            <script src="{{ asset('js/contact.js') }}?v=4"></script>
+            <script src="{{ asset('js/transitions.js') }}?v=4"></script>
+            <script src="{{ asset('js/accessibility.js') }}"></script>
+        {% endblock %}
+    </body>
+</html>
