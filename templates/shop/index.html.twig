@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shop &mdash; Maison Ungod{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/pages/shop.css') }}?v=2">
+{% endblock %}
+
+{% block body %}
+    <!-- Products Catalog Section -->
+    <section class="shop-page" id="shop">
+        <div class="shop-container">
+
+            <!-- Heading -->
+            <div class="shop-heading">
+                <h1>Our Products</h1>
+            </div>
+
+            <!-- Toolbar: Filters + Item count + Sort -->
+            <div class="shop-toolbar">
+                <form method="get" class="qa-catalog-filters shop-catalog-filters" role="search">
+                    {% if app.request.query.get('sort') %}
+                        <input type="hidden" name="sort" value="{{ app.request.query.get('sort') }}">
+                    {% endif %}
+                    <label class="shop-filter-field">
+                        <span class="sr-only">Search fragrances</span>
+                        <input type="search" name="q" value="{{ search }}" maxlength="100" placeholder="Search fragrances..." aria-label="Search fragrances">
+                    </label>
+                    <label class="shop-filter-field">
+                        <span class="sr-only">Category</span>
+                        <select name="category" aria-label="Category" onchange="this.form.submit()" style="background: transparent; border: none; color: inherit; font-size: 0.85rem; padding: 4px 8px; outline: none; cursor: pointer;">
+                            <option value="" style="background: #171717; color: #fff;">All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.name }}" {% if category == cat.name %}selected{% endif %} style="background: #171717; color: #fff;">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <button type="submit" class="shop-filter-btn">Filter</button>
+                    <a href="{{ path('app_shop') }}" class="shop-filter-reset">Reset</a>
+                </form>
+
+                <div class="shop-toolbar-meta">
+                    <span>{{ pagination.total }} Items</span>
+                    <div class="sort-wrapper" id="sortWrapper">
+                        <button type="button" class="shop-sort" id="sortToggle" aria-expanded="false" aria-controls="sortDropdown" style="background:transparent;border:0;color:inherit;">Sort
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </button>
+                        <div class="sort-dropdown" id="sortDropdown">
+                            <button data-sort="default" class="active">Default</button>
+                            <button data-sort="price-asc">Price: Low &rarr; High</button>
+                            <button data-sort="price-desc">Price: High &rarr; Low</button>
+                            <button data-sort="name-asc">Name: A &rarr; Z</button>
+                            <button data-sort="name-desc">Name: Z &rarr; A</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Product Grid -->
+            <div class="product-grid">
+                {% for product in products %}
+                    <div class="cat-card reveal reveal-d{{ (loop.index0 % 3) + 1 }}">
+                        <h3 class="cat-title">{{ product.name }}</h3>
+                        <p class="cat-subtitle">{{ product.category ? product.category.name : (product.brand|default('Maison Collection')) }}</p>
+                        <img class="cat-img" loading="lazy" decoding="async" src="{{ asset(product.image|default('assets/logo/logo.png')) }}" alt="{{ product.name }}">
+                        <p class="cat-price">₱{{ product.price|number_format(2, '.', ',') }}</p>
+                        <button class="cat-link add-to-cart-btn" style="background:transparent; border-top:none; border-left:none; border-right:none; cursor:pointer;"
+                                {{ product.stock > 0 ? '' : 'disabled' }} data-id="{{ product.id }}"
+                                data-name="{{ product.name }}"
+                                data-price="₱{{ product.price|number_format(2, '.', '') }}"
+                                data-image="{{ asset(product.image|default('assets/logo/logo.png')) }}">
+                            {{ product.stock > 0 ? 'ADD TO BAG' : 'OUT OF STOCK' }}
+                        </button>
+                    </div>
+                {% else %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-muted);">
+                        No products available at the moment.
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% include 'partials/_pagination.html.twig' %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/shop-sort.js') }}?v=2"></script>
+{% endblock %}
