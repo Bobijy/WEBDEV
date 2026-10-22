@@ -1,0 +1,11 @@
+{% if pagination.pages > 1 %}
+    <nav class="qa-pagination" aria-label="Pagination">
+        {% if pagination.page > 1 %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: pagination.page - 1})) }}">Previous</a>
+        {% endif %}
+        <span>Page {{ pagination.page }} of {{ pagination.pages }} · {{ pagination.total }} results</span>
+        {% if pagination.page < pagination.pages %}
+            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({page: pagination.page + 1})) }}">Next</a>
+        {% endif %}
+    </nav>
+{% endif %}
