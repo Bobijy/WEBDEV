@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Maison Ungod &mdash; Luxury Fragrances{% endblock %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="ambient-particles">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="mouse-glow"></div>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1>Find Your Signature Scent</h1>
+                <a href="{{ path('app_shop') }}" class="btn-shop">Shop Now</a>
+            </div>
+            <div class="hero-image">
+                <img src="{{ asset('assets/images/hero-product.png') }}" alt="Maison Ungod Signature Fragrance" data-parallax="0.4">
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- CATEGORIES - Pour Homme / Pour Femme -->
+    <section class="categories" id="categories">
+        <div class="container categories-grid">
+            <div class="cat-card reveal reveal-d1">
+                <h3 class="cat-title">Pour Homme</h3>
+                <p class="cat-subtitle">Fragrance For Him</p>
+                <img class="cat-img" src="{{ asset('assets/images/pour-homme.png') }}" alt="Pour Homme">
+                <a href="{{ path('app_shop') }}" class="cat-link">Shop Link</a>
+            </div>
+            <div class="cat-card reveal reveal-d2">
+                <h3 class="cat-title">Pour Femme</h3>
+                <p class="cat-subtitle">Fragrance For Her</p>
+                <img class="cat-img" src="{{ asset('assets/images/pour-femme.png') }}" alt="Pour Femme">
+                <a href="{{ path('app_shop') }}" class="cat-link">Shop Link</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- THE COLLECTIONS -->
+    <section class="collections" id="collections">
+        <div class="container">
+            <div class="section-title reveal">
+                <h2>The Collections</h2>
+            </div>
+        </div>
+        <div class="coll-slider-wrap">
+            <!-- Left Arrow -->
+            <button class="coll-arrow coll-arrow--left" id="collPrev" aria-label="Previous">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <!-- Right Arrow -->
+            <button class="coll-arrow coll-arrow--right" id="collNext" aria-label="Next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </button>
+            <!-- Slider Track -->
+            <div class="coll-track" id="collTrack">
+                {% for col in collections %}
+                    <div class="coll-card reveal reveal-d{{ (loop.index0 % 3) + 1 }}">
+                        <h3 class="coll-card__title">{{ col.name }}</h3>
+                        <div class="coll-card__img-wrap">
+                            <img src="{{ asset(col.image|default('assets/logo/logo.png')) }}" alt="{{ col.name }}">
+                        </div>
+                        <div class="coll-card__footer">
+                            <span class="coll-card__price">₱{{ col.price|number_format(2, '.', ',') }}</span>
+                            <button class="coll-card__bag add-to-cart-btn" data-id="{{ col.id }}"
+                                data-name="{{ col.name }}" data-price="₱{{ col.price|number_format(2, '.', '') }}"
+                                data-image="{{ asset(col.image|default('assets/logo/logo.png')) }}" aria-label="Add to bag">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- Slider Auto-play Progress -->
+            <div class="slider-progress">
+                <div class="slider-progress__bar"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- THE STORY OF THE MAISON -->
+    <section class="story" id="story">
+        <div class="container story-grid">
+            <div class="story-img-wrap reveal">
+                <img src="{{ asset('assets/images/story-perfume.png') }}" alt="Maison Ungod Heritage" data-parallax="0.3">
+            </div>
+            <div class="story-content reveal reveal-d2">
+                <h2>The Story of<br>the Maison</h2>
+                <div class="story-bar"></div>
+                <p>
+                    At Maison Ungod, we believe a fragrance is more than a scent &mdash; it is an art of expression. The
+                    Maison represents an unwavering dedication to the timeless art of perfumery, merging age-old methods
+                    and modern sophistication.
+                </p>
+                <p>
+                    Crafted from rare ingredients and the most exquisite raw materials, each collection is designed to
+                    be a timeless, lingering legacy wherever you go.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider reveal"></div>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="feat-row reveal">
+                <div class="feat-text">
+                    <h3>Rare Ingredients</h3>
+                    <p>We source only the finest, most exclusive raw materials. Every botanical and resin is carefully selected to ensure unparalleled quality and a truly distinctive scent profile.</p>
+                </div>
+                <div class="feat-img">
+                    <img src="{{ asset('assets/images/rare-ingredients.jpg') }}" alt="Rare Ingredients">
+                </div>
+            </div>
+            <div class="feat-row feat-row--reverse reveal">
+                <div class="feat-text">
+                    <h3>Masterful Craftsmanship</h3>
+                    <p>Perfumery excellence reimagined. Each Maison Ungod fragrance is meticulously blended and aged to perfection, allowing the unique character to develop over time.</p>
+                </div>
+                <div class="feat-img">
+                    <img src="{{ asset('assets/images/craftsmanship.jpg') }}" alt="Masterful Craftsmanship">
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
