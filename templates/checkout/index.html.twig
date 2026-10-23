@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>Maison Ungod — Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/pages/checkout.css') }}?v=2">
+<link rel="stylesheet" href="{{ asset('css/qa.css') }}">
+</head>
+<body>
+
+<div class="checkout-layout">
+    
+    <!-- Left Main Content -->
+    <div class="main-content">
+        <a href="{{ path('app_home') }}" class="header-logo">Maison Ungod</a>
+        
+        <form method="POST" action="{{ path('app_checkout') }}" id="checkoutForm">
+            <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+            <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+
+            <div class="alert" id="checkoutMsg" role="alert"></div>
+            
+            <div class="contact-info">
+                <div>
+                    <h2>Contact</h2>
+                    <p>{{ app.user.email }}</p>
+                </div>
+                <div class="contact-badge">
+                    {% set names = app.user.fullName|split(' ') %}
+                    {{ (names[0]|default('U'))|first|upper }}{{ (names[1]|default(''))|first|upper }}
+                </div>
+            </div>
+            
+            <label class="checkbox-wrapper">
+                <input type="checkbox" checked>
+                <span>Email me with news and offers</span>
+            </label>
+
+            <h2>Delivery</h2>
+            
+            {% if app.user.addresses|length > 0 %}
+                <div class="saved-addresses" style="margin-bottom: 20px;">
+                    {% set hasDefault = false %}
+                    {% for address in app.user.addresses %}
+                        {% if address.isDefault %}
+                            {% set hasDefault = true %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for address in app.user.addresses %}
+                        {% set isChecked = address.isDefault or (not hasDefault and loop.first) %}
+                        <label class="payment-option {{ isChecked ? 'active' : '' }}" style="display:flex; align-items:flex-start; margin-bottom:10px;">
+                            <div class="payment-label-wrap" style="align-items:flex-start; margin-top: 4px;">
+                                <input type="radio" name="selected_address_id" value="{{ address.id }}" {{ isChecked ? 'checked' : '' }} onclick="toggleAddressMode(false, this)">
+                                <div>
+                                    <strong style="font-size:0.85rem;">{{ address.fullName }}</strong>
+                                    {% if address.isDefault %}
+                                        <span style="background: #e2e8f0; color: #475569; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 5px; vertical-align: middle;">DEFAULT</span>
+                                    {% endif %}
+                                    <br>
+                                    <span style="font-size:0.8rem; color:var(--text-light);">{{ address.phone }}</span><br>
+                                    <span style="font-size:0.8rem; color:var(--text-light);" id="address_text_{{ address.id }}">{{ address.getFullAddressText() }}</span>
+                                </div>
+                            </div>
+                        </label>
+                    {% endfor %}
+                    <label class="payment-option" style="display:flex; align-items:center;">
+                        <div class="payment-label-wrap">
+                            <input type="radio" name="selected_address_id" value="new" onclick="toggleAddressMode(true, this)">
+                            <span>Use a different address</span>
+                        </div>
+                    </label>
+                </div>
+            {% elseif app.user.address %}
+                <div class="saved-addresses" style="margin-bottom: 20px;">
+                    <label class="payment-option active" style="display:flex; align-items:flex-start; margin-bottom:10px;">
+                        <div class="payment-label-wrap" style="align-items:flex-start; margin-top: 4px;">
+                            <input type="radio" name="selected_address_id" value="default" checked onclick="toggleAddressMode(false, this)">
+                            <div>
+                                <strong style="font-size:0.85rem;">{{ app.user.fullName }}</strong><br>
+                                <span style="font-size:0.8rem; color:var(--text-light);">{{ app.user.phone }}</span><br>
+                                <span style="font-size:0.8rem; color:var(--text-light);" id="address_text_default">{{ app.user.address }}</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="payment-option" style="display:flex; align-items:center;">
+                        <div class="payment-label-wrap">
+                            <input type="radio" name="selected_address_id" value="new" onclick="toggleAddressMode(true, this)">
+                            <span>Use a different address</span>
+                        </div>
+                    </label>
+                </div>
+            {% else %}
+                <input type="hidden" name="selected_address_id" value="new">
+            {% endif %}
+
+            <div id="newAddressForm" style="{% if app.user.addresses|length > 0 or app.user.address %}display:none;{% endif %}">
+                <div class="floating-input">
+                    <select id="country" name="country">
+                        <option value="Philippines">Philippines</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                    </select>
+                    <label for="country">Country/Region</label>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col floating-input">
+                        {% set names = app.user.fullName|split(' ') %}
+                        <input type="text" id="firstName" name="firstName" value="{{ names[0]|default('') }}" placeholder=" ">
+                        <label for="firstName">First name</label>
+                    </div>
+                    <div class="form-col floating-input">
+                        <input type="text" id="lastName" name="lastName" value="{{ names|slice(1)|join(' ') }}" placeholder=" ">
+                        <label for="lastName">Last name</label>
+                    </div>
+                </div>
+                
+                <div class="floating-input">
+                    <input type="text" id="addressLine1" name="addressLine1" placeholder=" ">
+                    <label for="addressLine1">"Complete Address" to avoid shipping delay.</label>
+                </div>
+                
+                <div class="floating-input">
+                    <input type="text" id="barangay" name="barangay" placeholder=" ">
+                    <label for="barangay">Barangay</label>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col floating-input">
+                        <input type="text" id="postalCode" name="postalCode" placeholder=" ">
+                        <label for="postalCode">Postal code</label>
+                    </div>
+                    <div class="form-col floating-input">
+                        <input type="text" id="city" name="city" placeholder=" ">
+                        <label for="city">City</label>
+                    </div>
+                </div>
+                
+                <div class="floating-input">
+                    <select id="region" name="region">
+                        <option value="Metro Manila">Metro Manila</option>
+                        <option value="Cebu">Cebu</option>
+                        <option value="Davao">Davao</option>
+                        <option value="Negros Oriental">Negros Oriental</option>
+                    </select>
+                    <label for="region">Region</label>
+                </div>
+                
+                <div class="floating-input">
+                    <input type="text" id="phone" name="phone" value="{{ app.user.phone }}" placeholder=" ">
+                    <label for="phone">Phone</label>
+                </div>
+            </div>
+            
+            <label class="checkbox-wrapper">
+                <input type="checkbox">
+                <span>Text me with news and offers</span>
+            </label>
+            
+            <h2>Payment</h2>
+            <p style="color: var(--text-light); font-size: 0.8rem; margin-bottom: 16px;">School project demonstration. Cash-on-delivery orders are paid when delivered; card checkout is simulated and makes no charge.</p>
+            
+            <div class="payment-box">
+                <!-- Option 1 -->
+                <label class="payment-option active" id="label-cc">
+                    <div class="payment-label-wrap">
+                        <input type="radio" name="payment_method" value="Credit Card" checked onclick="togglePayment(this, 'panel-cc')">
+                        <span>Credit card — demo only</span>
+                    </div>
+                    <div class="payment-icons">
+                        <span style="background: #1434CB; color: white; padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: bold;">VISA</span>
+                        <span style="background: #FF5F00; color: white; padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: bold;">MC</span>
+                    </div>
+                </label>
+                <div class="payment-panel active" id="panel-cc">
+                    <p style="padding:20px;">Demo card checkout creates an order for presentation only. No card details are needed and no payment is made.</p>
+                </div>
+
+                <!-- Option 2 (Removed) -->
+                
+                <!-- Option 3 -->
+                <label class="payment-option" id="label-cod">
+                    <div class="payment-label-wrap">
+                        <input type="radio" name="payment_method" value="Cash On Delivery" onclick="togglePayment(this, 'panel-cod')">
+                        <span>Cash On Delivery Nationwide (COD)</span>
+                    </div>
+                </label>
+                <div class="payment-panel" id="panel-cod">
+                    <p style="font-size: 0.8rem; color: var(--text-light); text-align: center; padding: 20px 0;">Pay with cash upon delivery.</p>
+                </div>
+            </div>
+
+            <input type="hidden" name="shipping_address" id="finalAddress">
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
+                <a href="{{ path('app_shop') }}" style="color: var(--brand-color); text-decoration: none; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M12 5l-7 7 7 7"/></svg>
+                    Return to cart
+                </a>
+                <button type="submit" class="btn-pay" id="checkoutSubmit" style="margin-top: 0; width: auto; padding: 18px 40px;">Place order</button>
+            </div>
+            
+            <div class="footer-links">
+                <a href="#">Refund policy</a>
+                <a href="#">Privacy policy</a>
+                <a href="#">Terms of service</a>
+                <a href="#">Contact</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Right Sidebar Content -->
+    <div class="sidebar">
+        {% for item in cart.items %}
+            <div class="cart-item">
+                <div class="item-thumb-wrapper">
+                    <img src="{{ asset(item.image|default('assets/logo/logo.png')) }}" alt="{{ item.name }}">
+                    <span class="item-badge">{{ item.quantity }}</span>
+                </div>
+                <div class="item-info">
+                    <h4>{{ item.name }}</h4>
+                    <p>100ml</p>
+                </div>
+                <div class="item-price">₱{{ item.total|number_format(2, '.', ',') }}</div>
+            </div>
+        {% endfor %}
+        
+        <div class="discount-row">
+            <div class="floating-input">
+                <input type="text" id="discount" placeholder=" ">
+                <label for="discount">Discount code</label>
+            </div>
+            <button class="btn-apply" disabled>Apply</button>
+        </div>
+        
+        {% set shipping = shipping_fee %}
+        {% set grand_total = cart.subtotal + shipping %}
+
+        <div class="totals-row">
+            <span>Subtotal</span>
+            <span class="val">₱{{ cart.subtotal|number_format(2, '.', ',') }}</span>
+        </div>
+        <div class="totals-row">
+            <span>Shipping</span>
+            <span class="val">₱{{ shipping|number_format(2, '.', ',') }}</span>
+        </div>
+        <div class="totals-row grand-total">
+            <span>Total</span>
+            <span class="val"><span class="currency">PHP</span>₱{{ grand_total|number_format(2, '.', ',') }}</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePayment(radio, panelId) {
+        document.querySelectorAll('.payment-box .payment-option').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.payment-panel').forEach(el => el.classList.remove('active'));
+        
+        radio.closest('.payment-option').classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+    }
+
+    function toggleAddressMode(isNew, radio) {
+        document.querySelectorAll('.saved-addresses .payment-option').forEach(el => el.classList.remove('active'));
+        radio.closest('.payment-option').classList.add('active');
+        document.getElementById('newAddressForm').style.display = isNew ? 'block' : 'none';
+    }
+    
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        const choice = document.querySelector('input[name="selected_address_id"]:checked') || document.querySelector('input[type="hidden"][name="selected_address_id"]');
+        const addrType = choice ? choice.value : 'new';
+        
+        if (addrType === 'default') {
+            document.getElementById('finalAddress').value = "{{ app.user.address|default('')|escape('js') }}";
+        } else if (addrType !== 'new') {
+            document.getElementById('finalAddress').value = document.getElementById('address_text_' + addrType).innerText;
+        } else {
+            let addr = document.getElementById('addressLine1').value + ', ';
+            if (document.getElementById('barangay').value) addr += document.getElementById('barangay').value + ', ';
+            addr += document.getElementById('city').value + ', ';
+            addr += document.getElementById('region').value + ', ';
+            addr += document.getElementById('postalCode').value + ', ';
+            addr += document.getElementById('country').value;
+            
+            document.getElementById('finalAddress').value = addr;
+        }
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', function () {
+        const button = document.getElementById('checkoutSubmit');
+        button.disabled = true;
+        button.textContent = 'Placing order…';
+    });
+
+    // Card Input Formatting
+    const ccNum = document.getElementById('cc_number');
+    const ccExp = document.getElementById('cc_exp');
+    const ccSec = document.getElementById('cc_sec');
+
+    if (ccNum) {
+        ccNum.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            if (val.length > 16) val = val.slice(0, 16);
+            let parts = val.match(/.{1,4}/g);
+            e.target.value = parts ? parts.join(' ') : '';
+        });
+    }
+
+    if (ccExp) {
+        ccExp.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 4) val = val.slice(0, 4);
+            if (val.length > 2) {
+                e.target.value = val.slice(0, 2) + ' / ' + val.slice(2);
+            } else {
+                e.target.value = val;
+            }
+        });
+    }
+
+    if (ccSec) {
+        ccSec.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 4) val = val.slice(0, 4);
+            e.target.value = val;
+        });
+    }
+</script>
+
+{% if receiptOrder %}
+<div class="receipt-modal-overlay" style="display:flex" role="dialog" aria-modal="true" aria-label="Order confirmation" id="receiptModalOverlay">
+    <div class="receipt-modal" style="position: relative;">
+        <button aria-label="Close order confirmation" onclick="document.getElementById('receiptModalOverlay').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #888; line-height: 1; padding: 5px; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='transparent'">&times;</button>
+        {% if receiptOrder.paymentMethod == 'Cash On Delivery' %}
+            <div style="text-align: center; padding: 30px 10px;">
+                <div style="background: #fdfaf0; color: #b45309; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <h2 style="color: #333; margin-bottom: 15px; font-weight: 600;">Order Placed Successfully!</h2>
+                <p style="color: #666; font-size: 1.05rem; line-height: 1.6;">Your order has been confirmed and is being prepared.</p>
+                <div style="margin-top: 25px; background: #fafafa; border: 1px solid #eaeaea; padding: 20px; border-radius: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <p style="color: #555; font-size: 0.95rem; line-height: 1.5; margin: 0;"><strong>Note for COD:</strong> The Official Receipt will be provided upon your payment at the delivery date.</p>
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <form action="{{ path('app_checkout_confirm') }}" method="POST">
+                        <input type="hidden" name="_token" value="{{ csrf_token('confirm_order') }}">
+                        <input type="hidden" name="order_id" value="{{ receiptOrder.id }}">
+                        <button type="submit" class="btn-receipt-continue">Confirm &rarr;</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+        <h2 class="receipt-header">HAUTE PARFUMERIE — DEMONSTRATION ORDER RECEIPT</h2>
+        <div class="receipt-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            DEMO ORDER PLACED — NO PAYMENT PROCESSED
+        </div>
+        
+        <div style="border-top: 1px dashed #ddd; margin: 20px 0;"></div>
+
+        <div class="receipt-grid">
+            <div>
+                <div class="receipt-label">ORDER NUMBER</div>
+                <div class="receipt-value">{{ receiptOrder.orderNumber }}</div>
+                <div class="receipt-label" style="margin-top: 15px;">DATE & TIME</div>
+                <div class="receipt-value">{{ receiptOrder.createdAt|date('M j, Y h:i A') }}</div>
+            </div>
+            <div>
+                <div class="receipt-label">TRANSACTION REFERENCE</div>
+                <div class="receipt-value">No payment transaction (demo)</div>
+                <div class="receipt-label" style="margin-top: 15px;">PAYMENT METHOD</div>
+                <div class="receipt-value" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="background: #1434CB; color: white; padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: bold;">CARD</span>
+                    Simulated card checkout
+                </div>
+            </div>
+        </div>
+        
+        <div class="receipt-grid">
+            <div>
+                <div class="receipt-label">BILLED TO (CARDHOLDER)</div>
+                <div class="receipt-value">{{ receiptOrder.user.fullName|upper }}</div>
+                <div class="receipt-value" style="color: var(--text-light); font-weight: normal; font-size: 0.85rem;">{{ receiptOrder.user.email }}<br>{{ receiptOrder.user.phone }}</div>
+            </div>
+            <div>
+                <div class="receipt-label">DELIVERY ADDRESS</div>
+                <div class="receipt-value" style="color: var(--text-light); font-weight: normal; font-size: 0.85rem;">
+                    {{ receiptOrder.shippingAddress }}
+                </div>
+            </div>
+        </div>
+
+        <table class="receipt-table">
+            <thead>
+                <tr>
+                    <th>ITEM DESCRIPTION</th>
+                    <th style="text-align: center;">QTY</th>
+                    <th style="text-align: right;">PRICE</th>
+                    <th style="text-align: right;">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in receiptOrder.orderItems %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">₱{{ item.price|number_format(2, '.', ',') }}</td>
+                    <td style="text-align: right; font-weight: 500;">₱{{ (item.price * item.quantity)|number_format(2, '.', ',') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% set shipping = receiptOrder.shippingFee %}
+        {% set subtotal = receiptOrder.totalAmount - shipping %}
+        
+        <div class="receipt-summary">
+            <div class="receipt-summary-row">
+                <span>Subtotal</span>
+                <span>₱{{ subtotal|number_format(2, '.', ',') }}</span>
+            </div>
+            <div class="receipt-summary-row">
+                <span>Shipping Fee</span>
+                <span>₱{{ shipping|number_format(2, '.', ',') }}</span>
+            </div>
+            <div class="receipt-summary-row total-paid">
+                <span>Order Total</span>
+                <span>₱{{ receiptOrder.totalAmount|number_format(2, '.', ',') }}</span>
+            </div>
+        </div>
+
+        <div style="border-top: 1px dashed #ddd; margin: 30px 0;"></div>
+
+        <div class="receipt-footer-text">
+            Thank you for choosing Maison Ungod. This is a school-project order summary. No card payment was processed.<br><br>
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Demonstration only — no payment transaction
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <form action="{{ path('app_checkout_confirm') }}" method="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token('confirm_order') }}">
+                <input type="hidden" name="order_id" value="{{ receiptOrder.id }}">
+                <button type="submit" class="btn-receipt-continue">Confirm &rarr;</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.receipt-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(2px);
+}
+.receipt-modal {
+    background: #fff; border-radius: 12px; width: 100%; max-width: 650px; padding: 40px; color: #333; max-height: 90vh; overflow-y: auto; font-family: 'Inter', sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.receipt-header {
+    text-align: center; color: #845371; font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase;
+}
+.receipt-badge {
+    background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; display: flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin: 0 auto; justify-content: center; width: max-content;
+}
+.receipt-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 25px; border: 1px solid #eaeaea; border-radius: 8px; margin-bottom: 15px; background: #fafafa;
+}
+.receipt-label {
+    font-size: 0.7rem; font-weight: 700; color: #666; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.receipt-value {
+    font-size: 0.9rem; font-weight: 600; color: #111; line-height: 1.4;
+}
+.receipt-table {
+    width: 100%; border-collapse: collapse; margin-top: 30px; margin-bottom: 30px; font-size: 0.85rem;
+}
+.receipt-table th {
+    text-align: left; padding: 12px 10px; border-bottom: 1px solid #eaeaea; color: #666; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+}
+.receipt-table td {
+    padding: 15px 10px; border-bottom: 1px solid #eaeaea; color: #333;
+}
+.receipt-summary {
+    width: 100%; max-width: 320px; margin-left: auto; margin-bottom: 10px; font-size: 0.85rem;
+}
+.receipt-summary-row {
+    display: flex; justify-content: space-between; margin-bottom: 10px; color: #555;
+}
+.receipt-summary-row.total-paid {
+    border-top: 2px solid #eaeaea; padding-top: 15px; margin-top: 15px; font-size: 1.1rem; font-weight: 700; color: #845371;
+}
+.receipt-footer-text {
+    text-align: center; font-size: 0.75rem; color: #888; line-height: 1.6;
+}
+.btn-receipt-continue {
+    display: inline-block; background: #845371; color: white; text-decoration: none; padding: 14px 35px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; border: none; cursor: pointer;
+}
+.btn-receipt-continue:hover {
+    background: #6d425c;
+}
+</style>
+{% endif %}
+<script src="{{ asset('js/accessibility.js') }}"></script>
+</body>
+</html>
