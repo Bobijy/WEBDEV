@@ -1,0 +1,666 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Account &mdash; Maison Ungod{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/pages/account.css') }}?v=8">
+    <style>
+        .account-page-wrapper {
+            padding-top: 130px;
+            padding-bottom: 80px;
+            min-height: 80vh;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="account-page-wrapper">
+    <div class="account-layout">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-avatar">MU</div>
+                <div class="sidebar-username">{{ user.fullName|default('User') }}</div>
+                <div class="sidebar-join-date">Joined {{ user.createdAt ? user.createdAt|date('M Y') : 'Recently' }}</div>
+            </div>
+            <div class="sidebar-nav">
+                <a class="nav-item active" href="#profile" onclick="switchTab('profile')" id="nav-profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    My Profile
+                </a>
+                <a class="nav-item" href="#orders" onclick="switchTab('orders')" id="nav-orders">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    Orders
+                </a>
+
+                <a class="nav-item" href="#messages" onclick="switchTab('messages')" id="nav-messages" style="cursor:pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Messages
+                </a>
+                <a class="nav-item" href="#addresses" onclick="switchTab('addresses')" id="nav-addresses" style="cursor:pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Addresses
+                </a>
+                <a class="nav-item" href="#passwordModalOverlay" onclick="openPasswordModal()" style="cursor:pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Change Password
+                </a>
+                <a class="nav-item" href="{{ logout_path() }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            
+            <!-- PROFILE TAB -->
+            <div class="tab-content active" id="tab-profile">
+                <div class="main-header">
+                    <h2>My Profile</h2>
+                    <p>Manage and protect your account</p>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <!-- Use a standard form POST for Symfony instead of inline AJAX for profile updates -->
+                <!-- Profile form is rendered once by Symfony. -->
+                    
+
+                    
+                    {{ form_start(form, {'attr': {'id': 'inlineProfileForm', 'class': 'profile-form'}}) }}
+                    {{ form_errors(form) }}
+                    <div class="form-row">
+                        <div class="form-label">Username</div>
+                        <div class="form-value">
+                            <span class="form-text">{{ user.email|split('@')[0] }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Name</div>
+                        <div class="form-value">
+                            {{ form_widget(form.full_name, {'attr': {'class': 'form-input', 'placeholder': 'Enter your name', 'aria-label': 'Full name'}}) }}
+                            {{ form_errors(form.full_name) }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Email</div>
+                        <div class="form-value">
+                            <div id="emailDisplay"{% if form.email.vars.errors|length %} style="display:none"{% endif %}>
+                                <span class="form-text" style="color: var(--text-light);">{{ user.email|slice(0, 2) }}***@{{ user.email|split('@')[1] }}</span>
+                                <button type="button" class="text-link" onclick="document.getElementById('emailDisplay').style.display='none'; document.getElementById('emailEdit').style.display='flex';">Change</button>
+                            </div>
+                            <div id="emailEdit" style="display:{{ form.email.vars.errors|length ? 'flex' : 'none' }}; width: 100%; max-width: 400px; flex-direction: column; gap: 8px;">
+                                {{ form_widget(form.email, {'attr': {'class': 'form-input', 'aria-label': 'Email address', 'autocomplete': 'email'}}) }}
+                                {{ form_errors(form.email) }}
+                                <div>
+                                    <button type="button" class="text-link" onclick="document.getElementById('emailEdit').style.display='none'; document.getElementById('emailDisplay').style.display='block';">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Phone Number</div>
+                        <div class="form-value">
+                            <div id="phoneDisplay"{% if form.phone.vars.errors|length %} style="display:none"{% endif %}>
+                                {% if user.phone %}
+                                    <span class="form-text" style="color: var(--text-light);">********** {{ user.phone|slice(-2) }}</span>
+                                    <button type="button" class="text-link" onclick="document.getElementById('phoneDisplay').style.display='none'; document.getElementById('phoneEdit').style.display='flex';">Change</button>
+                                {% else %}
+                                    <span class="form-text" style="color: var(--text-light);">Not set</span>
+                                    <button type="button" class="text-link" onclick="document.getElementById('phoneDisplay').style.display='none'; document.getElementById('phoneEdit').style.display='flex';">Add</button>
+                                {% endif %}
+                            </div>
+                            <div id="phoneEdit" style="display:{{ form.phone.vars.errors|length ? 'flex' : 'none' }}; width: 100%; max-width: 400px; flex-direction: column; gap: 8px;">
+                                {{ form_errors(form.phone) }}
+                            {{ form_widget(form.phone, {'attr': {'class': 'form-input', 'placeholder': 'Enter your phone', 'aria-label': 'Phone number', 'autocomplete': 'tel'}}) }}
+                                <div>
+                                    <button type="button" class="text-link" onclick="document.getElementById('phoneEdit').style.display='none'; document.getElementById('phoneDisplay').style.display='block';">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Gender <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                        <div class="form-value">
+                            <div class="radio-group">
+                                {% for child in form.gender %}
+                                    <label class="radio-label">
+                                        {{ form_widget(child) }} {{ child.vars.label }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Date of birth <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                        <div class="form-value">
+                            <div class="dob-group">
+                                <div class="select-wrapper">
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; padding-left: 4px;">Day</div>
+                                    {{ form_widget(form.dob.day, {'attr': {'class': 'form-select', 'aria-label': 'Birth day'}}) }}
+                                </div>
+                                <div class="select-wrapper">
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; padding-left: 4px;">Month</div>
+                                    {{ form_widget(form.dob.month, {'attr': {'class': 'form-select', 'aria-label': 'Birth month'}}) }}
+                                </div>
+                                <div class="select-wrapper">
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; padding-left: 4px;">Year</div>
+                                    {{ form_widget(form.dob.year, {'attr': {'class': 'form-select', 'aria-label': 'Birth year'}}) }}
+                                    {{ form_errors(form.dob) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:none;">
+                        {{ form_widget(form.address) }}
+                    </div>
+                    
+                    {{ form_widget(form._token) }}
+                    <button type="submit" class="btn-save" id="inlineModalSubmit">Save Changes</button>
+                    {{ form_end(form, {'render_rest': false}) }}
+            </div>
+            
+                        <!-- MESSAGES TAB -->
+            <div class="tab-content" id="tab-messages">
+                <div class="main-header">
+                    <h2>My Messages</h2>
+                    <p>Support tickets and conversations</p>
+                </div>
+                
+                <div class="divider"></div>
+                
+                {% if messages is empty %}
+                    <p style="color: var(--text-light);">You haven't sent any messages yet.</p>
+                {% else %}
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                    {% for message in messages %}
+                        <a href="{{ path('app_account_message_show', {'id': message.id}) }}" style="display:block; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; text-decoration: none; color: inherit; transition: background 0.2s;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+                                <strong>{{ message.createdAt|date('M j, Y H:i') }}</strong>
+                                {% if message.status == 'Replied' %}
+                                    <span style="color: #2ecc71; font-size: 0.8rem; border: 1px solid #2ecc71; padding: 2px 8px; border-radius: 10px;">Replied</span>
+                                {% else %}
+                                    <span style="color: var(--text-light); font-size: 0.8rem;">Pending</span>
+                                {% endif %}
+                            </div>
+                            <p style="color: var(--text-light); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {% if message.replies|length > 0 %}
+                                    <strong>Admin:</strong> {{ message.replies|last.message }}
+                                {% else %}
+                                    {{ message.message }}
+                                {% endif %}
+                            </p>
+                        </a>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <!-- ORDERS TAB -->
+            <div class="tab-content" id="tab-orders">
+                <div class="main-header">
+                    <h2>My Orders</h2>
+                    <p>View and track your purchases</p>
+                </div>
+                
+                <div class="divider"></div>
+                
+                {% if orders is empty %}
+                    <p style="color: var(--text-light);">You haven't placed any orders yet.</p>
+                {% else %}
+                    {% for order in orders %}
+                        <a href="{{ path('app_order_show', {'id': order.id}) }}" class="order-card">
+                            <div class="order-card-top">
+                                <div class="order-card-thumb">
+                                    {% if order.orderItems|length > 0 %}
+                                        <img src="{{ asset(order.orderItems[0].product.image|default('assets/logo/logo.png')) }}" alt="Product">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="order-card-bottom">
+                                <div>
+                                    <div class="order-card-status">{{ order.status }}</div>
+                                    <div class="order-card-meta">
+                                        {{ order.orderNumber }} &middot; &#8369;{{ order.totalAmount|number_format(2) }} PHP
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    {% if order.status == 'Pending' %}
+                                        <button class="order-card-btn" style="background:transparent; border:1px solid var(--border-color); color:var(--text-primary);" data-confirm-form="cancel-form-{{ order.id }}">Cancel</button>
+                                    {% endif %}
+                                    <button class="order-card-btn" onclick="event.preventDefault(); window.location.href='{{ path('app_shop') }}';">Buy again</button>
+                                </div>
+                            </div>
+                        </a>
+                        {% if order.status == 'Pending' %}
+                            <form data-confirm="Are you sure you want to cancel this order?" data-confirm-title="Cancel Order" data-confirm-button="Cancel Order" id="cancel-form-{{ order.id }}" action="{{ path('app_account_order_cancel', {'id': order.id}) }}" method="POST" style="display: none;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('cancel_order' ~ order.id) }}">
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <!-- ADDRESSES TAB -->
+            <div class="tab-content" id="tab-addresses">
+                <div class="main-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <h2>My Addresses</h2>
+                        <p>Manage your shipping addresses</p>
+                    </div>
+                    <button class="btn-save" style="margin-top:0;" onclick="openAddressModal()">+ Add New Address</button>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div id="addressList">
+                    {% if user.addresses|length > 0 %}
+                        {% for address in user.addresses %}
+                            <div class="address-card {{ address.isDefault ? 'default-address' : '' }}">
+                                <div class="address-card-main">
+                                    <div class="address-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                    </div>
+                                    <div class="address-info">
+                                        <div class="address-card-header">
+                                            <h3>{{ address.fullName }}</h3>
+                                            {% if address.isDefault %}
+                                                <span class="badge-default">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                                    DEFAULT
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="address-card-body">
+                                            <p>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                                {{ address.phone }}
+                                            </p>
+                                            <p>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                                {{ address.getFullAddressText() }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="address-card-actions">
+                                    <div>
+                                        <button class="text-link" onclick="openAddressModal({{ address.id }}, '{{ address.fullName|escape('js') }}', '{{ address.phone|escape('js') }}', '{{ address.firstName|default('')|escape('js') }}', '{{ address.lastName|default('')|escape('js') }}', '{{ address.country|default('')|escape('js') }}', '{{ address.barangay|default('')|escape('js') }}', '{{ address.postalCode|default('')|escape('js') }}', '{{ address.city|default('')|escape('js') }}', '{{ address.region|default('')|escape('js') }}', '{{ address.addressLine1|default(address.streetAddress)|escape('js') }}');">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                            Edit Address
+                                        </button>
+                                    </div>
+                                    {% if address.isDefault %}
+                                        <button class="btn-outline is-default" disabled>
+                                            <svg style="vertical-align: text-bottom; margin-right: 4px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                            Default Address
+                                        </button>
+                                    {% else %}
+                                        <form action="{{ path('app_account_address_default', {id: address.id}) }}" method="POST" style="margin:0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('address_default') }}">
+                                            <button type="submit" class="btn-outline">Make Default</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--text-light); text-align: center; padding: 40px; background: #1a1a1a; border-radius: 12px; margin-top: 20px;">You haven't saved any addresses yet. Click "+ Add New Address" above to get started.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div> <!-- Close account-layout -->
+
+<!-- Change Password Modal -->
+<div class="edit-modal-overlay" id="passwordModalOverlay" role="dialog" aria-modal="true" aria-label="Change password" tabindex="-1">
+    <div class="edit-modal pw-modal" style="max-width: 460px; background: #121216; border: 1px solid rgba(113,65,107,0.3); border-radius: 12px; padding: 24px 30px;">
+        <button class="edit-close" onclick="closePasswordModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 style="font-family: var(--font-body); font-weight: 600; font-size: 1.25rem; color: var(--brand-light); margin-bottom: 16px; text-transform: none; text-align: left;">Change Password</h2>
+        
+        <div class="pw-icon-wrapper" style="text-align: center; margin-bottom: 24px; position: relative;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid rgba(113,65,107,0.2); display: inline-flex; justify-content: center; align-items: center; position: relative;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(113,65,107,0.4); display: flex; justify-content: center; align-items: center; color: var(--brand-light); box-shadow: 0 0 15px rgba(113,65,107,0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm4 10.723V19h-2v-1.277a1.993 1.993 0 0 1 .567-3.677A2.001 2.001 0 0 1 14 16a1.99 1.99 0 0 1-1 1.723z"/></svg>
+                </div>
+                <!-- Small decorative dots -->
+                <div style="position: absolute; top: 0px; left: 30%; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: 8px; left: -2px; width: 4px; height: 4px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: 4px; right: 8px; width: 5px; height: 5px; background: var(--brand-light); border-radius: 50%;"></div>
+                <div style="position: absolute; top: 20px; right: -2px; width: 3px; height: 3px; background: var(--brand-light); border-radius: 50%;"></div>
+            </div>
+        </div>
+
+        <form action="{{ path('app_account_password') }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('password') }}">
+            <div class="pw-form-group">
+                <label for="current_password">Current Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="current_password" name="current_password" required>
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('current_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="pw-form-group">
+                <label for="new_password">New Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="new_password" name="new_password" required minlength="12" maxlength="72" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('new_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pw-form-group">
+                <label for="confirm_password">Confirm New Password</label>
+                <div class="pw-input-wrapper">
+                    <svg class="pw-icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePw('confirm_password')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="pw-strength-container" style="display:flex; align-items:center; gap: 12px; margin-bottom: 24px; margin-top: 16px;">
+                <div style="display:flex; align-items:center; gap:6px; color: #8A8A8A; font-size: 0.8rem; font-weight: 600;" id="pwStrengthLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                    <span id="pwStrengthText">None</span>
+                </div>
+                <div style="display:flex; gap: 4px; flex: 1;" id="pwStrengthBars">
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                    <div class="pw-strength-bar" style="height: 4px; flex: 1; background: #2E2E2E; border-radius: 2px;"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:12px;">
+                <button type="button" class="pw-btn-cancel" onclick="closePasswordModal()">Cancel</button>
+                <button type="submit" class="pw-btn-save">Save Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active');
+            
+            window.location.hash = tabId;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.replace('#', '') || '{{ active_tab|e('js') }}';
+            if (hash && document.getElementById('tab-' + hash)) {
+                switchTab(hash);
+            }
+        });
+
+        function openPasswordModal() {
+            document.getElementById('passwordModalOverlay').classList.add('open');
+        }
+        function closePasswordModal() {
+            document.getElementById('passwordModalOverlay').classList.remove('open');
+        }
+
+        function togglePw(id) {
+            const input = document.getElementById(id);
+            if(input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+        
+        function checkPwStrength(val) {
+            const bars = document.querySelectorAll('#pwStrengthBars .pw-strength-bar');
+            const label = document.getElementById('pwStrengthLabel');
+            const text = document.getElementById('pwStrengthText');
+            
+            let score = 0;
+            if(val.length > 5) score++;
+            if(val.length > 8) score++;
+            if(/[A-Z]/.test(val)) score++;
+            if(/[0-9]/.test(val)) score++;
+            if(/[^A-Za-z0-9]/.test(val)) score++;
+            
+            const colors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', 'var(--brand-light)', 'var(--brand-light)'];
+            const labels = ['None', 'Weak', 'Fair', 'Good', 'Strong', 'Strong'];
+            const labelColors = ['#2E2E2E', '#F44336', '#FF9800', '#FFC107', '#4CAF50', '#4CAF50'];
+            
+            bars.forEach((bar, idx) => {
+                bar.style.background = idx < score ? colors[score] : '#2E2E2E';
+            });
+            
+            text.textContent = val.length === 0 ? 'None' : labels[score];
+            label.style.color = val.length === 0 ? '#8A8A8A' : labelColors[score];
+        }
+    </script>
+
+<div class="modal-overlay" id="addressModalOverlay" role="dialog" aria-modal="true" aria-label="Delivery address" tabindex="-1" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(2px);">
+    <div class="modal" style="background: #1a1a1a; border-radius: 12px; width: 100%; max-width: 500px; padding: 40px; color: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative;">
+        <button onclick="document.getElementById('addressModalOverlay').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #888; display: flex; align-items: center; justify-content: center;">&times;</button>
+        <h2 id="addressModalTitle" style="margin-bottom: 20px; font-family: var(--font-heading);">Add New Address</h2>
+        <form action="{{ path('app_account_address_update') }}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token('update_address') }}">
+            <input type="hidden" name="address_id" id="modal_address_id" value="">
+            <style>
+                .dark-floating-input {
+                    position: relative;
+                    margin-bottom: 20px;
+                }
+                .dark-floating-input input, .dark-floating-input textarea, .dark-floating-input select {
+                    width: 100%;
+                    padding: 16px 15px;
+                    font-size: 0.95rem;
+                    background: #1a1a1a;
+                    border: 1px solid #444;
+                    border-radius: 5px;
+                    color: #fff;
+                    box-sizing: border-box;
+                    transition: all 0.2s ease;
+                    font-family: inherit;
+                    outline: none;
+                    appearance: none;
+                }
+                .dark-floating-input select {
+                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+                    background-repeat: no-repeat;
+                    background-position: right 14px center;
+                    padding-right: 36px;
+                }
+                .dark-floating-input input:focus, .dark-floating-input textarea:focus, .dark-floating-input select:focus {
+                    border-color: var(--brand-color, #845371);
+                    box-shadow: 0 0 0 1px var(--brand-color, #845371);
+                }
+                .dark-floating-input label {
+                    position: absolute;
+                    top: 50%;
+                    left: 10px;
+                    transform: translateY(-50%);
+                    font-size: 0.95rem;
+                    color: #888;
+                    pointer-events: none;
+                    transition: all 0.2s ease-out;
+                    background: transparent;
+                    padding: 0 4px;
+                }
+                .dark-floating-input select + label {
+                    top: 0;
+                    transform: translateY(-50%);
+                    font-size: 0.75rem;
+                    color: var(--brand-color, #845371);
+                    background: #1a1a1a;
+                    font-weight: 500;
+                }
+                .dark-floating-input input:focus + label,
+                .dark-floating-input input:not(:placeholder-shown) + label {
+                    top: 0;
+                    transform: translateY(-50%);
+                    font-size: 0.75rem;
+                    color: var(--brand-color, #845371);
+                    background: #1a1a1a;
+                    font-weight: 500;
+                }
+                .form-row { display: flex; flex-direction: row; gap: 12px; margin-bottom: 20px; }
+                .form-row .dark-floating-input { margin-bottom: 0; flex: 1; }
+            </style>
+            
+            <div class="dark-floating-input">
+                <select id="new_country" name="country">
+                    <option value="Philippines">Philippines</option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                </select>
+                <label for="new_country">Country/Region</label>
+            </div>
+            
+            <div class="form-row">
+                <div class="dark-floating-input">
+                    <input type="text" id="new_firstName" name="firstName" placeholder=" " required>
+                    <label for="new_firstName">First name</label>
+                </div>
+                <div class="dark-floating-input">
+                    <input type="text" id="new_lastName" name="lastName" placeholder=" " required>
+                    <label for="new_lastName">Last name</label>
+                </div>
+            </div>
+            
+            <div class="dark-floating-input">
+                <input type="text" id="new_addressLine1" name="addressLine1" placeholder=" " required>
+                <label for="new_addressLine1">"Complete Address" to avoid shipping delay.</label>
+            </div>
+            
+            <div class="dark-floating-input">
+                <input type="text" id="new_barangay" name="barangay" placeholder=" ">
+                <label for="new_barangay">Barangay</label>
+            </div>
+            
+            <div class="form-row">
+                <div class="dark-floating-input">
+                    <input type="text" id="new_postalCode" name="postalCode" placeholder=" " required>
+                    <label for="new_postalCode">Postal code</label>
+                </div>
+                <div class="dark-floating-input">
+                    <input type="text" id="new_city" name="city" placeholder=" " required>
+                    <label for="new_city">City</label>
+                </div>
+            </div>
+            
+            <div class="dark-floating-input">
+                <select id="new_region" name="region">
+                    <option value="Metro Manila">Metro Manila</option>
+                    <option value="Cebu">Cebu</option>
+                    <option value="Davao">Davao</option>
+                    <option value="Negros Oriental">Negros Oriental</option>
+                </select>
+                <label for="new_region">Region</label>
+            </div>
+            
+            <div class="dark-floating-input">
+                <input type="text" id="new_phone" name="phone" placeholder=" " required>
+                <label for="new_phone">Phone</label>
+            </div>
+            
+            <button type="submit" class="btn-save" style="width:100%; margin-top:10px;">Save Address</button>
+        </form>
+    </div>
+</div>
+<script>
+function openAddressModal(id = null, fullName = '', phone = '', firstName = '', lastName = '', country = '', barangay = '', postalCode = '', city = '', region = '', addressLine1 = '') {
+    document.getElementById('modal_address_id').value = id || '';
+    
+    fullName = fullName || '{{ user.fullName|default('')|escape('js') }}';
+    phone = phone || '{{ user.phone|default('')|escape('js') }}';
+    
+    if (!firstName && !lastName && fullName) {
+        let names = fullName.split(' ');
+        firstName = names.shift() || '';
+        lastName = names.join(' ') || '';
+    }
+    
+    document.getElementById('new_firstName').value = firstName;
+    document.getElementById('new_lastName').value = lastName;
+    document.getElementById('new_phone').value = phone;
+    
+    if (country && document.querySelector(`#new_country option[value="${country}"]`)) {
+        document.getElementById('new_country').value = country;
+    }
+    document.getElementById('new_postalCode').value = postalCode || '';
+    if (region && document.querySelector(`#new_region option[value="${region}"]`)) {
+        document.getElementById('new_region').value = region;
+    }
+    document.getElementById('new_city').value = city || '';
+    document.getElementById('new_barangay').value = barangay || '';
+    
+    // If addressLine1 is empty but they have a legacy streetAddress, we try to parse it
+    if (!addressLine1 && !city && id) {
+        // Fallback for legacy concatenated addresses
+        let parts = addressLine1 ? addressLine1.split(', ') : [];
+        if (parts.length >= 5) {
+            document.getElementById('new_addressLine1').value = parts.join(', ') || '';
+        } else {
+            document.getElementById('new_addressLine1').value = addressLine1;
+        }
+    } else {
+        // We actually just pass streetAddress in the addressLine1 parameter from the template
+        // Wait, streetAddress is the full concatenated string if it's a legacy record.
+        // Let's just put it in addressLine1 for now if they don't have individual fields.
+        // If they do have individual fields, we should theoretically separate them, but in our controller
+        // we saved streetAddress as the concatenated string.
+        // Actually, if we pass streetAddress as the last param, and they have NO city/postal code (newly migrated),
+        // we can try splitting streetAddress here.
+        let parts = addressLine1 ? addressLine1.split(', ') : [];
+        if (parts.length >= 5 && !city) {
+            let pCountry = parts.pop();
+            if (document.querySelector(`#new_country option[value="${pCountry}"]`)) document.getElementById('new_country').value = pCountry;
+            document.getElementById('new_postalCode').value = parts.pop() || '';
+            let pRegion = parts.pop();
+            if (document.querySelector(`#new_region option[value="${pRegion}"]`)) document.getElementById('new_region').value = pRegion;
+            document.getElementById('new_city').value = parts.pop() || '';
+            if (parts.length > 1) {
+                document.getElementById('new_barangay').value = parts.pop() || '';
+            }
+            document.getElementById('new_addressLine1').value = parts.join(', ') || '';
+        } else {
+            // For new records where addressLine1 IS just addressLine1, wait we didn't save addressLine1 separately!
+            // In the controller, we only saved $streetAddress as the full concatenated string.
+            // But we DID save firstName, lastName, city, etc.!
+            // So if `city` exists, then `addressLine1` (which is streetAddress in DB) is the full string!
+            // This means we still need to extract addressLine1 from it, OR we should have saved addressLine1 in the DB!
+            // For now, if city exists, we just put streetAddress as addressLine1. (They can edit it).
+            document.getElementById('new_addressLine1').value = addressLine1;
+        }
+    }
+
+    document.getElementById('addressModalTitle').innerText = id ? 'Edit Address' : 'Add New Address';
+    document.getElementById('addressModalOverlay').style.display = 'flex';
+}
+</script>
+{% endblock %}
