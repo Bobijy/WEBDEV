@@ -1,0 +1,351 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Official Receipt - #{{ order.orderNumber }}{% endblock %}
+
+{% block body %}
+<div class="receipt-wrapper">
+    <div class="receipt-card">
+        <button class="close-btn no-print" onclick="history.back()" title="Close">&times;</button>
+        
+        <div class="receipt-header">
+            <h4>HAUTE PARFUMERIE — ORDER RECEIPT</h4>
+            <div class="status-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>DEMO CHECKOUT — NO PAYMENT PROCESSED</span>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-item">
+                    <label>ORDER NUMBER</label>
+                    <div class="val">{{ order.orderNumber }}</div>
+                </div>
+                <div class="info-item">
+                    <label>TRANSACTION REFERENCE</label>
+                    <div class="val">{{ order.paymentMethod == 'Cash On Delivery' ? 'Cash on delivery' : 'No payment transaction (demo)' }}</div>
+                </div>
+                <div class="info-item">
+                    <label>DATE &amp; TIME</label>
+                    <div class="val">{{ order.createdAt|date('M j, Y h:i A') }}</div>
+                </div>
+                <div class="info-item">
+                    <label>PAYMENT METHOD</label>
+                    <div class="val" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="card-badge">{{ order.paymentMethod|upper|default('CARD') }}</span> 
+                        <span>Simulated card checkout</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <label>BILLED TO (CARDHOLDER)</label>
+                    <div class="val">{{ order.user.fullName|upper }}</div>
+                    <div class="sub-text">{{ order.user.email }}</div>
+                </div>
+                <div class="info-item">
+                    <label>DELIVERY ADDRESS</label>
+                    <div class="sub-text">
+                        {{ order.shippingAddress }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="receipt-table-container">
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">ITEM DESCRIPTION</th>
+                        <th>QTY</th>
+                        <th>PRICE</th>
+                        <th style="text-align: right;">AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.orderItems %}
+                    <tr>
+                        <td style="text-align: left; font-weight: 500;">{{ item.product.name|upper }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>&#8369;{{ item.price|number_format(2) }}</td>
+                        <td style="text-align: right;">&#8369;{{ (item.price * item.quantity)|number_format(2) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="receipt-summary">
+            {% set subtotal = order.totalAmount - order.shippingFee + order.discountAmount %}
+            <div class="summary-line">
+                <span>Subtotal</span>
+                <span>&#8369;{{ subtotal|number_format(2) }}</span>
+            </div>
+            <div class="summary-line">
+                <span>Shipping Fee</span>
+                <span>&#8369;{{ order.shippingFee|number_format(2) }}</span>
+            </div>
+            {% if order.discountAmount > 0 %}
+            <div class="summary-line">
+                <span>Discount</span>
+                <span>-&#8369;{{ order.discountAmount|number_format(2) }}</span>
+            </div>
+            {% endif %}
+            <div class="summary-line total-line">
+                <span>Order Total</span>
+                <span>&#8369;{{ order.totalAmount|number_format(2) }}</span>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>Thank you for choosing Maison Ungod. This school-project document summarizes your order. Card checkout is simulated; cash-on-delivery payment is collected on delivery.</p>
+        </div>
+        
+        <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" class="btn-print">PRINT RECEIPT</button>
+        </div>
+    </div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.receipt-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    font-family: 'Inter', sans-serif;
+    background: rgba(0,0,0,0.7);
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.receipt-card {
+    background: #ffffff;
+    color: #333;
+    max-width: 650px;
+    width: 100%;
+    padding: 45px 50px;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    position: relative;
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.receipt-header h4 {
+    color: #8c425a;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0 0 15px 0;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    gap: 8px;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.info-box {
+    border: 1px solid #f9f9f9;
+    border-radius: 8px;
+    padding: 20px 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: #fafafa;
+}
+
+.info-item label {
+    display: block;
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.info-item .val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+}
+
+.info-item .sub-text {
+    font-size: 12px;
+    color: #777;
+    font-weight: 400;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.card-badge {
+    background: #1e3a8a;
+    color: white;
+    font-size: 9px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.receipt-table th {
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 15px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.receipt-table td {
+    font-size: 13px;
+    color: #222;
+    padding: 15px 0;
+    border-bottom: 1px dashed #f1f1f1;
+    text-align: center;
+}
+
+.receipt-summary {
+    width: 250px;
+    margin-left: auto;
+    margin-bottom: 40px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+.total-line {
+    font-size: 15px;
+    font-weight: 700;
+    color: #8c425a;
+    border-top: 1px solid #f1f1f1;
+    padding-top: 15px;
+    margin-top: 5px;
+}
+
+.receipt-footer {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    line-height: 1.6;
+    padding: 0 30px;
+}
+
+.btn-print {
+    background: #222;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 6px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+}
+
+.btn-print:hover {
+    background: #000;
+}
+
+@media screen {
+    .receipt-wrapper .info-item { min-width: 0; overflow-wrap: anywhere; }
+    .receipt-wrapper .info-item label, .receipt-wrapper .receipt-table th { color: #666; font-size: 12px; }
+    .receipt-wrapper .receipt-footer { color: #666; }
+    .receipt-wrapper .receipt-table-container { overflow-x: auto; }
+    .receipt-wrapper .receipt-table { min-width: 380px; }
+    .receipt-wrapper .close-btn { width: 44px; height: 44px; top: 4px; right: 4px; }
+    .receipt-wrapper .status-badge { overflow-wrap: anywhere; }
+    .receipt-wrapper .status-badge svg { flex-shrink: 0; }
+}
+@media screen and (max-width: 520px) {
+    .receipt-wrapper { padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .receipt-wrapper .receipt-card { padding: 48px 20px 24px; max-height: calc(100dvh - 32px - env(safe-area-inset-bottom, 0px)); }
+    .receipt-wrapper .info-box { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 16px; }
+    .receipt-wrapper .receipt-summary { width: 100%; }
+    .receipt-wrapper .receipt-footer { padding-inline: 0; }
+}
+
+@media print {
+    body * { visibility: hidden; }
+    .receipt-wrapper { 
+        height: auto;
+        overflow: visible;
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        padding: 0; 
+        background: transparent;
+        align-items: flex-start;
+    }
+    .receipt-wrapper * { visibility: visible; }
+    .receipt-card { 
+        box-shadow: none; 
+        padding: 20px; 
+        max-width: 100%; 
+    }
+    .no-print { display: none !important; }
+}
+</style>
+{% endblock %}
