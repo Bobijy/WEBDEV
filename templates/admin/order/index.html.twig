@@ -1,0 +1,549 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Manage Orders{% include 'partials/_pagination.html.twig' %}
+{% endblock %}
+{% block page_title %}Manage Orders{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+    <h3 style="font-family: var(--font-heading); color: var(--accent); margin:0;">Order Management</h3>
+</div>
+
+<div class="admin-table-container">
+    <table class="admin-table" id="ordersTable">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Products</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            {% set displayAddress = order.shippingAddress %}
+            {% if not displayAddress and order.user %}
+                {% for addr in order.user.addresses %}
+                    {% if addr.isDefault %}
+                        {% set displayAddress = addr.getFullAddressText() %}
+                    {% endif %}
+                {% endfor %}
+                {% if not displayAddress and order.user.addresses|length > 0 %}
+                    {% set displayAddress = order.user.addresses|first.getFullAddressText() %}
+                {% endif %}
+            {% endif %}
+            <tr>
+                <td style="color: var(--text-muted);">#{{ order.orderNumber }}</td>
+                <td>
+                    <div style="font-weight: 500;">{{ order.user.fullName|upper }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ order.user.email }}</div>
+                </td>
+                <td style="white-space: normal; min-width: 120px; font-size: 0.8rem; line-height: 1.4; text-align: center;">
+                    <button type="button" class="btn" style="padding: 4px 10px; font-size: 11px; background: transparent; color: var(--text-main); border: 1px solid var(--border);" data-address="{{ displayAddress|e('html_attr') }}" onclick="showAddressModal(this.getAttribute('data-address'))">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        View Address
+                    </button>
+                </td>
+                <td style="white-space: normal; min-width: 120px; font-size: 0.85rem; line-height: 1.4;">
+                    {% for item in order.orderItems %}
+                        {{ item.product.name }} <span style="color: var(--text-muted);">(x{{ item.quantity }})</span><br>
+                    {% endfor %}
+                </td>
+                <td style="color: var(--text-muted);">{{ order.createdAt|date('M j, Y') }}</td>
+                <td>₱{{ order.totalAmount|number_format(2) }}</td>
+                <td style="line-height: 1.4;">
+                    <span style="font-size: 0.85rem; display:block; margin-bottom: 3px;">{{ order.paymentMethod }}</span>
+                    {% if order.paymentMethod|lower == 'cash on delivery' %}
+                        {% if order.status == 'Completed' %}
+                            <button type="button" class="btn-receipt-trigger" onclick="openReceiptModal('admin-receipt-{{ order.id }}')" title="Click to view Official Receipt">
+                                <span class="badge" style="background-color: #28a745; font-size: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    PAID (COD)
+                                </span>
+                            </button>
+                        {% else %}
+                            <span class="badge" style="background-color: #6c757d; font-size: 10px;">UNPAID (COD)</span>
+                        {% endif %}
+                    {% else %}
+                        <button type="button" class="btn-receipt-trigger" onclick="openReceiptModal('admin-receipt-{{ order.id }}')" title="Click to view Official Receipt">
+                            <span class="badge" style="background-color: #28a745; font-size: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                PAID
+                            </span>
+                        </button>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge badge-{{ order.status|lower }}">{{ order.status|upper }}</span>
+                </td>
+                <td>
+                    <a href="{{ path('app_admin_order_edit', {'id': order.id}) }}" class="btn" style="padding: 4px 8px; font-size: 12px;">Edit Status</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" style="text-align:center; padding: 20px;">No orders found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Address Modal #}
+<div id="addressModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(2px);">
+    <div style="background:#1a1a1a; padding:25px; border-radius:8px; max-width:400px; width:90%; color:#fff; box-shadow:0 10px 25px rgba(0,0,0,0.5); border: 1px solid #333;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
+            <h4 style="margin:0; color:#fff; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Shipping Address
+            </h4>
+            <button onclick="document.getElementById('addressModal').style.display='none'" style="background:none; border:none; color:#888; cursor:pointer; font-size: 18px;">&times;</button>
+        </div>
+        <p id="addressContent" style="line-height:1.6; font-size:14px; margin: 0 0 20px 0; word-break: break-word; color: #ccc;"></p>
+        <div style="text-align:right;">
+            <button onclick="document.getElementById('addressModal').style.display='none'" class="btn" style="padding:6px 16px; background: #333; color: #fff;">Close</button>
+        </div>
+    </div>
+</div>
+
+{# Official Receipt Modal Container #}
+<div id="adminReceiptModalOverlay" class="admin-receipt-overlay" style="display: none;" onclick="if(event.target === this) closeReceiptModal();">
+    <div id="adminReceiptTarget" style="width: 100%; display: flex; justify-content: center;"></div>
+</div>
+
+{# Hidden templates for Official Receipts (kept completely outside table) #}
+<div id="adminReceiptsStorage" style="display: none;" aria-hidden="true">
+    {% for order in orders %}
+    {% set displayAddress = order.shippingAddress %}
+    {% if not displayAddress and order.user %}
+        {% for addr in order.user.addresses %}
+            {% if addr.isDefault %}
+                {% set displayAddress = addr.getFullAddressText() %}
+            {% endif %}
+        {% endfor %}
+        {% if not displayAddress and order.user.addresses|length > 0 %}
+            {% set displayAddress = order.user.addresses|first.getFullAddressText() %}
+        {% endif %}
+    {% endif %}
+    <div id="admin-receipt-{{ order.id }}">
+        <div class="receipt-card">
+            <button type="button" class="close-btn admin-receipt-no-print" onclick="closeReceiptModal()" title="Close">&times;</button>
+            
+            <div class="receipt-header">
+                <h4>HAUTE PARFUMERIE — OFFICIAL RECEIPT</h4>
+                <div class="status-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    {% if order.paymentMethod|lower == 'cash on delivery' %}
+                        <span>COD ORDER — PAYMENT RECEIVED</span>
+                    {% else %}
+                        <span>PAID — OFFICIAL RECEIPT</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-item">
+                        <label>ORDER NUMBER</label>
+                        <div class="val">#{{ order.orderNumber }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>TRANSACTION REFERENCE</label>
+                        <div class="val">{{ order.transactionId ?: (order.paymentMethod|lower == 'cash on delivery' ? 'Cash on delivery' : 'TXN-' ~ order.orderNumber) }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>DATE &amp; TIME</label>
+                        <div class="val">{{ order.createdAt|date('M j, Y h:i A') }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>PAYMENT METHOD</label>
+                        <div class="val" style="display: flex; align-items: center; gap: 8px;">
+                            <span class="card-badge">{{ order.paymentMethod|upper|default('CARD') }}</span> 
+                            <span>{{ order.paymentMethod|lower == 'cash on delivery' ? 'Cash on Delivery' : 'Simulated Card Checkout' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-item">
+                        <label>BILLED TO (CUSTOMER)</label>
+                        <div class="val">{{ order.user.fullName|upper }}</div>
+                        <div class="sub-text">{{ order.user.email }}{% if order.user.phone %}<br>{{ order.user.phone }}{% endif %}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>DELIVERY ADDRESS</label>
+                        <div class="sub-text">
+                            {{ displayAddress ?: 'No delivery address recorded' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-table-container">
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">ITEM DESCRIPTION</th>
+                            <th>QTY</th>
+                            <th>PRICE</th>
+                            <th style="text-align: right;">AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set calculatedSubtotal = 0 %}
+                        {% for item in order.orderItems %}
+                        {% set lineTotal = item.price * item.quantity %}
+                        {% set calculatedSubtotal = calculatedSubtotal + lineTotal %}
+                        <tr>
+                            <td style="text-align: left; font-weight: 500;">{{ item.product.name|upper }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₱{{ item.price|number_format(2) }}</td>
+                            <td style="text-align: right;">₱{{ lineTotal|number_format(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="receipt-summary">
+                {% set shipping = order.shippingFee ?: 100 %}
+                {% set discount = order.discountAmount ?: 0 %}
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span>₱{{ (calculatedSubtotal ?: (order.totalAmount - shipping + discount))|number_format(2) }}</span>
+                </div>
+                <div class="summary-line">
+                    <span>Shipping Fee</span>
+                    <span>₱{{ shipping|number_format(2) }}</span>
+                </div>
+                {% if discount > 0 %}
+                <div class="summary-line">
+                    <span>Discount</span>
+                    <span>-₱{{ discount|number_format(2) }}</span>
+                </div>
+                {% endif %}
+                <div class="summary-line total-line">
+                    <span>Total Paid</span>
+                    <span>₱{{ order.totalAmount|number_format(2) }}</span>
+                </div>
+            </div>
+
+            <div class="receipt-footer">
+                <p>Thank you for choosing Maison Ungod. This official order receipt summarizes the transaction details and products ordered.</p>
+            </div>
+            
+            <div class="admin-receipt-no-print" style="display: flex; justify-content: center; gap: 12px; margin-top: 30px;">
+                <button type="button" onclick="window.print()" class="btn-print" style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    PRINT RECEIPT
+                </button>
+                <button type="button" onclick="closeReceiptModal()" class="btn-close-receipt">CLOSE</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.btn-receipt-trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+.btn-receipt-trigger:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+}
+.btn-receipt-trigger:active {
+    transform: translateY(0);
+}
+
+.admin-receipt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#adminReceiptModalOverlay .receipt-card {
+    background: #ffffff !important;
+    color: #333333 !important;
+    max-width: 650px !important;
+    width: 100% !important;
+    padding: 40px 45px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    position: relative !important;
+    max-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    text-align: left !important;
+    margin: auto !important;
+}
+
+#adminReceiptModalOverlay .close-btn {
+    position: absolute !important;
+    top: 18px !important;
+    right: 20px !important;
+    background: none !important;
+    border: none !important;
+    font-size: 26px !important;
+    color: #999999 !important;
+    cursor: pointer !important;
+    transition: color 0.2s !important;
+    line-height: 1 !important;
+}
+#adminReceiptModalOverlay .close-btn:hover {
+    color: #111111 !important;
+}
+
+#adminReceiptModalOverlay .receipt-header {
+    text-align: center !important;
+    margin-bottom: 25px !important;
+}
+#adminReceiptModalOverlay .receipt-header h4 {
+    color: #8c425a !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    margin: 0 0 12px 0 !important;
+}
+
+#adminReceiptModalOverlay .status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border: 1px solid #bbf7d0 !important;
+    padding: 6px 18px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    gap: 8px !important;
+}
+
+#adminReceiptModalOverlay .info-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    margin-bottom: 25px !important;
+}
+
+#adminReceiptModalOverlay .info-box {
+    border: 1px solid #f0f0f0 !important;
+    border-radius: 8px !important;
+    padding: 18px 22px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px !important;
+    background: #fafafa !important;
+}
+
+#adminReceiptModalOverlay .info-item label {
+    display: block !important;
+    font-size: 10px !important;
+    color: #888888 !important;
+    font-weight: 600 !important;
+    margin-bottom: 5px !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
+#adminReceiptModalOverlay .info-item .val {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+}
+
+#adminReceiptModalOverlay .info-item .sub-text {
+    font-size: 12px !important;
+    color: #666666 !important;
+    font-weight: 400 !important;
+    margin-top: 4px !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+}
+
+#adminReceiptModalOverlay .card-badge {
+    background: #1e3a8a !important;
+    color: white !important;
+    font-size: 9px !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    font-weight: bold !important;
+    letter-spacing: 0.5px !important;
+}
+
+#adminReceiptModalOverlay .receipt-table-container {
+    overflow-x: auto !important;
+    margin-bottom: 25px !important;
+}
+
+#adminReceiptModalOverlay .receipt-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    background: transparent !important;
+    margin: 0 !important;
+}
+
+#adminReceiptModalOverlay .receipt-table th {
+    font-size: 10px !important;
+    color: #888888 !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid #f1f1f1 !important;
+    padding: 10px 8px !important;
+    text-align: center !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    background: transparent !important;
+}
+
+#adminReceiptModalOverlay .receipt-table td {
+    font-size: 13px !important;
+    color: #222222 !important;
+    padding: 12px 8px !important;
+    border-bottom: 1px dashed #f1f1f1 !important;
+    text-align: center !important;
+    background: transparent !important;
+}
+
+#adminReceiptModalOverlay .receipt-summary {
+    width: 260px !important;
+    margin-left: auto !important;
+    margin-bottom: 30px !important;
+}
+
+#adminReceiptModalOverlay .summary-line {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 12px !important;
+    color: #555555 !important;
+    margin-bottom: 10px !important;
+}
+
+#adminReceiptModalOverlay .total-line {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #8c425a !important;
+    border-top: 1px solid #f1f1f1 !important;
+    padding-top: 12px !important;
+    margin-top: 6px !important;
+}
+
+#adminReceiptModalOverlay .receipt-footer {
+    text-align: center !important;
+    font-size: 11px !important;
+    color: #888888 !important;
+    line-height: 1.6 !important;
+    padding: 0 20px !important;
+}
+
+#adminReceiptModalOverlay .btn-print {
+    background: #111111 !important;
+    color: #ffffff !important;
+    padding: 10px 22px !important;
+    border-radius: 6px !important;
+    border: none !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    letter-spacing: 0.8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    transition: background 0.2s !important;
+}
+#adminReceiptModalOverlay .btn-print:hover {
+    background: #333333 !important;
+}
+
+#adminReceiptModalOverlay .btn-close-receipt {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+    padding: 10px 22px !important;
+    border-radius: 6px !important;
+    border: 1px solid #e5e7eb !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    letter-spacing: 0.8px !important;
+    transition: background 0.2s !important;
+}
+#adminReceiptModalOverlay .btn-close-receipt:hover {
+    background: #e5e7eb !important;
+}
+
+@media print {
+    body * { visibility: hidden !important; }
+    #adminReceiptModalOverlay, #adminReceiptModalOverlay * { visibility: visible !important; }
+    #adminReceiptModalOverlay {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: transparent !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+    .admin-receipt-no-print { display: none !important; }
+    #adminReceiptModalOverlay .receipt-card {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        padding: 20px !important;
+    }
+}
+</style>
+
+<script>
+function showAddressModal(address) {
+    document.getElementById('addressContent').innerText = address || 'No shipping address provided.';
+    document.getElementById('addressModal').style.display = 'flex';
+}
+
+function openReceiptModal(contentId) {
+    var content = document.getElementById(contentId);
+    if (!content) return;
+    document.getElementById('adminReceiptTarget').innerHTML = content.innerHTML;
+    document.getElementById('adminReceiptModalOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReceiptModal() {
+    var overlay = document.getElementById('adminReceiptModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeReceiptModal();
+        var addrModal = document.getElementById('addressModal');
+        if (addrModal) addrModal.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Edit Order Status{% endblock %}
+{% block page_title_hidden %}Update Order Status{% endblock %}
+
+{% block content %}
+
+<style>
+    .admin-main {
+        display: flex;
+        flex-direction: column;
+    }
+    .admin-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+    .modern-modal {
+        background: rgba(23, 23, 23, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.02);
+        width: 100%;
+        max-width: 850px;
+        position: relative;
+        overflow: hidden;
+        animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modern-modal__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .modern-modal__title {
+        margin: 0;
+        font-family: var(--font-heading);
+        color: var(--accent);
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+    }
+    .modern-modal__close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 8px;
+        margin: -8px;
+        border-radius: 50%;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modern-modal__close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+    .modern-modal__body {
+        padding: 30px;
+    }
+</style>
+
+<div class="modern-modal">
+    <div class="modern-modal__header">
+        <h3 class="modern-modal__title">{{ block('title') }}</h3>
+        <a href="{{ path('app_admin_order_index') }}" class="modern-modal__close" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </a>
+    </div>
+    <div class="modern-modal__body">
+<div style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+        <h4 style="color: var(--accent); margin-bottom: 10px;">Order Details (#{{ order.orderNumber }})</h4>
+        <div style="color: var(--text-main); font-size: 0.9rem;">
+            <strong>Customer:</strong> {{ order.user.fullName }}<br>
+            <strong>Total Amount:</strong> ₱{{ order.totalAmount|number_format(2) }}<br>
+            <strong>Date:</strong> {{ order.createdAt|date('M j, Y H:i') }}
+        </div>
+    </div>
+
+<form method="POST" action="{{ path('app_admin_order_status', {'id': order.id}) }}" id="orderForm">
+        <input type="hidden" name="_token" value="{{ csrf_token('update_status' ~ order.id) }}">
+        
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label for="status" style="display: block; margin-bottom: 8px; font-weight: 500;">Update Status</label>
+            <select name="status" id="status" class="form-control">
+                {% if order.status == 'Pending' %}
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Approved">Approved</option>
+                {% endif %}
+
+                {% if order.status == 'Approved' %}
+                    <option value="Approved" selected>Approved</option>
+                    <option value="Processing">Processing</option>
+                {% endif %}
+
+                {% if order.status == 'Processing' %}
+                    <option value="Processing" selected>Processing</option>
+                    <option value="Shipped">Shipped</option>
+                {% endif %}
+
+                {% if order.status == 'Shipped' %}
+                    <option value="Shipped" selected>Shipped</option>
+                    <option value="Completed">Completed</option>
+                {% endif %}
+
+                {% if order.status == 'Completed' %}
+                    <option value="Completed" selected>Completed</option>
+                {% endif %}
+
+                {% if order.status in ['Pending', 'Approved', 'Processing'] %}
+                    <option value="Cancelled">Cancelled</option>
+                {% endif %}
+
+                {% if order.status == 'Cancelled' %}
+                    <option value="Cancelled" selected>Cancelled</option>
+                {% endif %}
+            </select>
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <button type="submit" class="btn" style="flex:1; padding: 12px;">Update Status</button>
+            <a href="{{ path('app_admin_order_index') }}" class="btn btn-outline" style="flex:1; padding: 12px; text-align: center;">Cancel</a>
+        </div>
+    </form>
+    </div>
+</div>
+
+{% endblock %}
