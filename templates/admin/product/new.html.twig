@@ -1,0 +1,42 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Create Product{% endblock %}
+{% block page_title_hidden %}{{ block('title') }}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('admin/css/product-form.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="product-editor" aria-labelledby="product-editor-title">
+    <div class="product-editor__header">
+        <h1 id="product-editor-title">{{ block('title') }}</h1>
+        <a href="{{ path('app_admin_product_index') }}" class="product-editor__close" aria-label="Close">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="m18 6-12 12M6 6l12 12" />
+            </svg>
+        </a>
+    </div>
+    {{ form_start(form, {'attr': {'id': 'editProductForm', 'class': 'product-editor__form'}}) }}
+        {{ form_errors(form) }}
+        <div class="product-editor__fields">
+            {% for field in form %}
+                {% if field.vars.name != '_token' %}
+                    <div class="form-group product-editor__field {{ field.vars.name in ['name', 'description', 'brand', 'imageFile'] ? 'product-editor__field--wide' : '' }}">
+                        {{ form_label(field) }}
+                        {% block current_image %}{% endblock %}
+                        <div class="{{ field.vars.name == 'price' ? 'product-editor__money' : 'product-editor__control' }}">
+                            {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="product-editor__errors">{{ form_errors(field) }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {{ form_widget(form._token) }}
+        <div class="product-editor__actions">
+            <button type="submit" class="btn">{% block submit_label %}Save Product{% endblock %}</button>
+            <a href="{{ path('app_admin_product_index') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    {{ form_end(form, {'render_rest': false}) }}
+</section>
+{% endblock %}

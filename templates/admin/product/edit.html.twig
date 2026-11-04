@@ -1,0 +1,9 @@
+{% extends 'admin/product/new.html.twig' %}
+
+{% block title %}Edit Product{% endblock %}
+{% block submit_label %}Update Product{% endblock %}
+{% block current_image %}
+    {% if field.vars.name == 'imageFile' and product.image %}
+        <img class="product-editor__image" src="{{ asset(product.image) }}" alt="Current Image">
+    {% endif %}
+{% endblock %}
