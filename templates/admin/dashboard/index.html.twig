@@ -1,0 +1,171 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Dashboard Overview{% endblock %}
+
+{% block page_title %}
+    Welcome back, {{ app.user ? app.user.fullName|split(' ')|first|lower : 'admin' }}! 👋
+{% endblock %}
+
+{% block content %}
+    <div class="stats-grid" id="dashboardStats">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #71416b; background: rgba(113, 65, 107, 0.2);">
+                <i class="ph ph-lock-key"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Products</h4>
+                <p id="statProducts">{{ totalProducts }}</p>
+                <span>All Products</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #9b59b6; background: rgba(155, 89, 182, 0.1);">
+                <i class="ph ph-cube"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Stock</h4>
+                <p id="statStock">{{ totalStock }}</p>
+                <span>In Inventory</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #95a5a6; background: rgba(149, 165, 166, 0.1);">
+                <i class="ph ph-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Pending Orders</h4>
+                <p id="statPending">{{ statusCounts['Pending']|default('0') }}</p>
+                <span>Awaiting Action</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #2ecc71; background: rgba(46, 204, 113, 0.1);">
+                <i class="ph ph-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Approved Orders</h4>
+                <p id="statApproved">{{ statusCounts['Approved']|default('0') }}</p>
+                <span></span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #3498db; background: rgba(52, 152, 219, 0.1);">
+                <i class="ph ph-flask"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Processing Orders</h4>
+                <p id="statProcessing">{{ statusCounts['Processing']|default('0') }}</p>
+                <span></span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #9b59b6; background: rgba(155, 89, 182, 0.1);">
+                <i class="ph ph-copy"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Shipped Orders</h4>
+                <p id="statShipped">{{ statusCounts['Shipped']|default('0') }}</p>
+                <span></span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #3498db; background: rgba(52, 152, 219, 0.1);">
+                <i class="ph ph-clipboard-text"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Completed Orders</h4>
+                <p id="statCompleted">{{ statusCounts['Completed']|default('0') }}</p>
+                <span></span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #9b59b6; background: rgba(155, 89, 182, 0.1);">
+                <i class="ph ph-users"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Customers</h4>
+                <p id="statCustomers">{{ totalCustomers }}</p>
+                <span>Registered Users</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-columns">
+        <div class="dashboard-panel left-column">
+            <div class="panel-header">
+                <h3>Recent Orders</h3>
+                <a href="{{ path('app_admin_order_index') }}" class="view-all">View All Orders <i class="ph ph-arrow-right"></i></a>
+            </div>
+            <div class="admin-table-container">
+                <table class="admin-table" id="recentOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Address</th>
+                            <th>Products</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recentOrders %}
+                        <tr>
+                            <td style="color: var(--text-muted);">#{{ order.orderNumber }}</td>
+                            <td>
+                                <div style="font-weight: 500;">{{ order.user.fullName|upper }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ order.user.email }}</div>
+                            </td>
+                            <td style="font-size: 0.75rem; color: var(--text-main); line-height: 1.4; max-width: 150px;">
+                                {{ order.shippingAddress|length > 60 ? order.shippingAddress|slice(0, 60) ~ '...' : order.shippingAddress|nl2br }}
+                            </td>
+                            <td style="font-size: 0.75rem;">
+                                {% for item in order.orderItems %}
+                                    {{ item.product.name }} <br><span style="color: var(--text-muted);">(x{{ item.quantity }})</span><br>
+                                {% endfor %}
+                            </td>
+                            <td style="color: var(--text-muted);">{{ order.createdAt|date('M j, Y') }}</td>
+                            <td><span class="badge badge-{{ order.status|lower }}" style="font-weight: 600; padding: 5px 10px;">{{ order.status|upper }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 20px;">No recent orders found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="dashboard-panel right-column">
+            <div class="panel-header">
+                <h3>Best Selling Products</h3>
+                <a href="{{ path('app_admin_product_index') }}" class="view-all">View All <i class="ph ph-arrow-right"></i></a>
+            </div>
+            <div class="best-selling-list">
+                {% for item in bestSellingProducts %}
+                {% set p = item.product %}
+                {% set sales = item.totalSales %}
+                <div class="best-selling-item">
+                    <img src="{{ asset(p.image|default('assets/logo/logo.png')) }}" alt="{{ p.name }}" class="bs-image">
+                    <div class="bs-content">
+                        <div class="bs-row">
+                            <div class="bs-info">
+                                <span class="bs-name">{{ p.name }}</span>
+                                <span class="bs-sold">{{ sales }} Sold</span>
+                            </div>
+                            <div class="bs-price">&#8369;{{ p.price|number_format(2, '.', ',') }}</div>
+                        </div>
+                        <div class="bs-progress-bar"><div class="bs-progress" style="width: {{ loop.first ? '100' : (sales > 0 ? min(sales * 10, 90) : 5) }}%;"></div></div>
+                    </div>
+                </div>
+                {% else %}
+                <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                    No products sold yet.
+                </div>
+                {% endfor %}
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
