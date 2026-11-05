@@ -1,0 +1,58 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Message Thread{% endblock %}
+{% block page_title %}Message Thread{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h3 style="font-family: var(--font-heading); color: var(--accent);">Conversation with {{ message.name }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">{{ message.email }}</p>
+    </div>
+    <a href="{{ path('app_admin_contact_index') }}" class="btn btn-outline">Back to Inbox</a>
+</div>
+
+<div class="admin-table-container" style="padding: 30px; background: rgba(255, 255, 255, 0.02); display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto;">
+    
+    <!-- Initial Message -->
+    <div style="align-self: flex-start; max-width: 80%;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">{{ message.name }} - {{ message.createdAt|date('M j, Y H:i') }}</div>
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 15px 20px; border-radius: 12px; border-top-left-radius: 2px; color: var(--text-main); line-height: 1.5;">
+            {{ message.message|nl2br }}
+        </div>
+    </div>
+
+    <!-- Replies -->
+    {% for reply in message.replies %}
+        {% if reply.isFromAdmin() %}
+            <div style="align-self: flex-end; max-width: 80%;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; text-align: right;">You - {{ reply.createdAt|date('M j, Y H:i') }}</div>
+                <div style="background: var(--brand-color); padding: 15px 20px; border-radius: 12px; border-top-right-radius: 2px; color: white; line-height: 1.5;">
+                    {{ reply.message|nl2br }}
+                </div>
+            </div>
+        {% else %}
+            <div style="align-self: flex-start; max-width: 80%;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">{{ message.name }} - {{ reply.createdAt|date('M j, Y H:i') }}</div>
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 15px 20px; border-radius: 12px; border-top-left-radius: 2px; color: var(--text-main); line-height: 1.5;">
+                    {{ reply.message|nl2br }}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Reply Form -->
+    <div style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;">
+        <form method="post" action="{{ path('app_admin_contact_reply', {'id': message.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('reply') }}">
+            <div style="margin-bottom: 15px;">
+                <textarea aria-label="Reply message" maxlength="5000" name="reply_message" rows="4" class="form-control" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 15px; border-radius: 8px; font-family: inherit; resize: vertical;" placeholder="Type your reply here..." required></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" class="btn" style="padding: 10px 20px; background: var(--brand-color);">Send Reply</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

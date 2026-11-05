@@ -1,0 +1,65 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Manage Users{% include 'partials/_pagination.html.twig' %}
+{% endblock %}
+{% block page_title %}Manage Users{% endblock %}
+
+{% block content %}
+<form method="get" class="qa-catalog-filters admin-search-form" role="search">
+    <label class="admin-search-field">
+        <span class="sr-only">Search</span>
+        <input type="search" name="q" value="{{ app.request.query.get('q') }}" maxlength="100" placeholder="Search users..." aria-label="Search users">
+    </label>
+    <button type="submit" class="admin-search-btn">Search</button>
+    {% if app.request.query.get('q') %}
+        <a href="{{ path('app_admin_user_index') }}" class="admin-search-clear">Clear</a>
+    {% endif %}
+</form>
+<div style="margin-bottom: 20px;">
+    <h3 style="font-family: var(--font-heading); color: var(--accent);">Registered Users</h3>
+</div>
+
+<div class="admin-table-container">
+    <table class="admin-table" id="usersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Joined Date</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.fullName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.createdAt|default('now')|date('M j, Y') }}</td>
+                    <td>
+                        <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: {% if 'ROLE_ADMIN' in user.roles %}rgba(124, 58, 237, 0.2){% else %}rgba(255, 255, 255, 0.1){% endif %}; color: {% if 'ROLE_ADMIN' in user.roles %}#a78bfa{% else %}#aaa{% endif %};">
+                            {% if 'ROLE_ADMIN' in user.roles %}Admin{% else %}Customer{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if app.user != user %}
+                            <form method="post" action="{{ path('app_admin_user_delete', {'id': user.id}) }}" data-confirm="Are you sure you want to delete this user?" data-confirm-title="Delete User" data-confirm-button="Delete" style="margin: 0; display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button type="submit" class="btn" style="padding: 4px 8px; font-size: 12px; background-color: #e74c3c; color: white;">Delete</button>
+                            </form>
+                        {% else %}
+                            <span style="font-size: 12px; color: var(--text-muted);">(You)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">No users found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

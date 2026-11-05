@@ -1,0 +1,87 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Contact Messages{% include 'partials/_pagination.html.twig' %}
+{% endblock %}
+{% block page_title %}Contact Messages{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <div>
+        <h3 style="font-family: var(--font-heading); color: var(--accent);">Messages inbox</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">You have {{ unreadCount }} unread messages.</p>
+    </div>
+    <form method="get" action="{{ path('app_admin_contact_index') }}" class="admin-search-form" role="search" style="margin: 0;">
+        <label class="admin-search-field">
+            <span class="sr-only">Search name or email</span>
+            <input type="text" name="q" value="{{ search }}" placeholder="Search name or email..." class="admin-search-input" aria-label="Search name or email" style="width: 220px;">
+        </label>
+        <button type="submit" class="admin-search-btn">Search</button>
+        {% if search %}
+            <a href="{{ path('app_admin_contact_index') }}" class="admin-search-clear">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="admin-table-container">
+    <table class="admin-table" id="messagesTable">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Sender</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+                <tr style="{% if message.status == 'Unread' %}background: rgba(255, 255, 255, 0.03); font-weight: bold;{% endif %}">
+                    <td>
+                        {% if message.status == 'Unread' %}
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #e74c3c; margin-right: 5px;"></span> Unread
+                        {% else %}
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; margin-right: 5px;"></span> Read
+                        {% endif %}
+                    </td>
+                    <td>{{ message.createdAt|date('M j, Y H:i') }}</td>
+                    <td>{{ message.name }}</td>
+                    <td><a href="mailto:{{ message.email }}" style="color: var(--accent);">{{ message.email }}</a></td>
+                    <td style="max-width: 300px;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="{{ message.message }}" onclick="window.location.href='{{ path('app_admin_contact_show', {'id': message.id}) }}'">
+                            {{ message.message }}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <form method="post" action="{{ path('app_admin_contact_read', {'id': message.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('read' ~ message.id) }}">
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;" title="Mark as {{ message.status == 'Unread' ? 'Read' : 'Unread' }}">
+                                    {% if message.status == 'Unread' %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"></path></svg>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            
+                            <form method="post" action="{{ path('app_admin_contact_delete', {'id': message.id}) }}" data-confirm="Are you sure you want to delete this message?" data-confirm-title="Delete Message" data-confirm-button="Delete">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ message.id) }}">
+                                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem; color: #e74c3c; border-color: rgba(231, 76, 60, 0.3);" title="Delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        No contact messages found.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
