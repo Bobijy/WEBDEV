@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Entity\Address;
 use App\Entity\Cart;
 use App\Entity\CartItem;
+use App\Entity\Category;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Product;
@@ -30,21 +31,31 @@ $metadata = $em->getMetadataFactory()->getAllMetadata();
 $tool->dropSchema($metadata);
 $tool->createSchema($metadata);
 $users = [];
-foreach (['customer', 'admin'] as $role) {
-    $user = (new User())->setFullName(ucfirst($role) . ' Demo')->setEmail($role . '@example.test')
+foreach (['customer' => 'customer', 'admin' => 'admin', 'staff' => 'staff', 'staff2' => 'staff'] as $name => $role) {
+    $user = (new User())->setFullName(ucfirst($name) . ' Demo')->setEmail($name . '@example.test')
         ->setPassword(password_hash('Demo-project-password1!', PASSWORD_BCRYPT))->setRole($role);
     $em->persist($user);
-    $users[] = $user;
+    $users[$name] = $user;
+}
+$categories = [];
+foreach (['Floral', 'Woody'] as $name) {
+    $category = (new Category())->setName($name);
+    $em->persist($category);
+    $categories[$name] = $category;
 }
 $products = [];
 foreach (range(1, 30) as $number) {
     $product = (new Product())->setName(['Velvet Rose', 'Amber Silk', 'Midnight Oud'][($number - 1) % 3] . ' ' . $number)
         ->setDescription('An elegant fragrance from Maison Ungod.')->setPrice(number_format(145.35 + $number, 2, '.', ''))
-        ->setStock(20)->setCategory($number % 2 ? 'Floral' : 'Woody')->setImage('assets/images/' . ($number % 2 ? 'pour-homme.png' : 'pour-femme.png'));
+        ->setStock(20)->setCategory($categories[$number % 2 ? 'Floral' : 'Woody'])->setImage('assets/images/' . ($number % 2 ? 'pour-homme.png' : 'pour-femme.png'))
+        ->setCreatedBy($users[['admin', 'staff', 'staff2'][($number - 1) % 3]]);
     $em->persist($product);
     $products[] = $product;
 }
 foreach ($users as $user) {
+    if ($user->getRole() === 'staff') {
+        continue;
+    }
     $address = (new Address())->setUser($user)->setFullName($user->getFullName())->setFirstName('Demo')->setLastName('Customer')
         ->setPhone('09123456789')->setStreetAddress('10 Test Street, Manila, Philippines')->setAddressLine1('10 Test Street')
         ->setCity('Manila')->setRegion('Metro Manila')->setCountry('Philippines')->setPostalCode('1000')->setDefault(true);

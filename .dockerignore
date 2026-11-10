@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+vendor/
+assets/vendor/
+var/
+.phpunit.cache/
+public/uploads/
+public/bundles/
+deliverables/
+docs/
+tests/

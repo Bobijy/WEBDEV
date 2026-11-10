@@ -118,21 +118,33 @@ img { max-width: 100%; }
 .admin-sidebar { flex: 0 0 250px; }
 .stats-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
 .admin-table-container { overflow-x: auto; max-width: 100%; }
+.management-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.product-catalog-toolbar { gap: 16px 24px; margin-block: 8px 24px; }
+.admin-main .product-catalog-add { flex-shrink: 0; min-height: 46px; padding: 12px 20px; gap: 10px; white-space: nowrap; }
+.product-catalog-add svg { flex-shrink: 0; }
+.management-note, .product-editor .form-text { color: #bbb; line-height: 1.6; margin-bottom: 20px; }
+.product-editor .form-text { margin-top: 8px; margin-bottom: 0; }
+.admin-search-form select { background: #171717; color: #f5f5f5; border: 1px solid #555; border-radius: 6px; padding: 8px; font: inherit; max-width: 100%; }
+.admin-table a.btn, .admin-table button.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; }
 .admin-table { min-width: 640px; }
 .admin-content > form { flex-wrap: wrap; max-width: 100%; }
 .admin-content > form input { max-width: 100%; }
 @media (max-width: 768px) {
     body:has(.admin-main) { flex-direction: column; }
-    .admin-sidebar { flex: auto; width: 100%; }
+    .admin-sidebar { flex: auto; width: 100%; padding-block: 12px; }
+    .admin-sidebar .sidebar-brand { padding: 0 18px 12px; }
+    .admin-sidebar .sidebar-menu-title { display: none; }
     .admin-sidebar .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
     .admin-sidebar .sidebar-nav a { padding: 10px 16px; }
-    .admin-sidebar .sidebar-bottom { margin-top: 16px; }
+    .admin-sidebar .sidebar-bottom { margin-top: 8px; }
+    .admin-sidebar .admin-profile { padding: 8px 12px; }
     .admin-header, .admin-content { padding: 18px; }
     .admin-header h2 { font-size: 1.2rem; }
     .account-layout .form-row { flex-direction: column; gap: 8px; }
     .account-layout .form-label { width: auto; }
 }
 @media (max-width: 480px) {
+    .product-catalog-toolbar { align-items: flex-start; flex-direction: column; }
     .order-layout { grid-template-columns: minmax(0, 1fr); }
     .order-box { padding: 20px; }
     .order-item { flex-wrap: wrap; }

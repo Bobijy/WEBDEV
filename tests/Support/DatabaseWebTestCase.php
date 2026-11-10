@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support;
 
 use App\Entity\Product;
+use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
@@ -46,7 +47,11 @@ abstract class DatabaseWebTestCase extends WebTestCase
             $em->persist($user);
             $users[$name] = $user;
         }
-        $product = (new Product())->setName('Velvet Rose')->setPrice('145.35')->setStock(10)->setCategory('Floral')
+        $floral = (new Category())->setName('Floral');
+        $amber = (new Category())->setName('Amber');
+        $em->persist($floral);
+        $em->persist($amber);
+        $product = (new Product())->setName('Velvet Rose')->setPrice('145.35')->setStock(10)->setCategory($floral)
             ->setImage('assets/images/pour-homme.png');
         $em->persist($product);
         $em->flush();

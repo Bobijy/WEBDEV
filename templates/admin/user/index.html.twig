@@ -1,7 +1,6 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Manage Users{% include 'partials/_pagination.html.twig' %}
-{% endblock %}
+{% block title %}Manage Users{% endblock %}
 {% block page_title %}Manage Users{% endblock %}
 
 {% block content %}
@@ -10,13 +9,29 @@
         <span class="sr-only">Search</span>
         <input type="search" name="q" value="{{ app.request.query.get('q') }}" maxlength="100" placeholder="Search users..." aria-label="Search users">
     </label>
+    <label><span class="sr-only">Role</span>
+        <select name="role" aria-label="Filter by role">
+            <option value="">All roles</option>
+            {% for role in ['admin', 'staff', 'customer'] %}
+            <option value="{{ role }}" {{ app.request.query.get('role') == role ? 'selected' : '' }}>{{ role|capitalize }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label><span class="sr-only">Account status</span>
+        <select name="status" aria-label="Filter by account status">
+            <option value="">All statuses</option>
+            <option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Active</option>
+            <option value="disabled" {{ app.request.query.get('status') == 'disabled' ? 'selected' : '' }}>Disabled</option>
+        </select>
+    </label>
     <button type="submit" class="admin-search-btn">Search</button>
-    {% if app.request.query.get('q') %}
+    {% if app.request.query.get('q') or app.request.query.get('role') or app.request.query.get('status') %}
         <a href="{{ path('app_admin_user_index') }}" class="admin-search-clear">Clear</a>
     {% endif %}
 </form>
-<div style="margin-bottom: 20px;">
+<div class="management-toolbar">
     <h3 style="font-family: var(--font-heading); color: var(--accent);">Registered Users</h3>
+    <a href="{{ path('app_admin_user_new') }}" class="btn">Create account</a>
 </div>
 
 <div class="admin-table-container">
@@ -28,6 +43,7 @@
                 <th>Email</th>
                 <th>Joined Date</th>
                 <th>Role</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -40,10 +56,12 @@
                     <td>{{ user.createdAt|default('now')|date('M j, Y') }}</td>
                     <td>
                         <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: {% if 'ROLE_ADMIN' in user.roles %}rgba(124, 58, 237, 0.2){% else %}rgba(255, 255, 255, 0.1){% endif %}; color: {% if 'ROLE_ADMIN' in user.roles %}#a78bfa{% else %}#aaa{% endif %};">
-                            {% if 'ROLE_ADMIN' in user.roles %}Admin{% else %}Customer{% endif %}
+                            {{ user.role|capitalize }}
                         </span>
                     </td>
+                    <td>{{ user.active ? 'Active' : 'Disabled' }}</td>
                     <td>
+                        <a href="{{ path('app_admin_user_edit', {id: user.id}) }}" class="btn btn-outline">Edit</a>
                         {% if app.user != user %}
                             <form method="post" action="{{ path('app_admin_user_delete', {'id': user.id}) }}" data-confirm="Are you sure you want to delete this user?" data-confirm-title="Delete User" data-confirm-button="Delete" style="margin: 0; display: inline-block;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
@@ -56,10 +74,11 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" style="text-align:center;">No users found.</td>
+                    <td colspan="7" style="text-align:center;">No users found.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+{% include 'partials/_pagination.html.twig' %}
 {% endblock %}

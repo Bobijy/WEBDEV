@@ -1,4 +1,28 @@
+name: finals
+
 services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_ENV: dev
+      DB_HOST: symfony-db
+      DB_PORT: 3306
+      DEFAULT_URI: http://localhost:8000
+      MAILER_DSN: smtp://mailer:1025
+    ports:
+      - "127.0.0.1:8000:80"
+    volumes:
+      - ./.env:/var/www/html/.env:ro
+      - ./.env.dev:/var/www/html/.env.dev:ro
+      - ./public/uploads:/var/www/html/public/uploads
+      - app-var:/var/www/html/var
+    depends_on:
+      symfony-db:
+        condition: service_healthy
+    networks:
+      - platform-network
+
   symfony-db:
     image: mysql:8.0
     container_name: symfony-db
@@ -34,9 +58,11 @@ services:
       - platform-network
 
 volumes:
+  app-var:
   symfony-db-data:
     name: symfony-db-data
 
 networks:
   platform-network:
     name: platform-network
+    external: true

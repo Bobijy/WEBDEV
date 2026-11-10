@@ -87,7 +87,8 @@ class SecurityAndAdminTest extends DatabaseWebTestCase
     {
         $this->signIn($this->adminId);
         $crawler = $this->client->request('GET', '/admin/products/new');
-        $form = $crawler->filter('form')->form(['product[name]' => 'Amber Silk', 'product[price]' => '250.00', 'product[stock]' => '5', 'product[category]' => 'Amber', 'product[status]' => 'Active']);
+        $category = $this->em()->getRepository(\App\Entity\Category::class)->findOneBy(['name' => 'Amber']);
+        $form = $crawler->filter('form')->form(['product[name]' => 'Amber Silk', 'product[price]' => '250.00', 'product[stock]' => '5', 'product[category]' => (string) $category->getId(), 'product[status]' => 'Active']);
         $this->client->submit($form, [], ['HTTP_ORIGIN' => 'http://localhost']);
         self::assertResponseRedirects('/admin/products/');
         $product = $this->em()->getRepository(Product::class)->findOneBy(['name' => 'Amber Silk']);

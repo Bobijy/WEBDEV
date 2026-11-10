@@ -7,6 +7,11 @@
 {% endblock %}
 
 {% block content %}
+    <div class="stats-grid" aria-label="System totals">
+        <div class="stat-card"><div class="stat-info"><h4>Total users</h4><p id="statTotalUsers">{{ totalUsers }}</p></div></div>
+        <div class="stat-card"><div class="stat-info"><h4>Total staff</h4><p id="statTotalStaff">{{ totalStaff }}</p></div></div>
+        <div class="stat-card"><div class="stat-info"><h4>Total records (products)</h4><p id="statTotalRecords">{{ totalProducts }}</p></div></div>
+    </div>
     <div class="stats-grid" id="dashboardStats">
         <div class="stat-card">
             <div class="stat-icon" style="color: #71416b; background: rgba(113, 65, 107, 0.2);">

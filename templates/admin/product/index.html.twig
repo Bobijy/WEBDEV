@@ -1,8 +1,8 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Manage Products{% include 'partials/_pagination.html.twig' %}
-{% endblock %}
-{% block page_title %}Manage Products{% endblock %}
+{% set productRoutes = app.request.attributes.get('_route') starts with 'app_staff_' ? 'app_staff_product_' : 'app_admin_product_' %}
+{% block title %}Manage Products{% endblock %}
+{% block page_title %}{{ block('title') }}{% endblock %}
 
 {% block content %}
 <form method="get" class="qa-catalog-filters admin-search-form" role="search">
@@ -10,19 +10,26 @@
         <span class="sr-only">Search</span>
         <input type="search" name="q" value="{{ app.request.query.get('q') }}" maxlength="100" placeholder="Search products..." aria-label="Search products">
     </label>
+    <label><span class="sr-only">Product status</span>
+        <select name="status" aria-label="Filter by product status">
+            <option value="">All statuses</option>
+            {% for status in ['Active', 'Inactive'] %}
+            <option value="{{ status }}" {{ app.request.query.get('status') == status ? 'selected' : '' }}>{{ status }}</option>
+            {% endfor %}
+        </select>
+    </label>
     <button type="submit" class="admin-search-btn">Search</button>
-    {% if app.request.query.get('q') %}
-        <a href="{{ path('app_admin_product_index') }}" class="admin-search-clear">Clear</a>
+    {% if app.request.query.get('q') or app.request.query.get('status') %}
+        <a href="{{ path(productRoutes ~ 'index') }}" class="admin-search-clear">Clear</a>
     {% endif %}
 </form>
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+{% if not is_granted('ROLE_ADMIN') %}<p class="management-note">You can view all products, but edit or delete only products you created. Products with order history are archived when deleted.</p>{% endif %}
+<div class="management-toolbar product-catalog-toolbar">
     <h3 style="font-family: var(--font-heading); color: var(--accent); margin:0;">Product Catalog</h3>
-    <div style="display:flex; gap:10px;">
-        <a href="{{ path('app_admin_product_new') }}" class="btn" style="display:inline-flex; align-items:center; gap:8px;">
+        <a href="{{ path(productRoutes ~ 'new') }}" class="btn product-catalog-add">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Add Product
         </a>
-    </div>
 </div>
 
 <div class="admin-table-container">
@@ -35,6 +42,7 @@
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Status</th>
+                {% if is_granted('ROLE_ADMIN') %}<th>Created by</th>{% endif %}
                 <th>Actions</th>
             </tr>
         </thead>
@@ -57,22 +65,25 @@
                             {{ product.status }}
                         </span>
                     </td>
+                    {% if is_granted('ROLE_ADMIN') %}<td>{{ product.createdBy ? product.createdBy.fullName : 'Not recorded' }}</td>{% endif %}
                     <td>
                         <div style="display:flex; gap: 5px;">
-                            <a href="{{ path('app_admin_product_edit', {'id': product.id}) }}" class="btn" style="padding: 4px 8px; font-size: 12px;">Edit</a>
-                            <form action="{{ path('app_admin_product_delete', {'id': product.id}) }}" method="POST" style="display:inline;" data-confirm="Are you sure you want to delete this product?" data-confirm-title="Delete Product" data-confirm-button="Delete">
+                            {% if not is_granted('PRODUCT_EDIT', product) %}<span class="management-note">View only</span>{% endif %}
+                            {% if is_granted('PRODUCT_EDIT', product) %}<a href="{{ path(productRoutes ~ 'edit', {'id': product.id}) }}" class="btn" style="padding: 4px 8px; font-size: 12px;">Edit</a>{% endif %}
+                            {% if is_granted('PRODUCT_DELETE', product) %}<form action="{{ path(productRoutes ~ 'delete', {'id': product.id}) }}" method="POST" style="display:inline;" data-confirm="Delete this product? Products with order history will be archived." data-confirm-title="Delete Product" data-confirm-button="Delete">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
                                 <button type="submit" class="btn" style="padding: 4px 8px; font-size: 12px; background-color: #e74c3c; color: white;">Delete</button>
-                            </form>
+                            </form>{% endif %}
                         </div>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="7" style="text-align:center;">No products found.</td>
+                    <td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}" style="text-align:center;">No products found.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+{% include 'partials/_pagination.html.twig' %}
 {% endblock %}

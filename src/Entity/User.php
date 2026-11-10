@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[UniqueEntity(fields: ['email'], message: 'An account with this email already exists.')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,6 +52,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20, options: ['default' => 'customer'])]
     private ?string $role = 'customer';
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $active = true;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $created_at = null;
@@ -101,6 +105,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = ['ROLE_USER'];
         if ($this->role === 'admin') {
             $roles[] = 'ROLE_ADMIN';
+        } elseif ($this->role === 'staff') {
+            $roles[] = 'ROLE_STAFF';
         }
         return array_unique($roles);
     }
@@ -112,8 +118,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRole(string $role): static
     {
+        if (!in_array($role, ['customer', 'staff', 'admin'], true)) {
+            throw new \InvalidArgumentException('Unknown account role.');
+        }
         $this->role = $role;
         return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    public function isEqualTo(UserInterface $user): bool
+    {
+        // Account restrictions and password resets also revoke existing sessions.
+        return $user instanceof self && $this->id === $user->id
+            && $this->email === $user->email && $this->password === $user->password
+            && $this->role === $user->role && $this->active && $user->active;
     }
 
     public function getPassword(): string

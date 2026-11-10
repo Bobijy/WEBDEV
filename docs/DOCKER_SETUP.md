@@ -1,39 +1,37 @@
-# Existing Docker setup
+# Run FINALS in Docker
 
-The project keeps `compose.yaml` as its single main Compose file. It matches the running Symfony database containers inspected on 13 October 2026:
-
-| Service / container | Image | Host port → container port | Network |
-| --- | --- | --- | --- |
-| `symfony-db` | `mysql:8.0` | `3310 → 3306` | `platform-network` |
-| `symfony-pma` | `phpmyadmin` | `8081 → 80` | `platform-network` |
-
-MySQL uses the existing volume `symfony-db-data` mounted at `/var/lib/mysql`. Both that volume and the existing network are declared external. The old PostgreSQL service and port override have been removed. The separate Mailpit development service remains in `compose.override.yaml`.
-
-## Application connection
-
-Symfony runs on the Windows host and uses `DB_HOST=127.0.0.1`, `DB_PORT=3310`, and `DB_NAME=app_db` from the existing `.env`. Its current account is root. Compose obtains `MYSQL_ROOT_PASSWORD` from the existing `DB_PASSWORD`; no password is copied into YAML, and no new credentials are introduced. `MYSQL_USER` is intentionally omitted because the official MySQL image creates root separately.
-
-phpMyAdmin connects inside Docker to `symfony-db:3306`. Open **http://localhost:8081** and sign in with the existing MySQL account. The host port 3310 is for host applications, not phpMyAdmin's internal connection.
-
-## Current containers versus Compose ownership
-
-The inspected `symfony-db` and `symfony-pma` containers were created outside Compose. Matching `container_name` does not transfer their ownership to Compose. They remain usable as they are; editing these files does not replace or change their data. The YAML adds restart and health-check settings that would take effect only when containers are created from it.
-
-To start the existing containers if stopped:
+From `C:\WEBDEV\FINALS`, with Docker Desktop running:
 
 ```powershell
-docker start symfony-db symfony-pma
+docker compose up -d --build
 ```
 
-Validate configuration without printing resolved passwords:
+Docker Desktop groups the application, MySQL, phpMyAdmin, and Mailpit under **finals**.
+
+- Application: http://localhost:8000
+- phpMyAdmin: http://localhost:8081 (use your existing database credentials)
+- Mailpit: run `docker compose port mailer 8025` to find its local web port.
+
+This is a local development setup using Symfony's development environment. The application port is accessible only from this computer. It is not a production deployment.
+
+## Data and settings
+
+The application reads the existing `.env` and `.env.dev` through read-only mounts; both are excluded from the image. Inside Docker, `DB_HOST` becomes `symfony-db` and `DB_PORT` becomes `3306`. Your Windows database settings remain unchanged. Application emails go to Mailpit inside Docker.
+
+MySQL keeps the existing `symfony-db-data` volume and credentials. Uploads remain in `public/uploads` in this folder; application cache, logs, and sessions use the `finals_app-var` volume. No migrations, schema changes, or database resets run automatically.
+
+The existing database and phpMyAdmin containers are already managed by the `finals` Compose project. Unrelated Docker projects are not included.
+
+## Everyday commands
 
 ```powershell
-docker compose config --quiet
-docker compose config --services
+docker compose ps
+docker compose logs --tail=100 app
+docker compose exec --user www-data app php bin/console cache:clear
+docker compose stop
+docker compose start
 ```
 
-Do not run `docker compose up` against these existing names expecting automatic adoption: Docker would report a name conflict. A future migration to Compose management requires a verified database backup and deliberate replacement of the two containers while retaining the external volume and network. That replacement has not been performed. MySQL initialization environment variables do not reset credentials or import data into an already initialized volume.
+After changing application code, rebuild with `docker compose up -d --build app`. Upload changes are available immediately. Start the whole project with the default Compose files so the Mailpit service is included.
 
-The unrelated `webdev_b_activity_2_mysql` and `webdev_b_activity_2_phpmyadmin` containers are not part of this application's configuration.
-
-References: [Docker external volumes](https://docs.docker.com/reference/compose-file/volumes/), [Docker existing networks](https://docs.docker.com/compose/how-tos/networking/), [MySQL official image](https://hub.docker.com/_/mysql/), [phpMyAdmin official image](https://hub.docker.com/_/phpmyadmin).
+Do not use `docker compose down --volumes`: it deletes the database and application volumes. A regular `docker compose stop` preserves all data.

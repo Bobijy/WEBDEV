@@ -1,7 +1,8 @@
 {% extends 'admin/base.html.twig' %}
+{% set orderRoutes = app.request.attributes.get('_route') starts with 'app_staff_' ? 'app_staff_order_' : 'app_admin_order_' %}
 
 {% block title %}Edit Order Status{% endblock %}
-{% block page_title_hidden %}Update Order Status{% endblock %}
+{% block page_title %}Update Order Status{% endblock %}
 
 {% block content %}
 
@@ -74,7 +75,7 @@
 <div class="modern-modal">
     <div class="modern-modal__header">
         <h3 class="modern-modal__title">{{ block('title') }}</h3>
-        <a href="{{ path('app_admin_order_index') }}" class="modern-modal__close" aria-label="Close">
+        <a href="{{ path(orderRoutes ~ 'index') }}" class="modern-modal__close" aria-label="Close">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -91,7 +92,7 @@
         </div>
     </div>
 
-<form method="POST" action="{{ path('app_admin_order_status', {'id': order.id}) }}" id="orderForm">
+<form method="POST" action="{{ path(orderRoutes ~ 'status', {'id': order.id}) }}" id="orderForm">
         <input type="hidden" name="_token" value="{{ csrf_token('update_status' ~ order.id) }}">
         
         <div class="form-group" style="margin-bottom: 20px;">
@@ -133,7 +134,7 @@
         
         <div style="margin-top: 30px; display: flex; gap: 15px;">
             <button type="submit" class="btn" style="flex:1; padding: 12px;">Update Status</button>
-            <a href="{{ path('app_admin_order_index') }}" class="btn btn-outline" style="flex:1; padding: 12px; text-align: center;">Cancel</a>
+            <a href="{{ path(orderRoutes ~ 'index') }}" class="btn btn-outline" style="flex:1; padding: 12px; text-align: center;">Cancel</a>
         </div>
     </form>
     </div>

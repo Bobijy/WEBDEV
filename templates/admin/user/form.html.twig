@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ isNew ? 'Create account' : 'Edit account' }}{% endblock %}
+{% block page_title %}{{ block('title') }}{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('admin/css/product-form.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="product-editor" aria-labelledby="account-editor-title">
+    <div class="product-editor__header">
+        <h1 id="account-editor-title">{{ block('title') }}</h1>
+        <a href="{{ path('app_admin_user_index') }}" class="btn btn-outline">Back to users</a>
+    </div>
+    {% if not isNew and account.id == app.user.id %}
+        <p class="management-note">You can update your details and password. Another administrator must change your role or disable your account.</p>
+    {% endif %}
+    {{ form_start(form, {'attr': {'id': 'userAccountForm', 'class': 'product-editor__form'}}) }}
+        <div class="product-editor__errors" role="alert">{{ form_errors(form) }}</div>
+        <div class="product-editor__fields">
+        {% for field in form %}
+            {% if field.vars.name != '_token' %}
+            <div class="form-group product-editor__field {{ field.vars.name in ['fullName', 'email', 'plainPassword'] ? 'product-editor__field--wide' : '' }}">
+                {{ form_label(field) }}
+                {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                {{ form_help(field) }}
+                <div class="product-editor__errors">{{ form_errors(field) }}</div>
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+        {{ form_widget(form._token) }}
+        <div class="product-editor__actions">
+            <button class="btn" type="submit">{{ isNew ? 'Create account' : 'Save account' }}</button>
+            <a href="{{ path('app_admin_user_index') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    {{ form_end(form, {'render_rest': false}) }}
+</section>
+{% endblock %}

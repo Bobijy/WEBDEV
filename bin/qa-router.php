@@ -15,7 +15,7 @@ foreach ([
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if ($path === '/__qa/viewports') {
     $page = $_GET['page'] ?? '/shop';
-    $allowed = ['/', '/shop', '/login', '/register', '/account/', '/checkout', '/admin/', '/admin/products/', '/admin/orders/', '/admin/users/', '/admin/messages/'];
+    $allowed = ['/', '/shop', '/login', '/register', '/account/', '/checkout', '/admin/', '/admin/products/', '/admin/orders/', '/admin/users/', '/admin/users/new', '/admin/messages/', '/staff/products/', '/staff/products/new'];
     if (!in_array($page, $allowed, true)) {
         http_response_code(400);
         exit('Unsupported preview page.');

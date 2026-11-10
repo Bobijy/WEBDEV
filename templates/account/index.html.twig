@@ -25,6 +25,11 @@
                 <div class="sidebar-join-date">Joined {{ user.createdAt ? user.createdAt|date('M Y') : 'Recently' }}</div>
             </div>
             <div class="sidebar-nav">
+                {% if is_granted('ROLE_ADMIN') %}
+                <a class="nav-item" href="{{ path('app_admin_dashboard') }}">Admin dashboard</a>
+                {% elseif is_granted('ROLE_STAFF') %}
+                <a class="nav-item" href="{{ path('app_staff_product_index') }}">Products</a>
+                {% endif %}
                 <a class="nav-item active" href="#profile" onclick="switchTab('profile')" id="nav-profile">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     My Profile

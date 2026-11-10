@@ -49,6 +49,8 @@ class AdminDashboardController extends AbstractController
             'totalStock' => $totalStock,
             'statusCounts' => $statusCounts,
             'totalCustomers' => $totalCustomers,
+            'totalUsers' => $userRepository->count([]),
+            'totalStaff' => $userRepository->count(['role' => 'staff']),
             'recentOrders' => $orderRepository->findBy([], ['created_at' => 'DESC'], 5),
             'bestSellingProducts' => $bestSellingProducts,
         ]);
